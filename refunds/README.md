@@ -12,6 +12,22 @@ curl -s -X POST localhost:8000/refund-requests -H 'content-type: application/jso
 curl -s localhost:8000/orders/o_1/refunds
 ```
 
+## Stack
+
+| Part | What it uses | Why |
+|---|---|---|
+| Language | Python 3.9+, standard library for the whole domain | the decision, ledger and money code import nothing third-party, so they are trivially testable and portable |
+| Money | `decimal.Decimal` quantised to cents | exact partial sums; floats are rejected at construction |
+| Domain model | `dataclasses` (frozen) + `enum` | immutable values, no framework types in the core |
+| Policy config | `pydantic` v2 model, frozen, versioned | validation on load from dict/JSON, immutable once active |
+| Storage | in-memory `RefundLedger`, `IdempotencyStore`, `OrderRepo` | stand-ins for database tables; the SQL equivalent is in the `ledger.py` docstring |
+| Concurrency | `threading.Lock` + per-order version (compare-and-set) | the lock plays the DB's row atomicity; CAS is what survives several instances |
+| Payment provider | `PaymentProvider` protocol + `FakeProvider` (ok / decline / timeout) | the real SDK plugs in behind the same two calls, `refund` and `lookup` |
+| API | FastAPI + pydantic request models | thin HTTP layer; amounts arrive as decimal strings, never floats |
+| Tests | pytest, FastAPI `TestClient` (httpx) | 56 tests, under a second |
+
+Install: `pip install -e ".[dev]"` from the repo root (same `pyproject.toml` as the shopfeed prototype; refunds needs only `fastapi`, `pydantic`, `uvicorn` and the dev extras).
+
 ## Invariants and where they live
 
 | Invariant | Enforced in | How |
