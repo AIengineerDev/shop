@@ -114,6 +114,28 @@ def history_under_threshold(ctx: Context) -> Optional[Verdict]:
     return None
 
 
+def abuse_score_bounded(ctx: Context) -> Optional[Verdict]:
+    """Model output can only make the automatic path *narrower*.
+
+    * no score (model down, new customer) -> no-op: the deterministic rules decide alone
+    * score >= escalate_at                -> ESCALATE, a human looks
+    * score >= tighten_at                 -> the auto ceiling is scaled down; above it -> ESCALATE
+    The rule never returns APPROVE, so a model bug cannot pay money the fixed rules would not.
+    Every verdict carries the score and the threshold it hit, so the decision stays explainable.
+    """
+    score = ctx.signals.abuse_score
+    if score is None:
+        return None
+    cfg = ctx.config
+    if score >= cfg.abuse_escalate_at:
+        return Verdict(Outcome.ESCALATE, f"abuse_score:{score:.2f}>={cfg.abuse_escalate_at:.2f}")
+    if score >= cfg.abuse_tighten_at:
+        limit = Money(cfg.auto_limit, ctx.order.paid_total.currency).scale(cfg.abuse_tighten_factor)
+        if ctx.amount > limit:
+            return Verdict(Outcome.ESCALATE, f"abuse_score_lowered_limit:{score:.2f}>={cfg.abuse_tighten_at:.2f},limit={limit}")
+    return None
+
+
 DEFAULT_RULES: Sequence[Rule] = (
     order_is_refundable,
     amount_is_valid,
@@ -122,6 +144,7 @@ DEFAULT_RULES: Sequence[Rule] = (
     reason_is_automatic,
     under_auto_limit,
     history_under_threshold,
+    abuse_score_bounded,
 )
 
 SEVERITY = {Outcome.REJECT: 2, Outcome.ESCALATE: 1, Outcome.APPROVE: 0}
