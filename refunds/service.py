@@ -74,8 +74,19 @@ class RefundService:
         self.rules = list(rules) if rules is not None else list(DEFAULT_RULES)
         self.abuse_scores = abuse_scores or (lambda customer_id: None)
         self.max_attempts = 3
+        self.policy_history: List[PolicyConfig] = [policy]
         for o in orders._orders.values():
             ledger.open_account(o.order_id, o.paid_total)
+
+    # ---------------------------------------------------------------- policy management
+    def set_policy(self, policy: PolicyConfig) -> PolicyConfig:
+        """Swap the active policy without a deploy. Decisions already made keep their version;
+        a retried request replays the stored decision, so a policy change never flips history."""
+        if policy.version == self.policy.version and policy != self.policy:
+            raise ValueError(f"policy content changed but version {policy.version!r} did not")
+        self.policy_history.append(policy)
+        self.policy = policy
+        return policy
 
     # ---------------------------------------------------------------- main entry
     def handle(self, request: RefundRequest) -> RefundResult:

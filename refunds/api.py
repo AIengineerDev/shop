@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationError, field_validator
 
 from refunds.config import PolicyConfig
 from refunds.idempotency import IdempotencyConflict
@@ -93,7 +93,22 @@ def create_app(service: RefundService) -> FastAPI:
             "refunds": [_refund_out(r) for r in service.ledger.refunds_for(order_id)],
         }
 
+    @app.get("/admin/policy")
+    def get_policy() -> Dict[str, Any]:
+        return {"active": _policy_out(service.policy), "history": [p.version for p in service.policy_history]}
+
+    @app.put("/admin/policy")
+    def put_policy(body: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            return _policy_out(service.set_policy(PolicyConfig.from_dict(body)))
+        except (ValueError, ValidationError) as e:
+            raise HTTPException(422, str(e))
+
     return app
+
+
+def _policy_out(p: PolicyConfig) -> Dict[str, Any]:
+    return p.model_dump(mode="json")
 
 
 def demo_service() -> RefundService:
