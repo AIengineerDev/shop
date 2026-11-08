@@ -24,12 +24,21 @@ class ProviderReceipt:
 class PaymentProvider(Protocol):
     def refund(self, idempotency_key: str, amount: Money) -> ProviderReceipt: ...
 
+    def lookup(self, idempotency_key: str) -> Optional[ProviderReceipt]:
+        """Did a refund with this key execute? Used by reconciliation after a timeout."""
+        ...
+
 
 class FakeProvider:
-    """mode: 'ok' | 'decline' | 'timeout'. Calls are recorded by idempotency key."""
+    """mode: 'ok' | 'decline' | 'timeout'. Calls are recorded by idempotency key.
 
-    def __init__(self, mode: str = "ok") -> None:
+    In 'timeout' mode `executed_before_timeout` says whether the money actually moved before the
+    connection dropped — the two cases reconciliation must tell apart.
+    """
+
+    def __init__(self, mode: str = "ok", executed_before_timeout: bool = False) -> None:
         self.mode = mode
+        self.executed_before_timeout = executed_before_timeout
         self.calls: Dict[str, Money] = {}
         self._settled: Dict[str, ProviderReceipt] = {}
 
@@ -40,7 +49,15 @@ class FakeProvider:
         if self.mode == "decline":
             raise ProviderDeclined("insufficient balance on original charge")
         if self.mode == "timeout":
+            if self.executed_before_timeout:
+                self._execute(idempotency_key, amount)
             raise ProviderTimeout("gateway timeout")
+        return self._execute(idempotency_key, amount)
+
+    def lookup(self, idempotency_key: str) -> Optional[ProviderReceipt]:
+        return self._settled.get(idempotency_key)
+
+    def _execute(self, key: str, amount: Money) -> ProviderReceipt:
         receipt = ProviderReceipt(f"prov_{len(self._settled) + 1:06d}", amount)
-        self._settled[idempotency_key] = receipt
+        self._settled[key] = receipt
         return receipt
