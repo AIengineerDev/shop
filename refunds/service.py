@@ -14,7 +14,7 @@ from typing import Callable, Dict, Iterable, List, Optional
 
 from refunds.config import PolicyConfig
 from refunds.idempotency import IdempotencyStore
-from refunds.ledger import OverRefund, RefundLedger
+from refunds.ledger import ConcurrencyConflict, OverRefund, RefundLedger
 from refunds.model import Decision, Order, Outcome, Refund, RefundStatus, RefundRequest, Signals
 from refunds.policy import DEFAULT_RULES, Rule, decide
 from refunds.provider import PaymentProvider, ProviderDeclined, ProviderTimeout
@@ -73,6 +73,7 @@ class RefundService:
         self.clock = clock
         self.rules = list(rules) if rules is not None else list(DEFAULT_RULES)
         self.abuse_scores = abuse_scores or (lambda customer_id: None)
+        self.max_attempts = 3
         for o in orders._orders.values():
             ledger.open_account(o.order_id, o.paid_total)
 
@@ -89,23 +90,35 @@ class RefundService:
         self.ledger.open_account(order.order_id, order.paid_total)
 
         now = self.clock()
-        decision = decide(order, request, self.ledger.view(order.order_id), now, self.policy,
-                          self._signals(order, now), self.rules)
-
-        refund: Optional[Refund] = None
-        if decision.approved:
-            refund, decision = self._execute(order, request, decision, now)
+        for attempt in range(self.max_attempts):
+            view = self.ledger.view(order.order_id)
+            decision = decide(order, request, view, now, self.policy, self._signals(order, now), self.rules)
+            refund: Optional[Refund] = None
+            if not decision.approved:
+                break
+            try:
+                refund, decision = self._execute(order, request, decision, now, view.version)
+                break
+            except ConcurrencyConflict:
+                # another instance changed the account between our read and our write: re-decide
+                # on the fresh view (the amount may now need capping, or nothing may be left)
+                continue
+        else:
+            decision = Decision(Outcome.ESCALATE, None, ["concurrency_retries_exhausted"], self.policy.version)
+            refund = None
 
         result = RefundResult(decision, refund)
         self.idempotency.put(request.request_id, fp, result)
         return result
 
     # ---------------------------------------------------------------- helpers
-    def _execute(self, order: Order, request: RefundRequest, decision: Decision, now: datetime):
+    def _execute(self, order: Order, request: RefundRequest, decision: Decision, now: datetime,
+                 expected_version: int):
         assert decision.amount is not None
         try:
             refund = self.ledger.reserve(order.order_id, request.request_id, decision.amount,
-                                         decision.policy_version, now, decision.reasons)
+                                         decision.policy_version, now, decision.reasons,
+                                         expected_version=expected_version)
         except OverRefund as e:
             # Defence in depth: the policy said yes but the ledger said no. Never pay.
             return None, Decision(Outcome.REJECT, None, decision.reasons + [f"ledger_guard:{e}"], decision.policy_version)
