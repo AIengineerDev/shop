@@ -12,6 +12,7 @@ pip install -e ".[dev]"
 python scripts/generate_data.py          # synthetic Shop world -> data/*.parquet       (~1 s)
 python scripts/train_all.py              # retrieval + light + heavy rankers -> artifacts/ (~25 s)
 python scripts/evaluate.py               # offline metrics, simulated guardrails, simulated A/B (~90 s)
+python scripts/report.py                 # reports/eval_report.html: charts vs baselines   (~40 s)
 pytest -q                                # 98 tests                                       (~10 s)
 python scripts/serve.py                  # http://127.0.0.1:8000
 ```

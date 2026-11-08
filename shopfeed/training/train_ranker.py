@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import pickle
 from pathlib import Path
 from typing import Tuple
 
@@ -32,8 +31,7 @@ def save_artifacts(dir_: Path, retrieval: RetrievalArtifacts, light: LightRanker
                 "hidden": retrieval.model.user_net[0].out_features}, dir_ / "two_tower.pt")
     np.save(dir_ / "item_ids.npy", retrieval.item_ids.astype(str))
     np.save(dir_ / "item_vecs.npy", retrieval.item_vecs)
-    with open(dir_ / "light.pkl", "wb") as f:
-        pickle.dump(light, f)
+    np.savez(dir_ / "light.npz", **light.to_state())  # arrays, not a pickled estimator
     torch.save({"state": heavy.model.state_dict(), "n_features": heavy.model.norm.num_features,
                 "hidden": heavy.model.bottom[0].out_features, "n_experts": len(heavy.model.experts)}, dir_ / "heavy.pt")
     with open(dir_ / "meta.json", "w") as f:
@@ -48,8 +46,8 @@ def load_artifacts(dir_: Path) -> Tuple[RetrievalArtifacts, LightRanker, RankerA
     model.load_state_dict(tt["state"])
     retrieval = RetrievalArtifacts(model=model, item_ids=np.load(dir_ / "item_ids.npy", allow_pickle=True).astype(object),
                                    item_vecs=np.load(dir_ / "item_vecs.npy"))
-    with open(dir_ / "light.pkl", "rb") as f:
-        light = pickle.load(f)
+    with np.load(dir_ / "light.npz", allow_pickle=False) as z:
+        light = LightRanker.from_state({k: z[k] for k in z.files})
     hv = torch.load(dir_ / "heavy.pt", weights_only=False)
     hm = MultiTaskRanker(hv["n_features"], hv["hidden"], hv["n_experts"])
     hm.load_state_dict(hv["state"])

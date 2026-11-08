@@ -35,7 +35,33 @@ class LightRanker:
             # Untrained fallback: popularity + affinity heuristic, so the pipeline runs before training.
             Xn = neutralize_position(X)
             return Xn[:, FEATURE_NAMES.index("p_log_purchases")] + Xn[:, FEATURE_NAMES.index("x_cat_affinity")]
-        return self.clf.predict_proba(neutralize_position(X)[:, LIGHT_IDX])[:, 1]
+        # Plain numpy inference from stored weights: no dependency on the sklearn object or its version.
+        z = neutralize_position(X)[:, LIGHT_IDX] @ self.coef_ + self.intercept_
+        return 1.0 / (1.0 + np.exp(-z))
+
+    @property
+    def coef_(self) -> np.ndarray:
+        return self.clf.coef_.ravel()
+
+    @property
+    def intercept_(self) -> float:
+        return float(self.clf.intercept_[0])
+
+    def to_state(self) -> dict:
+        if not self.fitted:
+            raise ValueError("cannot serialise an unfitted light ranker")
+        return {"coef": self.coef_, "intercept": np.array([self.intercept_]), "features": np.array(LIGHT_FEATURES)}
+
+    @classmethod
+    def from_state(cls, state: dict) -> "LightRanker":
+        if list(state["features"]) != LIGHT_FEATURES:
+            raise ValueError("light ranker feature list changed since the artifact was saved; retrain")
+        lr = cls()
+        lr.clf.coef_ = np.asarray(state["coef"], dtype=float).reshape(1, -1)
+        lr.clf.intercept_ = np.asarray(state["intercept"], dtype=float)
+        lr.clf.classes_ = np.array([0, 1])
+        lr.fitted = True
+        return lr
 
     def cut(self, candidates: pd.DataFrame, X: np.ndarray, n: int) -> pd.DataFrame:
         """Return the top-n candidates (fewer if fewer exist), ids preserved, with light_score."""
