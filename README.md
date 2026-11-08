@@ -21,6 +21,22 @@ curl -s -X POST localhost:8000/feed -H 'content-type: application/json' \
   -d '{"user_id":"u_1","country":"CA","session_id":"s1","page":0}'
 ```
 
+## Stack
+
+| Part | What it uses | Why |
+|---|---|---|
+| Language | Python 3.9+ (`pyproject.toml` is the source of truth) | one environment for data generation, training, evaluation and serving |
+| Data | pandas DataFrames, parquet via pyarrow (`data/*.parquet`) | columnar, fast to reload; bulk data never goes through Python objects |
+| Synthetic world | `shopfeed/data/synth.py`, numpy RNG with a known engagement formula | lets offline metrics be checked against ground truth |
+| Features | `features/batch.py` (as-of daily snapshots), `features/streaming.py` (clocked counters), `features/snapshot.py` (single assembly point) | leakage safety: training and serving build the vector through the same code |
+| Retrieval | two-tower model in PyTorch, brute-force cosine index in numpy | stands in for FAISS/ANN; same interface |
+| Light ranker | scikit-learn logistic regression on 13 cheap features | cuts 2k candidates to 300 at low cost |
+| Heavy ranker | PyTorch MMoE-lite: shared bottom, 3 experts, per-head gates, 7 heads | multi-task heads feed the value function |
+| Value + re-rank | plain Python in `ranking/value.py`, `rerank/policy.py`, weights in `config.py` | business rules stay readable and configurable |
+| Evaluation / A/B | `eval/offline.py` (IPS), `eval/simulator.py`, `eval/ab.py` | offline estimate, simulated guardrails, bucketed comparison |
+| Serving | FastAPI + pydantic (`serving/api.py`), uvicorn | one `POST /feed` plus `/health` |
+| Tests | pytest, FastAPI `TestClient` (httpx) | 98 tests, about 10 s |
+
 ## Request path
 
 ```
