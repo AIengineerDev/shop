@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "refundsv2"
+version = "0.1.0"
+description = "Automatic refund system (interview exercise, second build)"
+requires-python = ">=3.9"
+dependencies = ["fastapi>=0.100", "pydantic>=2.0", "uvicorn>=0.22"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "httpx>=0.24"]
+
+[tool.setuptools.packages.find]
+include = ["refundsv2*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
