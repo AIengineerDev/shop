@@ -73,6 +73,6 @@ class RotaryEmbedding(nn.Module):
             )
         if int(positions.max()) >= self.max_seq_len:
             raise ValueError(
-                f"RoPE position {int(positions.max())} >= max_seq_len {self.max_seq_len}"
+                f"RoPE table overflow: position {int(positions.max())} >= max_seq_len={self.max_seq_len}"
             )
         return apply_rope(x, self.cos[positions], self.sin[positions])
