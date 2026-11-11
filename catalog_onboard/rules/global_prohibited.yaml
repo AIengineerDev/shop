@@ -1,0 +1,13 @@
+# Marketplace-wide prohibited keywords, matched on word boundaries, case-insensitive.
+keywords:
+  - counterfeit
+  - replica
+  - knockoff
+  - fake
+  - stolen
+  - prescription
+  - narcotic
+  - firearm
+  - ammunition
+  - explosive
+  - ivory

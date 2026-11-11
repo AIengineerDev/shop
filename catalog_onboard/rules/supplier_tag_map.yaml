@@ -1,0 +1,80 @@
+# Per-supplier tag normalization. '*' applies to every supplier (lowest priority).
+"*":
+  keys:
+    colour: color
+    color: color
+    col: color
+    size: size
+    sz: size
+    gender: gender
+    sex: gender
+    material: material
+    mat: material
+    fabric: material
+    pack: pack_count
+    qty: pack_count
+    quantity: pack_count
+    capacity_l: capacity_liters
+    capacity: capacity_liters
+    volume_oz: capacity_oz
+    weight_lb: weight_lb
+    length_ft: length_ft
+    length: length_ft
+    connector: connector
+    wattage: wattage_w
+    wattage_w: wattage_w
+    shoe_size: size
+  values:
+    color:
+      blk: black
+      nvy: navy
+      wht: white
+      gry: gray
+      grey: gray
+      rd: red
+      bl: blue
+      grn: green
+      ylw: yellow
+      prpl: purple
+      pnk: pink
+      brn: brown
+      org: orange
+      multi: multicolor
+    gender:
+      m: men
+      f: women
+      w: women
+      u: unisex
+      k: kids
+      male: men
+      female: women
+      mens: men
+      womens: women
+      boys: kids
+      girls: kids
+    size:
+      x-small: XS
+      small: S
+      medium: M
+      large: L
+      x-large: XL
+      xx-large: XXL
+      "2xl": XXL
+      "3xl": XXXL
+      extra large: XL
+"sup_acme":
+  keys:
+    clr: color
+    sze: size
+  values:
+    size:
+      sm: S
+      md: M
+      lg: L
+"sup_zenith":
+  keys:
+    kolor: color
+  values:
+    color:
+      navyblue: navy
+      jetblack: black

@@ -218,3 +218,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# catalog_onboard: generated starter / working databases
+data/*.sqlite
+*.sqlite-wal
+*.sqlite-shm
