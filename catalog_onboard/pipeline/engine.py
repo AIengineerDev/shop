@@ -1,0 +1,388 @@
+"""Orchestrates the stages per item, persists the trail, and enforces idempotency."""
+
+from __future__ import annotations
+
+import logging
+import time
+import traceback
+import uuid
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
+
+from pydantic import BaseModel
+
+from catalog_onboard.config import Settings
+from catalog_onboard.db.store import Store
+from catalog_onboard.models import (
+    AttrValue,
+    Candidate,
+    CandidateListing,
+    LLMAttempt,
+    LLMClassification,
+    NormalizedListing,
+    RawFeedRow,
+    ReasonCode,
+    Status,
+    ValidationResult,
+)
+from catalog_onboard.pipeline import candidates as cand_mod
+from catalog_onboard.pipeline import clean, comply, reconcile, route, validate
+from catalog_onboard.pipeline.llm import LLMClient, runner
+from catalog_onboard.rules import Rules
+from catalog_onboard.taxonomy import Taxonomy
+
+log = logging.getLogger("catalog_onboard.engine")
+
+
+@dataclass
+class ItemOutcome:
+    feed_item_id: str
+    status: Status | None
+    skipped: bool = False
+    error: str | None = None
+    reason_codes: list[ReasonCode] = field(default_factory=list)
+
+
+@dataclass
+class BatchSummary:
+    processed: int = 0
+    draft: int = 0
+    quarantined: int = 0
+    errors: int = 0
+    skipped: int = 0
+    run_id: str = ""
+
+
+class _Trail:
+    """Collects per-stage records and flushes them to pipeline_runs."""
+
+    def __init__(self, store: Store, run_id: str, feed_item_id: str):
+        self.store = store
+        self.run_id = run_id
+        self.feed_item_id = feed_item_id
+        self.seq = 0
+
+    def record(self, stage: str, input_obj: Any, output_obj: Any, started: float, llm_raw: Any = None) -> None:
+        if isinstance(input_obj, list):
+            input_obj = {"items": input_obj}
+        if isinstance(output_obj, list):
+            output_obj = {"items": output_obj}
+        self.seq += 1
+        self.store.insert_run(
+            run_id=self.run_id,
+            feed_item_id=self.feed_item_id,
+            stage=stage,
+            seq=self.seq,
+            input_obj=_dump(input_obj),
+            output_obj=_dump(output_obj),
+            llm_raw=_dump(llm_raw),
+            duration_ms=int((time.perf_counter() - started) * 1000),
+        )
+
+
+def _dump(obj: Any) -> Any:
+    if obj is None:
+        return None
+    if isinstance(obj, BaseModel):
+        return obj.model_dump(mode="json")
+    if isinstance(obj, list):
+        return [_dump(o) for o in obj]
+    if isinstance(obj, dict):
+        return {k: _dump(v) for k, v in obj.items()}
+    return obj
+
+
+class Engine:
+    def __init__(
+        self,
+        *,
+        store: Store,
+        taxonomy: Taxonomy,
+        rules: Rules,
+        llm: LLMClient,
+        settings: Settings,
+        dry_run: bool = False,
+    ):
+        self.store = store
+        self.taxonomy = taxonomy
+        self.rules = rules
+        self.llm = llm
+        self.settings = settings
+        self.dry_run = dry_run
+        self.index = cand_mod.CandidateIndex(taxonomy)
+
+    # ------------------------------------------------------------------ batch
+
+    def run_batch(
+        self,
+        *,
+        supplier_id: str | None = None,
+        limit: int | None = None,
+        on_item: Callable[[ItemOutcome], None] | None = None,
+    ) -> BatchSummary:
+        run_id = uuid.uuid4().hex[:12]
+        summary = BatchSummary(run_id=run_id)
+        for row in list(self.store.iter_feed_rows(supplier_id=supplier_id, limit=limit)):
+            outcome = self.process_item(row, run_id)
+            if outcome.skipped:
+                summary.skipped += 1
+            else:
+                summary.processed += 1
+                if outcome.error:
+                    summary.errors += 1
+                if outcome.status == "draft":
+                    summary.draft += 1
+                elif outcome.status == "quarantined":
+                    summary.quarantined += 1
+            if on_item:
+                on_item(outcome)
+        return summary
+
+    # ------------------------------------------------------------------- item
+
+    def process_item(self, row: RawFeedRow, run_id: str) -> ItemOutcome:
+        rv = self.rules.version
+        if self.store.processed_status(row.feed_item_id, rv) is not None:
+            return ItemOutcome(feed_item_id=row.feed_item_id, status=None, skipped=True)
+
+        trail = _Trail(self.store, run_id, row.feed_item_id)
+        stage = "clean"
+        try:
+            candidate, result = self._run_stages(row, trail)
+            status = route.route(result)
+            stage = "route"
+            t0 = time.perf_counter()
+            self._persist(row, candidate, result, status, run_id)
+            trail.record("route", None, {"status": status, "codes": [c.code for c in result.reason_codes]}, t0)
+            self.store.mark_processed(row.feed_item_id, rv, status, run_id)
+            self._commit()
+            return ItemOutcome(row.feed_item_id, status, reason_codes=result.reason_codes)
+        except Exception as exc:  # noqa: BLE001 - one bad row must not abort the batch
+            self.store.rollback()
+            stage = getattr(exc, "stage", stage)
+            err = f"{type(exc).__name__}: {exc}"
+            log.exception("item %s failed at stage %s", row.feed_item_id, stage)
+            code = ReasonCode(code=f"PIPELINE_ERROR:{stage}", severity="blocking", stage="route", detail=err)
+            try:
+                trail.seq = 0
+                trail.record(
+                    "error",
+                    None,
+                    {"stage": stage, "error": err, "trace": traceback.format_exc()[-2000:]},
+                    time.perf_counter(),
+                )
+                self.store.supersede(row.feed_item_id)
+                self.store.insert_quarantine(
+                    feed_item_id=row.feed_item_id,
+                    supplier_id=row.supplier_id,
+                    proposed_category_id=None,
+                    candidate=None,
+                    reason_codes=[code],
+                    run_id=run_id,
+                    rules_version=rv,
+                )
+                self.store.mark_processed(row.feed_item_id, rv, "quarantined", run_id)
+                self._commit()
+            except Exception:  # noqa: BLE001
+                self.store.rollback()
+                log.exception("could not record failure for %s", row.feed_item_id)
+            return ItemOutcome(row.feed_item_id, "quarantined", error=err, reason_codes=[code])
+
+    def _commit(self) -> None:
+        if self.dry_run:
+            self.store.rollback()
+        else:
+            self.store.commit()
+
+    # ----------------------------------------------------------------- stages
+
+    def _run_stages(self, row: RawFeedRow, trail: _Trail) -> tuple[CandidateListing, ValidationResult]:
+        s = self.settings
+        codes: list[ReasonCode] = []
+
+        t0 = time.perf_counter()
+        listing = _staged("clean", clean.normalize, row, self.rules)
+        trail.record("clean", row, listing, t0)
+        codes.extend(listing.reason_codes)
+
+        # candidates (deterministic)
+        t0 = time.perf_counter()
+        cands = _staged("candidates", self.index.shortlist, listing.search_text, s.candidate_k)
+        if not cands and cand_mod.tokenize(listing.search_text):
+            # No lexical overlap with any leaf: let the model choose from the full leaf set.
+            cands = self.index.all_leaves()
+            codes.append(ReasonCode(code="CLASSIFICATION_WEAK_CANDIDATES", severity="warning", stage="candidates"))
+        trail.record("candidates", {"text": listing.search_text}, {"candidates": cands}, t0)
+
+        # classify (LLM proposes, Python decides)
+        t0 = time.perf_counter()
+        category_id, source, llm_cls, cls_trace, cls_codes = _staged("classify", self._classify, listing, cands)
+        codes.extend(cls_codes)
+        trail.record(
+            "classify",
+            {"candidates": [c.category_id for c in cands]},
+            {"category_id": category_id, "source": source, "llm": llm_cls, "codes": [c.code for c in cls_codes]},
+            t0,
+            llm_raw=cls_trace,
+        )
+
+        attrs: dict[str, AttrValue] = {}
+        extra: dict[str, AttrValue] = {}
+        ext_trace: list[LLMAttempt] = []
+        if category_id is not None:
+            specs = self.taxonomy.required_attributes(category_id)
+            missing = reconcile.missing_specs(specs, listing.det_attrs)
+            llm_attrs: dict[str, Any] | None = None
+            if missing:
+                t0 = time.perf_counter()
+                parsed, ext_trace = _staged(
+                    "classify", runner.extract, self.llm, listing, missing, max_retries=s.llm_max_retries
+                )
+                if parsed is None:
+                    codes.append(ReasonCode(code="LLM_SCHEMA_INVALID:extract", severity="warning", stage="classify"))
+                else:
+                    llm_attrs = parsed.model_dump()
+                trail.record(
+                    "classify", {"missing": [m.key for m in missing]}, {"llm_attrs": llm_attrs}, t0, llm_raw=ext_trace
+                )
+
+            t0 = time.perf_counter()
+            attrs, extra, rec_codes = _staged(
+                "reconcile", reconcile.merge_attributes, specs, listing.det_attrs, llm_attrs
+            )
+            codes.extend(rec_codes)
+            trail.record(
+                "reconcile", {"det": listing.det_attrs, "llm": llm_attrs}, {"attrs": attrs, "extra": extra}, t0
+            )
+
+            t0 = time.perf_counter()
+            attrs, val_codes = _staged("validate", validate.validate_attributes, specs, attrs)
+            codes.extend(val_codes)
+            trail.record("validate", None, {"attrs": attrs, "codes": [c.code for c in val_codes]}, t0)
+
+        candidate = CandidateListing(
+            normalized=listing,
+            category_id=category_id,
+            classification_source=source,
+            det_top1=cands[0] if cands else None,
+            llm_classification=llm_cls,
+            attributes=attrs,
+            extra_attributes=extra,
+            llm_trace=[*cls_trace, *ext_trace],
+            reason_codes=codes,
+        )
+
+        t0 = time.perf_counter()
+        fp = comply.fingerprint(listing.supplier_id, listing.clean_title, attrs)
+        comp_codes = _staged(
+            "comply",
+            comply.check_compliance,
+            clean_title=listing.clean_title,
+            scan_text=listing.compliance_text,
+            category_prohibited=self.taxonomy.effective_prohibited(category_id) if category_id else (),
+            global_prohibited=self.rules.global_prohibited,
+            price_min=listing.price_min,
+            duplicate_exists=lambda: self.store.fingerprint_exists(fp, exclude_feed_item_id=listing.feed_item_id),
+        )
+        codes.extend(comp_codes)
+        trail.record("comply", {"fingerprint": fp}, {"codes": [c.code for c in comp_codes]}, t0)
+
+        return candidate, ValidationResult(reason_codes=codes)
+
+    def _classify(
+        self, listing: NormalizedListing, cands: list[Candidate]
+    ) -> tuple[str | None, str | None, LLMClassification | None, list[LLMAttempt], list[ReasonCode]]:
+        codes: list[ReasonCode] = []
+        if not cands:
+            codes.append(ReasonCode(code="CLASSIFICATION_NO_CANDIDATES", severity="blocking", stage="candidates"))
+            return None, None, None, [], codes
+
+        det_top1 = cands[0]
+        det_conf = cand_mod.deterministic_confidence(cands)
+        llm_cls, trace = runner.classify(self.llm, listing, cands, max_retries=self.settings.llm_max_retries)
+
+        if llm_cls is None:
+            codes.append(ReasonCode(code="LLM_SCHEMA_INVALID:classify", severity="blocking", stage="classify"))
+            return det_top1.category_id, "deterministic", None, trace, codes
+
+        if llm_cls.category_id not in {c.category_id for c in cands}:
+            # unreachable with the Literal-constrained model, kept as a belt-and-braces check
+            codes.append(ReasonCode(code="CLASSIFICATION_OUT_OF_SET", severity="blocking", stage="classify"))
+            return det_top1.category_id, "deterministic", llm_cls, trace, codes
+
+        if llm_cls.category_id == det_top1.category_id:
+            chosen, source = llm_cls.category_id, "agree"
+        else:
+            severity = (
+                "blocking"
+                if det_conf >= self.settings.high_conf_threshold
+                and llm_cls.confidence < self.settings.disagree_quarantine_below
+                else "warning"
+            )
+            codes.append(
+                ReasonCode(
+                    code="CLASSIFICATION_DISAGREE",
+                    severity=severity,
+                    stage="classify",
+                    detail=(
+                        f"det={det_top1.category_id}({det_conf:.2f}) "
+                        f"llm={llm_cls.category_id}({llm_cls.confidence:.2f})"
+                    ),
+                )
+            )
+            chosen, source = llm_cls.category_id, "llm"
+
+        if not self.taxonomy.is_leaf(chosen):
+            codes.append(
+                ReasonCode(code="CLASSIFICATION_NOT_LEAF", severity="blocking", stage="classify", detail=chosen)
+            )
+        return chosen, source, llm_cls, trace, codes
+
+    # ---------------------------------------------------------------- persist
+
+    def _persist(
+        self, row: RawFeedRow, candidate: CandidateListing, result: ValidationResult, status: Status, run_id: str
+    ) -> None:
+        self.store.supersede(row.feed_item_id)
+        listing = candidate.normalized
+        if status == "draft":
+            assert candidate.category_id is not None
+            self.store.insert_draft(
+                feed_item_id=row.feed_item_id,
+                supplier_id=row.supplier_id,
+                category_id=candidate.category_id,
+                clean_title=listing.clean_title,
+                attributes=candidate.attributes,
+                reason_codes=result.reason_codes,
+                price=listing.price_min,
+                fingerprint=comply.fingerprint(listing.supplier_id, listing.clean_title, candidate.attributes),
+                run_id=run_id,
+                rules_version=self.rules.version,
+            )
+        else:
+            self.store.insert_quarantine(
+                feed_item_id=row.feed_item_id,
+                supplier_id=row.supplier_id,
+                proposed_category_id=candidate.category_id,
+                candidate=candidate.model_dump(mode="json"),
+                reason_codes=result.reason_codes,
+                run_id=run_id,
+                rules_version=self.rules.version,
+            )
+
+
+class StageError(Exception):
+    def __init__(self, stage: str, cause: BaseException):
+        super().__init__(f"{stage}: {type(cause).__name__}: {cause}")
+        self.stage = stage
+        self.__cause__ = cause
+
+
+def _staged(stage: str, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
+    try:
+        return fn(*args, **kwargs)
+    except StageError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        raise StageError(stage, exc) from exc
