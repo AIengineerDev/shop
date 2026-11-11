@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Literal
 
 ExtractorMode = Literal["llm", "regex"]
+LlmMode = Literal["live", "record", "replay"]
 
 PACKAGE_DIR = Path(__file__).resolve().parent
 DEFAULT_POLICIES_PATH = PACKAGE_DIR / "rules" / "policies.yaml"
@@ -33,7 +34,7 @@ class Settings:
     db_path: Path
     model: str
     extractor: ExtractorMode
-    live_llm: bool
+    llm_mode: LlmMode
     hard_cap_bp: int
     llm_batch: int
     policies_path: Path
@@ -45,13 +46,19 @@ class Settings:
         if extractor_raw not in ("llm", "regex"):
             raise ValueError(f"REPRICER_EXTRACTOR must be 'llm' or 'regex', got {extractor_raw!r}")
         extractor: ExtractorMode = "llm" if extractor_raw == "llm" else "regex"
+        mode_raw = os.environ.get("REPRICER_LLM_MODE", "live").strip().lower() or "live"
+        if mode_raw not in ("live", "record", "replay"):
+            raise ValueError(f"REPRICER_LLM_MODE must be live|record|replay, got {mode_raw!r}")
+        llm_mode: LlmMode = (
+            "live" if mode_raw == "live" else "record" if mode_raw == "record" else "replay"
+        )
         policies_raw = os.environ.get("REPRICER_POLICIES_PATH", "").strip()
         cassette_raw = os.environ.get("REPRICER_CASSETTE_DIR", "").strip()
         return cls(
             db_path=Path(os.environ.get("REPRICER_DB_PATH", "dev.db")),
             model=os.environ.get("REPRICER_MODEL", DEFAULT_MODEL).strip() or DEFAULT_MODEL,
             extractor=extractor,
-            live_llm=_env_bool("REPRICER_LIVE_LLM", False),
+            llm_mode=llm_mode,
             hard_cap_bp=_env_int("REPRICER_HARD_CAP_BP", 5000),
             llm_batch=_env_int("REPRICER_LLM_BATCH", 20),
             policies_path=Path(policies_raw) if policies_raw else DEFAULT_POLICIES_PATH,
