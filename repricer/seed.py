@@ -329,10 +329,24 @@ def generate(
     # Make the worked example's offer eligible even for 'new'-only policies.
     scrapes[0].raw_text = f"Brand new {WORKED_TITLE} on sale for $42.99 with $5 coupon"
     scrapes[0].expected["condition"] = "new"
+    # Second source so the worked SKU is never a single low-confidence source.
+    scrapes.append(
+        SeedScrape(
+            scrape_id=2,
+            sku=WORKED_SKU,
+            competitor="ShopMart",
+            raw_text=f"Brand new {WORKED_TITLE} - $44.49 FREE SHIPPING",
+            scraped_at=now - timedelta(hours=5),
+            expected=_base(Decimal("44.49"), condition="new", shipping="0.00"),
+            expected_status="accepted",
+            expected_reason=None,
+            case="free_ship",
+        )
+    )
     _ = worked
 
     weights = [w for _, _, w in TEMPLATES]
-    sid = 2
+    sid = 3
     while len(scrapes) < n_scrapes:
         inv = rng.choice(inventory)
         name, fn, _w = rng.choices(TEMPLATES, weights=weights, k=1)[0]
