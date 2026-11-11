@@ -1,0 +1,2430 @@
+{
+ "rows": {
+  "SAMPLE-0001": {
+   "bullets": [
+    "Moisture wicking fabric",
+    "Two side pockets",
+    "Elastic waistband with drawstring"
+   ],
+   "clean_title": "Men Dry-Fit Athletic Gym Shorts With Pockets",
+   "det_attrs": {
+    "color": [
+     "black",
+     "navy"
+    ],
+    "gender": "men",
+    "material": "polyester",
+    "pack_count": 2,
+    "size": [
+     "L"
+    ]
+   },
+   "feed_item_id": "SAMPLE-0001",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "24.99",
+   "price_min": "24.99",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.shorts",
+    "injected_defect": null,
+    "raw_bullets": "Moisture wicking fabric\n\u2022 Two side pockets\n\u2022 Elastic waistband with drawstring\n\u2022    \n\u2022 Moisture wicking fabric",
+    "raw_price": "$24.99",
+    "raw_tags": "sze=L;clr=blk,nvy;qty=2;material=polyester;sex=M",
+    "raw_title": "Men's Dry-Fit Athletic Gym Shorts w/ Pockets Pack of 2 (Black/Navy, L) - Running Workout",
+    "received_at": "2026-11-01T08:00:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "blk,nvy",
+    "gender": "M",
+    "material": "polyester",
+    "pack_count": "2",
+    "size": "L"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00004": {
+   "bullets": [
+    "Material: nylon",
+    "Machine washable"
+   ],
+   "clean_title": "Men Relaxed Denim Jeans With Pockets",
+   "det_attrs": {
+    "color": [
+     "black"
+    ],
+    "gender": "men",
+    "material": "nylon",
+    "pack_count": 4,
+    "size": [
+     "XXL",
+     "L"
+    ]
+   },
+   "feed_item_id": "SUP_ACME-00004",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "96.24",
+   "price_min": "74.03",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.jeans",
+    "injected_defect": null,
+    "raw_bullets": "Material: nylon; Machine washable; Material: nylon",
+    "raw_price": "$74.03 - $96.24",
+    "raw_tags": "sze=xxl/l;clr=black;gender=men;qty=4",
+    "raw_title": "Men Relaxed Denim Jeans w/ Pockets Set of 4 (Black, XXL/L) - Everyday Casual",
+    "received_at": "2026-11-01T08:28:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "black",
+    "gender": "men",
+    "pack_count": "4",
+    "size": "xxl/l"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00007": {
+   "bullets": [
+    "Material: nylon",
+    "Machine washable"
+   ],
+   "clean_title": "Women Premium Button-Down Blouse With Pockets",
+   "det_attrs": {
+    "color": [
+     "brown"
+    ],
+    "gender": "women",
+    "material": "nylon",
+    "pack_count": 2,
+    "size": [
+     "XL"
+    ]
+   },
+   "feed_item_id": "SUP_ACME-00007",
+   "keyword_tail": [
+    "RUNNING",
+    "WORKOUT"
+   ],
+   "price_max": "126.42",
+   "price_min": "126.42",
+   "raw_json": {
+    "expected_leaf": "apparel.women.tops.blouses",
+    "injected_defect": null,
+    "raw_bullets": "Material: nylon; Machine washable",
+    "raw_price": "$126.42",
+    "raw_tags": "sze=xl;clr=brown;sex=women;qty=2",
+    "raw_title": "LADIES PREMIUM BUTTON-DOWN BLOUSE WITH POCKETS SET OF 2 (BROWN, XL) - RUNNING WORKOUT",
+    "received_at": "2026-11-01T08:49:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "brown",
+    "gender": "women",
+    "pack_count": "2",
+    "size": "xl"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00011": {
+   "bullets": [
+    "Material: fleece",
+    "Machine washable"
+   ],
+   "clean_title": "Kids Breathable Toddler Tee",
+   "det_attrs": {
+    "color": [
+     "brown"
+    ],
+    "gender": "kids",
+    "material": "fleece",
+    "size": [
+     "XS"
+    ]
+   },
+   "feed_item_id": "SUP_ACME-00011",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "141.03",
+   "price_min": "141.03",
+   "raw_json": {
+    "expected_leaf": "apparel.kids.tshirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: fleece\n\u2022 Machine washable",
+    "raw_price": "141.03",
+    "raw_tags": "sze=xs;clr=brown;gender=K",
+    "raw_title": "Kids Breathable Toddler Tee (Brown, XS) - Travel Camping",
+    "received_at": "2026-11-01T09:17:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "brown",
+    "gender": "K",
+    "size": "xs"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00016": {
+   "bullets": [
+    "Made of cast iron",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Quick Dry Cast Iron Skillet",
+   "det_attrs": {
+    "color": [
+     "red"
+    ],
+    "material": "cast iron",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_ACME-00016",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": null,
+   "price_min": null,
+   "raw_json": {
+    "expected_leaf": "kitchen.cookware.pans",
+    "injected_defect": "bad_price",
+    "raw_bullets": "Made of cast iron\n\u2022 Dishwasher safe\n\u2022    ",
+    "raw_price": "",
+    "raw_tags": "clr=red|qty=6",
+    "raw_title": "Quick Dry Cast Iron Skillet 6pk (Red) - Running Workout",
+    "received_at": "2026-11-01T09:52:00+00:00"
+   },
+   "reason_codes": [
+    {
+     "code": "PRICE_UNPARSEABLE",
+     "detail": "",
+     "severity": "warning",
+     "stage": "clean"
+    }
+   ],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "red",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00017": {
+   "bullets": [
+    "Made of silicone",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Premium Enameled Dutch Oven",
+   "det_attrs": {
+    "color": [
+     "red"
+    ],
+    "material": "silicone"
+   },
+   "feed_item_id": "SUP_ACME-00017",
+   "keyword_tail": [
+    "Everyday",
+    "Casual",
+    "Replica"
+   ],
+   "price_max": "78.69",
+   "price_min": "78.69",
+   "raw_json": {
+    "expected_leaf": "kitchen.cookware.pots",
+    "injected_defect": "prohibited_global",
+    "raw_bullets": "Made of silicone\n\u2022 Dishwasher safe\n\u2022 Made of silicone",
+    "raw_price": "USD 78.69",
+    "raw_tags": "clr=red",
+    "raw_title": "Premium Enameled Dutch Oven (Red) - Everyday Casual   Replica",
+    "received_at": "2026-11-01T09:59:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "red"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00021": {
+   "bullets": [
+    "Made of stainless steel",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Quick Dry 24 Oz Ceramic Coffee Mug",
+   "det_attrs": {
+    "capacity_oz": 24.0,
+    "color": [
+     "purple"
+    ],
+    "material": "stainless steel"
+   },
+   "feed_item_id": "SUP_ACME-00021",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "63.23",
+   "price_min": "63.23",
+   "raw_json": {
+    "expected_leaf": "kitchen.drinkware.mugs",
+    "injected_defect": null,
+    "raw_bullets": "Made of stainless steel\n\u2022 Dishwasher safe\n\u2022 Made of stainless steel",
+    "raw_price": "USD 63.23",
+    "raw_tags": "volume_oz=24;clr=purple",
+    "raw_title": "Quick Dry 24 oz Ceramic Coffee Mug (Purple) - Gym Training",
+    "received_at": "2026-11-01T10:27:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "capacity_oz": "24",
+    "color": "purple"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00022": {
+   "bullets": [
+    "Made of glass",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Breathable Glass Meal Prep Containers",
+   "det_attrs": {
+    "color": [
+     "black"
+    ],
+    "material": "glass"
+   },
+   "feed_item_id": "SUP_ACME-00022",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "21.81",
+   "price_min": "21.81",
+   "raw_json": {
+    "expected_leaf": "kitchen.storage",
+    "injected_defect": null,
+    "raw_bullets": "Made of glass \u2022 Dishwasher safe",
+    "raw_price": "$21.81",
+    "raw_tags": "clr=black",
+    "raw_title": "Breathable Glass Meal Prep Containers (Black) - Travel Camping",
+    "received_at": "2026-11-01T10:34:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "black"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00025": {
+   "bullets": [
+    "Material: TPE foam",
+    "Non-slip surface"
+   ],
+   "clean_title": "Adjustable Dumbbell",
+   "det_attrs": {
+    "color": [
+     "yellow"
+    ],
+    "material": "tpe foam",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_ACME-00025",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "52.21",
+   "price_min": "52.21",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.dumbbells",
+    "injected_defect": null,
+    "raw_bullets": "Material: TPE foam\n\u2022 Non-slip surface\n\u2022    ",
+    "raw_price": "52.21",
+    "raw_tags": "clr=yellow;qty=6",
+    "raw_title": "Adjustable Dumbbell Pack of 6 (Yellow) - Travel Camping",
+    "received_at": "2026-11-01T10:55:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "yellow",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00027": {
+   "bullets": [
+    "Material: ripstop nylon",
+    "65L capacity"
+   ],
+   "clean_title": "Camping Tent",
+   "det_attrs": {
+    "capacity_liters": 65.0,
+    "color": [
+     "yellow",
+     "purple"
+    ],
+    "material": "ripstop nylon",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ACME-00027",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "193.26",
+   "price_min": "148.66",
+   "raw_json": {
+    "expected_leaf": "sport.outdoor.tents",
+    "injected_defect": null,
+    "raw_bullets": "Material: ripstop nylon\n\u2022 65L capacity\n\u2022 Material: ripstop nylon",
+    "raw_price": "$148.66 - $193.26",
+    "raw_tags": "capacity_l=65|clr=yellow,purple|qty=2",
+    "raw_title": "Camping Tent 2pk (Yellow) - Travel Camping",
+    "received_at": "2026-11-01T11:09:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "capacity_liters": "65",
+    "color": "yellow,purple",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00029": {
+   "bullets": [
+    "Material: neoprene",
+    "Non-slip surface"
+   ],
+   "clean_title": "Premium Soccer Ball",
+   "det_attrs": {
+    "color": [
+     "green",
+     "red",
+     "white"
+    ],
+    "material": "neoprene",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ACME-00029",
+   "keyword_tail": [
+    "Home",
+    "Office"
+   ],
+   "price_max": "26.89",
+   "price_min": "26.89",
+   "raw_json": {
+    "expected_leaf": "sport.ball",
+    "injected_defect": null,
+    "raw_bullets": "Material: neoprene; Non-slip surface",
+    "raw_price": "26.89",
+    "raw_tags": "clr=green,red,white,qty=2",
+    "raw_title": "Premium Soccer Ball 2pk (Green) - Home Office  ",
+    "received_at": "2026-11-01T11:23:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "green,red,white",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00030": {
+   "bullets": [
+    "Connector: 3.5mm",
+    "12-month warranty"
+   ],
+   "clean_title": "Quick Dry Braided Charger Cable",
+   "det_attrs": {
+    "color": [
+     "green"
+    ],
+    "connector": "3.5mm",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ACME-00030",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "55.7",
+   "price_min": "55.7",
+   "raw_json": {
+    "expected_leaf": "electronics.cables",
+    "injected_defect": null,
+    "raw_bullets": "Connector: 3.5mm; 12-month warranty; Connector: 3.5mm",
+    "raw_price": "55.7",
+    "raw_tags": "connector=3.5MM;clr=green;qty=2",
+    "raw_title": "Quick Dry Braided Charger Cable 2pk (Green) - Travel Camping",
+    "received_at": "2026-11-01T11:30:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "green",
+    "connector": "3.5MM",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00035": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Men Zip-Up Hooded Sweatshirt With Pockets",
+   "det_attrs": {
+    "color": [
+     "black",
+     "navy",
+     "green"
+    ],
+    "gender": "men",
+    "material": "polyester",
+    "pack_count": 6,
+    "size": [
+     "XS"
+    ]
+   },
+   "feed_item_id": "SUP_ACME-00035",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "130.41",
+   "price_min": "130.41",
+   "raw_json": {
+    "expected_leaf": "apparel.men.tops.hoodies",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester \u2022 Machine washable \u2022    ",
+    "raw_price": "130.41",
+    "raw_tags": "sze=XS,clr=black,navy,green,gender=male,qty=6",
+    "raw_title": "Men Zip-Up Hooded Sweatshirt w/ Pockets Pack of 6 (Black/Navy/Green, XS) - Gym Training",
+    "received_at": "2026-11-01T12:05:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "black,navy,green",
+    "gender": "male",
+    "pack_count": "6",
+    "size": "XS"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00039": {
+   "bullets": [
+    "Material: fleece",
+    "Machine washable"
+   ],
+   "clean_title": "Men Heavy Duty Jogger Sweatpants With Pockets",
+   "det_attrs": {
+    "color": [
+     "white"
+    ],
+    "gender": "men",
+    "material": "fleece",
+    "pack_count": 4,
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ACME-00039",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "103.64",
+   "price_min": "103.64",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.joggers",
+    "injected_defect": null,
+    "raw_bullets": "Material: fleece; Machine washable",
+    "raw_price": "103.64",
+    "raw_tags": "sze=m|clr=white|gender=men|qty=4",
+    "raw_title": "Men Heavy Duty Jogger Sweatpants w/ Pockets Pack of 4 (White, M) - Travel Camping",
+    "received_at": "2026-11-01T12:33:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "white",
+    "gender": "men",
+    "pack_count": "4",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00052": {
+   "bullets": [
+    "Made of stainless steel",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Eco Friendly 8 Inch Chef Knife",
+   "det_attrs": {
+    "color": [
+     "black"
+    ],
+    "material": "stainless steel",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_ACME-00052",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "34.73",
+   "price_min": "34.73",
+   "raw_json": {
+    "expected_leaf": "kitchen.cutlery.chef_knives",
+    "injected_defect": "missing_size",
+    "raw_bullets": "Made of stainless steel; Dishwasher safe",
+    "raw_price": "34.73",
+    "raw_tags": "clr=black;qty=6",
+    "raw_title": "Eco Friendly 8 Inch Chef Knife 6-Pack (Black) - Everyday Casual  ",
+    "received_at": "2026-11-01T14:04:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "black",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00056": {
+   "bullets": [
+    "Made of glass",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Breathable Food Storage Container Set",
+   "det_attrs": {
+    "color": [
+     "brown",
+     "orange"
+    ],
+    "material": "glass",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ACME-00056",
+   "keyword_tail": [
+    "GIFT",
+    "IDEA"
+   ],
+   "price_max": "67.76",
+   "price_min": "67.76",
+   "raw_json": {
+    "expected_leaf": "kitchen.storage",
+    "injected_defect": null,
+    "raw_bullets": "Made of glass\nDishwasher safe\nMade of glass\n   ",
+    "raw_price": "$67.76",
+    "raw_tags": "clr=brown,orange,qty=2",
+    "raw_title": "BREATHABLE FOOD STORAGE CONTAINER SET PACK OF 2 (BROWN) - GIFT IDEA",
+    "received_at": "2026-11-01T14:32:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "brown,orange",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ACME-00059": {
+   "bullets": [
+    "Material: latex",
+    "Non-slip surface"
+   ],
+   "clean_title": "Premium Adjustable Dumbbell",
+   "det_attrs": {
+    "color": [
+     "white"
+    ],
+    "material": "latex",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ACME-00059",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "208.97",
+   "price_min": "160.75",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.dumbbells",
+    "injected_defect": null,
+    "raw_bullets": "Material: latex\nNon-slip surface\n   ",
+    "raw_price": "$160.75 - $208.97",
+    "raw_tags": "clr=white,qty=2",
+    "raw_title": "Premium Adjustable Dumbbell 2-Pack (White) - Gym Training",
+    "received_at": "2026-11-01T14:53:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_acme",
+   "tags": {
+    "color": "white",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00002": {
+   "bullets": [
+    "Material: fleece",
+    "Machine washable"
+   ],
+   "clean_title": "Men Breathable Pique Polo Shirt With Pockets",
+   "det_attrs": {
+    "color": [
+     "red"
+    ],
+    "gender": "men",
+    "material": "fleece",
+    "pack_count": 2,
+    "size": [
+     "M",
+     "XL"
+    ]
+   },
+   "feed_item_id": "SUP_NIMBUS-00002",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "166.68",
+   "price_min": "166.68",
+   "raw_json": {
+    "expected_leaf": "apparel.men.tops.polos",
+    "injected_defect": null,
+    "raw_bullets": "Material: fleece\n\u2022 Machine washable",
+    "raw_price": "USD 166.68",
+    "raw_tags": "size=M/XL|colour=red|gender=men|qty=2",
+    "raw_title": "Men's Breathable Pique Polo Shirt with Pockets 2-Pack (Red, M/XL) - Running Workout",
+    "received_at": "2026-11-01T08:14:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "red",
+    "gender": "men",
+    "pack_count": "2",
+    "size": "M/XL"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00010": {
+   "bullets": [
+    "Material: spandex blend",
+    "Machine washable"
+   ],
+   "clean_title": "Women Eco Friendly Maxi Sundress With Pockets",
+   "det_attrs": {
+    "color": [
+     "purple"
+    ],
+    "gender": "women",
+    "material": "spandex blend",
+    "size": [
+     "XL"
+    ]
+   },
+   "feed_item_id": "SUP_NIMBUS-00010",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "81.48",
+   "price_min": "81.48",
+   "raw_json": {
+    "expected_leaf": "apparel.women.dresses",
+    "injected_defect": null,
+    "raw_bullets": "Material: spandex blend\nMachine washable",
+    "raw_price": "81.48",
+    "raw_tags": "size=XL;color=purple;gender=women",
+    "raw_title": "Women's Eco Friendly Maxi Sundress w/ Pockets (Purple, XL) - Everyday Casual  ",
+    "received_at": "2026-11-01T09:10:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "purple",
+    "gender": "women",
+    "size": "XL"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00020": {
+   "bullets": [
+    "Made of glass",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Breathable 20 Oz Sports Water Bottle",
+   "det_attrs": {
+    "capacity_oz": 20.0,
+    "color": [
+     "gray",
+     "orange"
+    ],
+    "material": "glass"
+   },
+   "feed_item_id": "SUP_NIMBUS-00020",
+   "keyword_tail": [
+    "Gift",
+    "Idea"
+   ],
+   "price_max": "50.47",
+   "price_min": "50.47",
+   "raw_json": {
+    "expected_leaf": "kitchen.drinkware.bottles",
+    "injected_defect": null,
+    "raw_bullets": "Made of glass\nDishwasher safe\nMade of glass",
+    "raw_price": "50.47",
+    "raw_tags": "volume_oz=20;colour=gray,orange",
+    "raw_title": "Breathable 20 oz Sports Water Bottle (Gray) - Gift Idea",
+    "received_at": "2026-11-01T10:20:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "capacity_oz": "20",
+    "color": "gray,orange"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00023": {
+   "bullets": [
+    "Material: TPE foam",
+    "Non-slip surface"
+   ],
+   "clean_title": "Eco Friendly Non-Slip Yoga Mat",
+   "det_attrs": {
+    "color": [
+     "red",
+     "orange"
+    ],
+    "material": "tpe foam"
+   },
+   "feed_item_id": "SUP_NIMBUS-00023",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "91.99",
+   "price_min": "91.99",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.yoga_mats",
+    "injected_defect": null,
+    "raw_bullets": "Material: TPE foam\n\u2022 Non-slip surface",
+    "raw_price": "USD 91.99",
+    "raw_tags": "colour=red,orange",
+    "raw_title": "Eco Friendly Non-Slip Yoga Mat (Red) - Running Workout",
+    "received_at": "2026-11-01T10:41:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "red,orange"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00026": {
+   "bullets": [
+    "Material: canvas",
+    "30L capacity"
+   ],
+   "clean_title": "Eco Friendly Daypack Backpack",
+   "det_attrs": {
+    "capacity_liters": 30.0,
+    "color": [
+     "orange",
+     "red",
+     "black"
+    ],
+    "material": "canvas",
+    "pack_count": 3
+   },
+   "feed_item_id": "SUP_NIMBUS-00026",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "116.92",
+   "price_min": "89.94",
+   "raw_json": {
+    "expected_leaf": "sport.outdoor.backpacks",
+    "injected_defect": null,
+    "raw_bullets": "Material: canvas; 30L capacity;    ",
+    "raw_price": "$89.94 - $116.92",
+    "raw_tags": "capacity_l=30|colour=orange,red,black|qty=3",
+    "raw_title": "Eco Friendly Daypack Backpack 3-Pack (Orange) - Running Workout",
+    "received_at": "2026-11-01T11:02:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "capacity_liters": "30",
+    "color": "orange,red,black",
+    "pack_count": "3"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00028": {
+   "bullets": [
+    "Material: canvas",
+    "40L capacity"
+   ],
+   "clean_title": "",
+   "det_attrs": {
+    "capacity_liters": 40.0,
+    "color": [
+     "white"
+    ],
+    "material": "canvas",
+    "pack_count": 4
+   },
+   "feed_item_id": "SUP_NIMBUS-00028",
+   "keyword_tail": [],
+   "price_max": "60.14",
+   "price_min": "46.26",
+   "raw_json": {
+    "expected_leaf": "sport.outdoor.coolers",
+    "injected_defect": "empty_title",
+    "raw_bullets": "Material: canvas; 40L capacity",
+    "raw_price": "$46.26 - $60.14",
+    "raw_tags": "capacity_l=40|color=white|qty=4",
+    "raw_title": null,
+    "received_at": "2026-11-01T11:16:00+00:00"
+   },
+   "reason_codes": [
+    {
+     "code": "TITLE_EMPTY",
+     "detail": null,
+     "severity": "blocking",
+     "stage": "clean"
+    }
+   ],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "capacity_liters": "40",
+    "color": "white",
+    "pack_count": "4"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00034": {
+   "bullets": [
+    "Material: nylon",
+    "Machine washable"
+   ],
+   "clean_title": "Men Eco Friendly Graphic Tee With Pockets",
+   "det_attrs": {
+    "color": [
+     "green"
+    ],
+    "gender": "men",
+    "material": "nylon",
+    "size": [
+     "XL"
+    ]
+   },
+   "feed_item_id": "SUP_NIMBUS-00034",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "157.88",
+   "price_min": "157.88",
+   "raw_json": {
+    "expected_leaf": "apparel.men.tops.tshirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: nylon\n\u2022 Machine washable",
+    "raw_price": "$157.88",
+    "raw_tags": "size=XL;colour=green;sex=M",
+    "raw_title": "Mens Eco Friendly Graphic Tee with Pockets (Green, XL) - Everyday Casual",
+    "received_at": "2026-11-01T11:58:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "green",
+    "gender": "M",
+    "size": "XL"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00043": {
+   "bullets": [
+    "Material: nylon",
+    "Machine washable"
+   ],
+   "clean_title": "Women Breathable Pleated Midi Skirt With Pockets",
+   "det_attrs": {
+    "color": [
+     "yellow",
+     "brown",
+     "gray"
+    ],
+    "gender": "women",
+    "material": "nylon",
+    "pack_count": 4,
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_NIMBUS-00043",
+   "keyword_tail": [
+    "Gift",
+    "Idea"
+   ],
+   "price_max": "38.76",
+   "price_min": "38.76",
+   "raw_json": {
+    "expected_leaf": "apparel.women.bottoms.skirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: nylon \u2022 Machine washable",
+    "raw_price": "$38.76",
+    "raw_tags": "size=m|color=yellow,brown,gray|sex=women|qty=4",
+    "raw_title": "Ladies Breathable Pleated Midi Skirt w/ Pockets 4-Pack (Yellow/Brown/Gray, M) - Gift Idea",
+    "received_at": "2026-11-01T13:01:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "yellow,brown,gray",
+    "gender": "women",
+    "pack_count": "4",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00046": {
+   "bullets": [
+    "Material: cotton",
+    "Machine washable"
+   ],
+   "clean_title": "Kids Lightweight Kids Pajama Set",
+   "det_attrs": {
+    "color": [
+     "green"
+    ],
+    "gender": "kids",
+    "material": "cotton",
+    "pack_count": 4,
+    "size": [
+     "M",
+     "L"
+    ]
+   },
+   "feed_item_id": "SUP_NIMBUS-00046",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "25.76",
+   "price_min": "25.76",
+   "raw_json": {
+    "expected_leaf": "apparel.kids.pajamas",
+    "injected_defect": null,
+    "raw_bullets": "Material: cotton\nMachine washable\n   ",
+    "raw_price": "$25.76",
+    "raw_tags": "size=m/l|color=green|gender=kids|qty=4",
+    "raw_title": "Kids Lightweight Kids Pajama Set Set of 4 (Green, M/L) - Everyday Casual",
+    "received_at": "2026-11-01T13:22:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "green",
+    "gender": "kids",
+    "pack_count": "4",
+    "size": "m/l"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00051": {
+   "bullets": [
+    "Made of ceramic",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Lightweight Enameled Dutch Oven",
+   "det_attrs": {
+    "color": [
+     "blue"
+    ],
+    "material": "ceramic",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_NIMBUS-00051",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "166.45",
+   "price_min": "166.45",
+   "raw_json": {
+    "expected_leaf": "kitchen.cookware.pots",
+    "injected_defect": null,
+    "raw_bullets": "Made of ceramic\nDishwasher safe\nMade of ceramic\n   ",
+    "raw_price": "USD 166.45",
+    "raw_tags": "colour=blue,qty=2",
+    "raw_title": "Lightweight Enameled Dutch Oven Set of 2 (Blue) - Running Workout",
+    "received_at": "2026-11-01T13:57:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "color": "blue",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00054": {
+   "bullets": [
+    "Made of ceramic",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Quick Dry 12 Oz Insulated Water Bottle",
+   "det_attrs": {
+    "capacity_oz": 12.0,
+    "color": [
+     "green",
+     "white"
+    ],
+    "material": "ceramic",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_NIMBUS-00054",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "159.56",
+   "price_min": "159.56",
+   "raw_json": {
+    "expected_leaf": "kitchen.drinkware.bottles",
+    "injected_defect": null,
+    "raw_bullets": "Made of ceramic\n\u2022 Dishwasher safe",
+    "raw_price": "$159.56",
+    "raw_tags": "volume_oz=12|colour=green,white|qty=6",
+    "raw_title": "Quick Dry 12 oz Insulated Water Bottle 6pk (Green) - Everyday Casual",
+    "received_at": "2026-11-01T14:18:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "capacity_oz": "12",
+    "color": "green,white",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_NIMBUS-00055": {
+   "bullets": [
+    "Made of ceramic",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Quick Dry 12 Oz Ceramic Coffee Mug",
+   "det_attrs": {
+    "capacity_oz": 12.0,
+    "color": [
+     "brown",
+     "white"
+    ],
+    "material": "ceramic"
+   },
+   "feed_item_id": "SUP_NIMBUS-00055",
+   "keyword_tail": [
+    "Home",
+    "Office"
+   ],
+   "price_max": "59.95",
+   "price_min": "59.95",
+   "raw_json": {
+    "expected_leaf": "kitchen.drinkware.mugs",
+    "injected_defect": null,
+    "raw_bullets": "Made of ceramic\nDishwasher safe",
+    "raw_price": "USD 59.95",
+    "raw_tags": "volume_oz=12,color=brown,white",
+    "raw_title": "Quick Dry 12 oz Ceramic Coffee Mug (Brown) - Home Office",
+    "received_at": "2026-11-01T14:25:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_nimbus",
+   "tags": {
+    "capacity_oz": "12",
+    "color": "brown,white"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00001": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Men Eco Friendly Pullover Hoodie With Pockets",
+   "det_attrs": {
+    "color": [
+     "navy"
+    ],
+    "gender": "men",
+    "material": "polyester",
+    "pack_count": 6,
+    "size": [
+     "XS",
+     "XL"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00001",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "107.44",
+   "price_min": "107.44",
+   "raw_json": {
+    "expected_leaf": "apparel.men.tops.hoodies",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester\nMachine washable",
+    "raw_price": "$107.44",
+    "raw_tags": "size=XS/XL,color=navy,gender=men,qty=6",
+    "raw_title": "Men Eco Friendly Pullover Hoodie w/ Pockets Set of 6 (Navy, XS/XL) - Everyday Casual",
+    "received_at": "2026-11-01T08:07:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "navy",
+    "gender": "men",
+    "pack_count": "6",
+    "size": "XS/XL"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00006": {
+   "bullets": [
+    "Material: spandex blend",
+    "Machine washable"
+   ],
+   "clean_title": "Women Heavy Duty Fitted Tee With Pockets",
+   "det_attrs": {
+    "color": [
+     "yellow"
+    ],
+    "gender": "women",
+    "material": "spandex blend",
+    "pack_count": 6,
+    "size": [
+     "L"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00006",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "6.04",
+   "price_min": "6.04",
+   "raw_json": {
+    "expected_leaf": "apparel.women.tops.tshirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: spandex blend\nMachine washable\n   ",
+    "raw_price": "6.04",
+    "raw_tags": "size=L,color=yellow,gender=women,qty=6",
+    "raw_title": "Ladies Heavy Duty Fitted Tee w/ Pockets Pack of 6 (Yellow, L) - Everyday Casual",
+    "received_at": "2026-11-01T08:42:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "yellow",
+    "gender": "women",
+    "pack_count": "6",
+    "size": "L"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00008": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Women Premium High Waist Leggings With Pockets",
+   "det_attrs": {
+    "color": [
+     "orange",
+     "navy"
+    ],
+    "gender": "women",
+    "material": "polyester",
+    "pack_count": 4,
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00008",
+   "keyword_tail": [],
+   "price_max": "186.52",
+   "price_min": "143.48",
+   "raw_json": {
+    "expected_leaf": "apparel.women.bottoms.leggings",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester; Machine washable",
+    "raw_price": "$143.48 - $186.52",
+    "raw_tags": "size=m|colour=orange,navy|sex=F|qty=4",
+    "raw_title": "Ladies Premium High Waist Leggings w/ Pockets 4-Pack (Orange/Navy, M)",
+    "received_at": "2026-11-01T08:56:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "orange,navy",
+    "gender": "F",
+    "pack_count": "4",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00013": {
+   "bullets": [
+    "Upper: suede",
+    "Cushioned sole"
+   ],
+   "clean_title": "Women Trail Running Sneakers",
+   "det_attrs": {
+    "color": [
+     "purple"
+    ],
+    "gender": "women",
+    "material": "suede",
+    "pack_count": 3,
+    "size": [
+     "9"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00013",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "43.01",
+   "price_min": "43.01",
+   "raw_json": {
+    "expected_leaf": "footwear.running",
+    "injected_defect": null,
+    "raw_bullets": "Upper: suede\nCushioned sole",
+    "raw_price": "USD 43.01",
+    "raw_tags": "shoe_size=9;colour=purple;qty=3",
+    "raw_title": "Women's Trail Running Sneakers Set of 3 (Purple, Size 9) - Gym Training  ",
+    "received_at": "2026-11-01T09:31:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "purple",
+    "pack_count": "3",
+    "size": "9"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00019": {
+   "bullets": [
+    "Made of silicone",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Quick Dry Kitchen Knife Set With Block",
+   "det_attrs": {
+    "color": [
+     "black"
+    ],
+    "material": "silicone",
+    "pack_count": 4
+   },
+   "feed_item_id": "SUP_ORBIT-00019",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "105.56",
+   "price_min": "81.2",
+   "raw_json": {
+    "expected_leaf": "kitchen.cutlery.knife_sets",
+    "injected_defect": null,
+    "raw_bullets": "Made of silicone\n\u2022 Dishwasher safe\n\u2022 Made of silicone",
+    "raw_price": "$81.2 - $105.56",
+    "raw_tags": "colour=black,qty=4",
+    "raw_title": "Quick Dry Kitchen Knife Set with Block Set of 4 (Black) - Running Workout",
+    "received_at": "2026-11-01T10:13:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "black",
+    "pack_count": "4"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00031": {
+   "bullets": [
+    "Connector: micro-usb",
+    "12-month warranty"
+   ],
+   "clean_title": "Dry-Fit Over-Ear Headphones",
+   "det_attrs": {
+    "color": [
+     "green",
+     "black"
+    ],
+    "connector": "micro-usb",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_ORBIT-00031",
+   "keyword_tail": [
+    "Gift",
+    "Idea"
+   ],
+   "price_max": "204.48",
+   "price_min": "157.29",
+   "raw_json": {
+    "expected_leaf": "electronics.audio",
+    "injected_defect": null,
+    "raw_bullets": "Connector: micro-usb\n\u2022 12-month warranty\n\u2022    ",
+    "raw_price": "$157.29 - $204.48",
+    "raw_tags": "connector=micro-usb;colour=green,black;qty=6",
+    "raw_title": "Dry-Fit Over-Ear Headphones Pack of 6 (Green) - Gift Idea  ",
+    "received_at": "2026-11-01T11:37:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "green,black",
+    "connector": "micro-usb",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00036": {
+   "bullets": [
+    "Material: merino wool",
+    "Machine washable"
+   ],
+   "clean_title": "Men Lightweight Golf Polo",
+   "det_attrs": {
+    "color": [
+     "red"
+    ],
+    "gender": "men",
+    "material": "merino wool",
+    "pack_count": 3,
+    "size": [
+     "S"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00036",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "63.69",
+   "price_min": "48.99",
+   "raw_json": {
+    "expected_leaf": "apparel.men.tops.polos",
+    "injected_defect": null,
+    "raw_bullets": "Material: merino wool \u2022 Machine washable",
+    "raw_price": "$48.99 - $63.69",
+    "raw_tags": "size=S,colour=red,sex=male,qty=3",
+    "raw_title": "Men Lightweight Golf Polo 3pk (Red, S) - Running Workout",
+    "received_at": "2026-11-01T12:12:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "red",
+    "gender": "male",
+    "pack_count": "3",
+    "size": "S"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00037": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Men Premium Athletic Gym Shorts",
+   "det_attrs": {
+    "color": [
+     "orange",
+     "purple",
+     "green"
+    ],
+    "gender": "men",
+    "material": "polyester",
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00037",
+   "keyword_tail": [
+    "Gift",
+    "Idea"
+   ],
+   "price_max": "93.85",
+   "price_min": "93.85",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.shorts",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester\nMachine washable",
+    "raw_price": "93.85",
+    "raw_tags": "size=m|colour=orange,purple,green|sex=male",
+    "raw_title": "Mens Premium Athletic Gym Shorts (Orange/Purple/Green, M) - Gift Idea",
+    "received_at": "2026-11-01T12:19:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "orange,purple,green",
+    "gender": "male",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00040": {
+   "bullets": [
+    "Material: nylon",
+    "Machine washable"
+   ],
+   "clean_title": "Women Eco Friendly Fitted Tee With Pockets",
+   "det_attrs": {
+    "color": [
+     "purple"
+    ],
+    "gender": "women",
+    "material": "nylon",
+    "pack_count": 2,
+    "size": [
+     "S"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00040",
+   "keyword_tail": [
+    "RUNNING",
+    "WORKOUT"
+   ],
+   "price_max": "162.35",
+   "price_min": "162.35",
+   "raw_json": {
+    "expected_leaf": "apparel.women.tops.tshirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: nylon\nMachine washable",
+    "raw_price": "USD 162.35",
+    "raw_tags": "size=s|color=purple|sex=women|qty=2",
+    "raw_title": "WOMENS ECO FRIENDLY FITTED TEE WITH POCKETS PACK OF 2 (PURPLE, S) - RUNNING WORKOUT",
+    "received_at": "2026-11-01T12:40:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "purple",
+    "gender": "women",
+    "pack_count": "2",
+    "size": "s"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00041": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Women Premium Button-Down Blouse With Pockets",
+   "det_attrs": {
+    "color": [
+     "red",
+     "purple"
+    ],
+    "gender": "women",
+    "material": "polyester",
+    "size": [
+     "XS"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00041",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "145.65",
+   "price_min": "145.65",
+   "raw_json": {
+    "expected_leaf": "apparel.women.tops.blouses",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester \u2022 Machine washable \u2022    ",
+    "raw_price": "USD 145.65",
+    "raw_tags": "size=XS,color=red,purple,sex=women",
+    "raw_title": "Ladies Premium Button-Down Blouse with Pockets (Red/Purple, XS) - Travel Camping",
+    "received_at": "2026-11-01T12:47:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "red,purple",
+    "gender": "women",
+    "size": "XS"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00044": {
+   "bullets": [
+    "Material: spandex blend",
+    "Machine washable"
+   ],
+   "clean_title": "Women Breathable Wrap Dress",
+   "det_attrs": {
+    "color": [
+     "orange"
+    ],
+    "gender": "women",
+    "material": "spandex blend",
+    "pack_count": 2,
+    "size": [
+     "S"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00044",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "203.72",
+   "price_min": "156.71",
+   "raw_json": {
+    "expected_leaf": "apparel.women.dresses",
+    "injected_defect": null,
+    "raw_bullets": "Material: spandex blend \u2022 Machine washable",
+    "raw_price": "$156.71 - $203.72",
+    "raw_tags": "size=s,colour=orange,gender=F,qty=2",
+    "raw_title": "Women's Breathable Wrap Dress 2-Pack (Orange, S) - Everyday Casual",
+    "received_at": "2026-11-01T13:08:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "orange",
+    "gender": "F",
+    "pack_count": "2",
+    "size": "s"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00045": {
+   "bullets": [
+    "Material: cotton",
+    "Machine washable"
+   ],
+   "clean_title": "Kids Lightweight Kids Graphic T-Shirt",
+   "det_attrs": {
+    "color": [
+     "gray",
+     "black"
+    ],
+    "gender": "kids",
+    "material": "cotton",
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00045",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "117.17",
+   "price_min": "90.13",
+   "raw_json": {
+    "expected_leaf": "apparel.kids.tshirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: cotton \u2022 Machine washable \u2022 Material: cotton",
+    "raw_price": "$90.13 - $117.17",
+    "raw_tags": "size=M;colour=gray,black;gender=kids",
+    "raw_title": "Kids' Lightweight Kids Graphic T-Shirt (Gray/Black, M) - Everyday Casual",
+    "received_at": "2026-11-01T13:15:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "gray,black",
+    "gender": "kids",
+    "size": "M"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00047": {
+   "bullets": [
+    "Upper: mesh",
+    "Cushioned sole"
+   ],
+   "clean_title": "Men Heavy Duty Trail Running Sneakers",
+   "det_attrs": {
+    "color": [
+     "black"
+    ],
+    "gender": "men",
+    "material": "mesh",
+    "pack_count": 3,
+    "size": [
+     "12"
+    ]
+   },
+   "feed_item_id": "SUP_ORBIT-00047",
+   "keyword_tail": [
+    "GIFT",
+    "IDEA"
+   ],
+   "price_max": "91.35",
+   "price_min": "91.35",
+   "raw_json": {
+    "expected_leaf": "footwear.running",
+    "injected_defect": null,
+    "raw_bullets": "Upper: mesh \u2022 Cushioned sole \u2022    ",
+    "raw_price": "91.35",
+    "raw_tags": "shoe_size=12|color=black|qty=3",
+    "raw_title": "MEN'S HEAVY DUTY TRAIL RUNNING SNEAKERS 3-PACK (BLACK, SIZE 12) - GIFT IDEA",
+    "received_at": "2026-11-01T13:29:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "black",
+    "pack_count": "3",
+    "size": "12"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00053": {
+   "bullets": [
+    "Made of silicone",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Heavy Duty Steak Knife Set",
+   "det_attrs": {
+    "color": [
+     "yellow",
+     "white"
+    ],
+    "material": "silicone"
+   },
+   "feed_item_id": "SUP_ORBIT-00053",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "70.77",
+   "price_min": "70.77",
+   "raw_json": {
+    "expected_leaf": "kitchen.cutlery.knife_sets",
+    "injected_defect": null,
+    "raw_bullets": "Made of silicone; Dishwasher safe",
+    "raw_price": "70.77",
+    "raw_tags": "color=yellow,white",
+    "raw_title": "Heavy Duty Steak Knife Set (Yellow) - Travel Camping",
+    "received_at": "2026-11-01T14:11:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "yellow,white"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ORBIT-00057": {
+   "bullets": [
+    "Material: neoprene",
+    "Non-slip surface"
+   ],
+   "clean_title": "Eco Friendly Non-Slip Yoga Mat",
+   "det_attrs": {
+    "color": [
+     "brown",
+     "white"
+    ],
+    "material": "neoprene"
+   },
+   "feed_item_id": "SUP_ORBIT-00057",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "31.98",
+   "price_min": "31.98",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.yoga_mats",
+    "injected_defect": null,
+    "raw_bullets": "Material: neoprene\nNon-slip surface",
+    "raw_price": "$31.98",
+    "raw_tags": "color=brown,white",
+    "raw_title": "Eco Friendly Non-Slip Yoga Mat (Brown) - Gym Training",
+    "received_at": "2026-11-01T14:39:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_orbit",
+   "tags": {
+    "color": "brown,white"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00003": {
+   "bullets": [
+    "Material: merino wool",
+    "Machine washable"
+   ],
+   "clean_title": "Men Breathable Athletic Gym Shorts",
+   "det_attrs": {
+    "color": [
+     "pink",
+     "yellow"
+    ],
+    "gender": "men",
+    "material": "merino wool",
+    "size": [
+     "XS",
+     "XXL"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00003",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "120.15",
+   "price_min": "92.42",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.shorts",
+    "injected_defect": null,
+    "raw_bullets": "Material: merino wool; Machine washable",
+    "raw_price": "$92.42 - $120.15",
+    "raw_tags": "size=xs/XXL;kolor=pink,yellow;gender=M",
+    "raw_title": "Men Breathable Athletic Gym Shorts (Pink/Yellow, XS/XXL) - Running Workout  ",
+    "received_at": "2026-11-01T08:21:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "pink,yellow",
+    "gender": "M",
+    "size": "xs/XXL"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00005": {
+   "bullets": [
+    "Material: fleece",
+    "Machine washable"
+   ],
+   "clean_title": "Men Eco Friendly Tapered Joggers",
+   "det_attrs": {
+    "color": [
+     "white",
+     "green"
+    ],
+    "gender": "men",
+    "material": "fleece",
+    "pack_count": 6,
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00005",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "55.06",
+   "price_min": "55.06",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.joggers",
+    "injected_defect": null,
+    "raw_bullets": "Material: fleece\n\u2022 Machine washable\n\u2022    ",
+    "raw_price": "55.06",
+    "raw_tags": "size=m|kolor=white,green|gender=M|qty=6",
+    "raw_title": "Men Eco Friendly Tapered Joggers 6-Pack (White/Green, M) - Gym Training",
+    "received_at": "2026-11-01T08:35:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "white,green",
+    "gender": "M",
+    "pack_count": "6",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00009": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Women A-Line Skirt With Pockets",
+   "det_attrs": {
+    "color": [
+     "blue",
+     "navy"
+    ],
+    "gender": "women",
+    "material": "polyester",
+    "size": [
+     "M"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00009",
+   "keyword_tail": [],
+   "price_max": "143.31",
+   "price_min": "143.31",
+   "raw_json": {
+    "expected_leaf": "apparel.women.bottoms.skirts",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester \u2022 Machine washable \u2022    ",
+    "raw_price": "USD 143.31",
+    "raw_tags": "size=m;kolor=blue,navy;gender=women",
+    "raw_title": "Women's A-Line Skirt with Pockets (Blue/Navy, M)",
+    "received_at": "2026-11-01T09:03:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "blue,navy",
+    "gender": "women",
+    "size": "m"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00012": {
+   "bullets": [
+    "Material: merino wool",
+    "Machine washable"
+   ],
+   "clean_title": "Boys Lightweight Toddler Sleepwear",
+   "det_attrs": {
+    "color": [
+     "blue"
+    ],
+    "gender": "kids",
+    "material": "merino wool",
+    "pack_count": 4,
+    "size": [
+     "XS"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00012",
+   "keyword_tail": [
+    "Gym",
+    "Training"
+   ],
+   "price_max": "93.97",
+   "price_min": "93.97",
+   "raw_json": {
+    "expected_leaf": "apparel.kids.pajamas",
+    "injected_defect": null,
+    "raw_bullets": "Material: merino wool\nMachine washable",
+    "raw_price": "93.97",
+    "raw_tags": "size=XS,kolor=blue,gender=K,qty=4",
+    "raw_title": "Boys Lightweight Toddler Sleepwear Set of 4 (Blue, XS) - Gym Training  ",
+    "received_at": "2026-11-01T09:24:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "blue",
+    "gender": "K",
+    "pack_count": "4",
+    "size": "XS"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00014": {
+   "bullets": [
+    "Upper: suede",
+    "Cushioned sole"
+   ],
+   "clean_title": "Unisex Heavy Duty Sport Sandals",
+   "det_attrs": {
+    "color": [
+     "yellow"
+    ],
+    "gender": "unisex",
+    "material": "suede",
+    "size": [
+     "7"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00014",
+   "keyword_tail": [
+    "Travel",
+    "Camping"
+   ],
+   "price_max": "95.72",
+   "price_min": "95.72",
+   "raw_json": {
+    "expected_leaf": "footwear.sandals",
+    "injected_defect": null,
+    "raw_bullets": "Upper: suede \u2022 Cushioned sole \u2022 Upper: suede",
+    "raw_price": "USD 95.72",
+    "raw_tags": "shoe_size=7|kolor=yellow",
+    "raw_title": "Unisex Heavy Duty Sport Sandals (Yellow, Size 7) - Travel Camping",
+    "received_at": "2026-11-01T09:38:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "yellow",
+    "size": "7"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00015": {
+   "bullets": [
+    "Upper: mesh",
+    "Cushioned sole"
+   ],
+   "clean_title": "Women Dry-Fit Chelsea Boots",
+   "det_attrs": {
+    "color": [
+     "black",
+     "blue"
+    ],
+    "gender": "women",
+    "material": "mesh",
+    "pack_count": 3,
+    "size": [
+     "13"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00015",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "177.4",
+   "price_min": "177.4",
+   "raw_json": {
+    "expected_leaf": "footwear.boots",
+    "injected_defect": null,
+    "raw_bullets": "Upper: mesh; Cushioned sole;    ",
+    "raw_price": "177.4",
+    "raw_tags": "shoe_size=13;kolor=black,blue;qty=3",
+    "raw_title": "Women's Dry-Fit Chelsea Boots 3pk (Black, Size 13) - Running Workout",
+    "received_at": "2026-11-01T09:45:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "black,blue",
+    "pack_count": "3",
+    "size": "13"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00018": {
+   "bullets": [
+    "Made of cast iron",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Breathable 8 Inch Chef Knife",
+   "det_attrs": {
+    "color": [
+     "red"
+    ],
+    "material": "cast iron"
+   },
+   "feed_item_id": "SUP_ZENITH-00018",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "83.55",
+   "price_min": "83.55",
+   "raw_json": {
+    "expected_leaf": "kitchen.cutlery.chef_knives",
+    "injected_defect": null,
+    "raw_bullets": "Made of cast iron; Dishwasher safe",
+    "raw_price": "83.55",
+    "raw_tags": "kolor=red",
+    "raw_title": "Breathable 8 Inch Chef Knife (Red) - Running Workout",
+    "received_at": "2026-11-01T10:06:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "red"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00024": {
+   "bullets": [
+    "Material: TPE foam",
+    "Non-slip surface"
+   ],
+   "clean_title": "Eco Friendly Resistance Bands Set",
+   "det_attrs": {
+    "color": [
+     "pink"
+    ],
+    "material": "tpe foam",
+    "pack_count": 6
+   },
+   "feed_item_id": "SUP_ZENITH-00024",
+   "keyword_tail": [
+    "EVERYDAY",
+    "CASUAL"
+   ],
+   "price_max": "84.54",
+   "price_min": "84.54",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.resistance_bands",
+    "injected_defect": null,
+    "raw_bullets": "Material: TPE foam; Non-slip surface",
+    "raw_price": "$84.54",
+    "raw_tags": "kolor=pink,qty=6",
+    "raw_title": "ECO FRIENDLY RESISTANCE BANDS SET PACK OF 6 (PINK) - EVERYDAY CASUAL",
+    "received_at": "2026-11-01T10:48:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "pink",
+    "pack_count": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00032": {
+   "bullets": [
+    "Connector: lightning",
+    "12-month warranty",
+    "Doubles as a signal blocker"
+   ],
+   "clean_title": "Shockproof Phone Case",
+   "det_attrs": {
+    "color": [
+     "red",
+     "purple"
+    ],
+    "connector": "lightning"
+   },
+   "feed_item_id": "SUP_ZENITH-00032",
+   "keyword_tail": [
+    "Home",
+    "Office"
+   ],
+   "price_max": "24.8",
+   "price_min": "19.08",
+   "raw_json": {
+    "expected_leaf": "electronics.cases",
+    "injected_defect": "prohibited_category",
+    "raw_bullets": "Connector: lightning\n\u2022 12-month warranty\n\u2022 Connector: lightning\nDoubles as a signal blocker",
+    "raw_price": "$19.08 - $24.8",
+    "raw_tags": "connector=LIGHTNING,kolor=red,purple",
+    "raw_title": "Shockproof Phone Case (Red) - Home Office",
+    "received_at": "2026-11-01T11:44:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "red,purple",
+    "connector": "LIGHTNING"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00033": {
+   "bullets": [
+    "Connector: usb-a",
+    "12-month warranty"
+   ],
+   "clean_title": "Dry-Fit Power Bank Charger",
+   "det_attrs": {
+    "color": [
+     "green",
+     "white",
+     "pink"
+    ],
+    "connector": "usb-a"
+   },
+   "feed_item_id": "SUP_ZENITH-00033",
+   "keyword_tail": [],
+   "price_max": "105.11",
+   "price_min": "105.11",
+   "raw_json": {
+    "expected_leaf": "electronics.power",
+    "injected_defect": null,
+    "raw_bullets": "Connector: usb-a; 12-month warranty",
+    "raw_price": "$105.11",
+    "raw_tags": "connector=USB-A,kolor=green,white,pink",
+    "raw_title": "Dry-Fit Power Bank Charger (Green)",
+    "received_at": "2026-11-01T11:51:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "green,white,pink",
+    "connector": "USB-A"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00038": {
+   "bullets": [
+    "Material: spandex blend",
+    "Machine washable"
+   ],
+   "clean_title": "Men Breathable Relaxed Denim Jeans With Pockets",
+   "det_attrs": {
+    "color": [
+     "gray",
+     "red",
+     "orange"
+    ],
+    "gender": "men",
+    "material": "spandex blend",
+    "size": [
+     "S"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00038",
+   "keyword_tail": [
+    "Gift",
+    "Idea"
+   ],
+   "price_max": "74.44",
+   "price_min": "74.44",
+   "raw_json": {
+    "expected_leaf": "apparel.men.bottoms.jeans",
+    "injected_defect": null,
+    "raw_bullets": "Material: spandex blend\n\u2022 Machine washable\n\u2022 Material: spandex blend\n\u2022    ",
+    "raw_price": "USD 74.44",
+    "raw_tags": "size=s,kolor=gray,red,orange,gender=male",
+    "raw_title": "Men Breathable Relaxed Denim Jeans w/ Pockets (Gray/Red/Orange, S) - Gift Idea  ",
+    "received_at": "2026-11-01T12:26:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "gray,red,orange",
+    "gender": "male",
+    "size": "s"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00042": {
+   "bullets": [
+    "Material: polyester",
+    "Machine washable"
+   ],
+   "clean_title": "Women Dry-Fit High Waist Leggings With Pockets",
+   "det_attrs": {
+    "color": [
+     "yellow",
+     "blue"
+    ],
+    "gender": "women",
+    "material": "polyester",
+    "pack_count": 6,
+    "size": [
+     "L"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00042",
+   "keyword_tail": [],
+   "price_max": "29.61",
+   "price_min": "22.78",
+   "raw_json": {
+    "expected_leaf": "apparel.women.bottoms.leggings",
+    "injected_defect": null,
+    "raw_bullets": "Material: polyester\nMachine washable\n   ",
+    "raw_price": "$22.78 - $29.61",
+    "raw_tags": "size=L,kolor=yellow,blue,sex=F,qty=6",
+    "raw_title": "Women's Dry-Fit High Waist Leggings with Pockets 6-Pack (Yellow/Blue, L)",
+    "received_at": "2026-11-01T12:54:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "yellow,blue",
+    "gender": "F",
+    "pack_count": "6",
+    "size": "L"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00048": {
+   "bullets": [
+    "Upper: leather",
+    "Cushioned sole"
+   ],
+   "clean_title": "",
+   "det_attrs": {
+    "color": [
+     "brown"
+    ],
+    "material": "leather",
+    "pack_count": 4,
+    "size": [
+     "7"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00048",
+   "keyword_tail": [],
+   "price_max": "57.15",
+   "price_min": "43.96",
+   "raw_json": {
+    "expected_leaf": "footwear.sandals",
+    "injected_defect": "empty_title",
+    "raw_bullets": "Upper: leather \u2022 Cushioned sole \u2022    ",
+    "raw_price": "$43.96 - $57.15",
+    "raw_tags": "shoe_size=7,kolor=brown,qty=4",
+    "raw_title": null,
+    "received_at": "2026-11-01T13:36:00+00:00"
+   },
+   "reason_codes": [
+    {
+     "code": "TITLE_EMPTY",
+     "detail": null,
+     "severity": "blocking",
+     "stage": "clean"
+    }
+   ],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "brown",
+    "pack_count": "4",
+    "size": "7"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00049": {
+   "bullets": [
+    "Upper: mesh",
+    "Cushioned sole"
+   ],
+   "clean_title": "Men Dry-Fit Chelsea Boots",
+   "det_attrs": {
+    "color": [
+     "gray"
+    ],
+    "gender": "men",
+    "material": "mesh",
+    "pack_count": 4,
+    "size": [
+     "6"
+    ]
+   },
+   "feed_item_id": "SUP_ZENITH-00049",
+   "keyword_tail": [
+    "Running",
+    "Workout"
+   ],
+   "price_max": "77.06",
+   "price_min": "59.28",
+   "raw_json": {
+    "expected_leaf": "footwear.boots",
+    "injected_defect": null,
+    "raw_bullets": "Upper: mesh\n\u2022 Cushioned sole",
+    "raw_price": "$59.28 - $77.06",
+    "raw_tags": "shoe_size=6|kolor=gray|qty=4",
+    "raw_title": "Men's Dry-Fit Chelsea Boots Pack of 4 (Gray, Size 6) - Running Workout",
+    "received_at": "2026-11-01T13:43:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "gray",
+    "pack_count": "4",
+    "size": "6"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00050": {
+   "bullets": [
+    "Made of cast iron",
+    "Dishwasher safe"
+   ],
+   "clean_title": "Eco Friendly Cast Iron Skillet",
+   "det_attrs": {
+    "color": [
+     "yellow",
+     "pink"
+    ],
+    "material": "cast iron",
+    "pack_count": 2
+   },
+   "feed_item_id": "SUP_ZENITH-00050",
+   "keyword_tail": [
+    "Everyday",
+    "Casual"
+   ],
+   "price_max": "147.72",
+   "price_min": "113.63",
+   "raw_json": {
+    "expected_leaf": "kitchen.cookware.pans",
+    "injected_defect": null,
+    "raw_bullets": "Made of cast iron\n\u2022 Dishwasher safe",
+    "raw_price": "$113.63 - $147.72",
+    "raw_tags": "kolor=yellow,pink;qty=2",
+    "raw_title": "Eco Friendly Cast Iron Skillet Pack of 2 (Yellow) - Everyday Casual",
+    "received_at": "2026-11-01T13:50:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "yellow,pink",
+    "pack_count": "2"
+   },
+   "unmapped_tags": {}
+  },
+  "SUP_ZENITH-00058": {
+   "bullets": [
+    "Material: neoprene",
+    "Non-slip surface"
+   ],
+   "clean_title": "Eco Friendly Loop Resistance Band",
+   "det_attrs": {
+    "color": [
+     "black",
+     "purple"
+    ],
+    "material": "neoprene",
+    "pack_count": 4
+   },
+   "feed_item_id": "SUP_ZENITH-00058",
+   "keyword_tail": [],
+   "price_max": "76.64",
+   "price_min": "76.64",
+   "raw_json": {
+    "expected_leaf": "sport.fitness.resistance_bands",
+    "injected_defect": null,
+    "raw_bullets": "Material: neoprene\nNon-slip surface\nMaterial: neoprene",
+    "raw_price": "76.64",
+    "raw_tags": "kolor=black,purple;qty=4",
+    "raw_title": "Eco Friendly Loop Resistance Band Set of 4 (Black)",
+    "received_at": "2026-11-01T14:46:00+00:00"
+   },
+   "reason_codes": [],
+   "supplier_id": "sup_zenith",
+   "tags": {
+    "color": "black,purple",
+    "pack_count": "4"
+   },
+   "unmapped_tags": {}
+  }
+ },
+ "rules_version": "81f9e0b1ff7a8c2f"
+}
