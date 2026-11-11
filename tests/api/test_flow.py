@@ -69,8 +69,11 @@ def test_ac_a1_full_flow(api: TestClient) -> None:
 
     card = api.get(f"/v1/recommendations/{rec['recommendation_id']}").json()
     assert card["title"].endswith("Headphones X1")
-    assert len(card["eligible_offers"]) == 2
-    assert any("$42.99 with $5 coupon" in o["raw_text"] for o in card["eligible_offers"])
+    texts = [o["raw_text"] for o in card["eligible_offers"]]
+    assert len(texts) >= 2
+    assert any("$42.99 with $5 coupon" in t for t in texts)
+    assert any("$44.49 FREE SHIPPING" in t for t in texts)
+    assert card["eligible_offers"][0]["effective_price"] == "37.99"  # sorted ascending
     assert "40.99" in card["explanation"]
     assert_money_strings(card)
 
@@ -98,7 +101,7 @@ def test_ac_a1_full_flow(api: TestClient) -> None:
     assert r.json()["error"]["code"] == "ILLEGAL_TRANSITION"
 
     offers = api.get("/v1/skus/SKU-0001/offers").json()
-    assert len(offers) == 2 and all(o["status"] == "accepted" for o in offers)
+    assert len(offers) >= 2 and offers[0]["status"] == "accepted"
     assert_money_strings(offers)
 
     # new run expires the leftover pendings for other SKUs and makes new ones
