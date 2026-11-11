@@ -1,0 +1,211 @@
+[
+  {
+    "scrape_id": 15,
+    "sku": null,
+    "competitor": "QuickCart",
+    "raw_text": "[SKU-0021] Heavy-Duty Blender H9 $58.70",
+    "expected": {
+      "sku_hint": "SKU-0021",
+      "listed_price": "58.70",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 28,
+    "sku": null,
+    "competitor": "ShopMart",
+    "raw_text": "[SKU-0009] Compact Charger D5 $155.57",
+    "expected": {
+      "sku_hint": "SKU-0009",
+      "listed_price": "155.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 58,
+    "sku": null,
+    "competitor": "QuickCart",
+    "raw_text": "[SKU-0038] Ultra Speaker D6 $197.41",
+    "expected": {
+      "sku_hint": "SKU-0038",
+      "listed_price": "197.41",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 61,
+    "sku": null,
+    "competitor": "MegaBuy",
+    "raw_text": "[SKU-0045] Ultra Desk Lamp F5 $21.02",
+    "expected": {
+      "sku_hint": "SKU-0045",
+      "listed_price": "21.02",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 65,
+    "sku": null,
+    "competitor": "DealHub",
+    "raw_text": "[SKU-0037] Compact Blender C5 $120.53",
+    "expected": {
+      "sku_hint": "SKU-0037",
+      "listed_price": "120.53",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 85,
+    "sku": null,
+    "competitor": "QuickCart",
+    "raw_text": "[SKU-0008] Smart Water Bottle D2 $113.55",
+    "expected": {
+      "sku_hint": "SKU-0008",
+      "listed_price": "113.55",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 116,
+    "sku": null,
+    "competitor": "PriceZone",
+    "raw_text": "[SKU-0029] Smart Headphones A3 $126.93",
+    "expected": {
+      "sku_hint": "SKU-0029",
+      "listed_price": "126.93",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 129,
+    "sku": null,
+    "competitor": "MegaBuy",
+    "raw_text": "[SKU-0049] Ultra Keyboard A9 $118.98",
+    "expected": {
+      "sku_hint": "SKU-0049",
+      "listed_price": "118.98",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 137,
+    "sku": null,
+    "competitor": "QuickCart",
+    "raw_text": "[SKU-0043] Smart Headphones C3 $69.08",
+    "expected": {
+      "sku_hint": "SKU-0043",
+      "listed_price": "69.08",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 142,
+    "sku": null,
+    "competitor": "ShopMart",
+    "raw_text": "[SKU-0013] Ultra Backpack G6 $120.07",
+    "expected": {
+      "sku_hint": "SKU-0013",
+      "listed_price": "120.07",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 152,
+    "sku": null,
+    "competitor": "MegaBuy",
+    "raw_text": "[SKU-0042] Ultra Speaker F4 $35.47",
+    "expected": {
+      "sku_hint": "SKU-0042",
+      "listed_price": "35.47",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

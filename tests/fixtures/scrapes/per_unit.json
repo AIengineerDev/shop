@@ -1,0 +1,135 @@
+[
+  {
+    "scrape_id": 36,
+    "sku": "SKU-0017",
+    "competitor": "QuickCart",
+    "raw_text": "Eco Kettle D3 $42.34 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "42.34",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 45,
+    "sku": "SKU-0035",
+    "competitor": "MegaBuy",
+    "raw_text": "Classic Backpack D9 $82.45 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "82.45",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 47,
+    "sku": "SKU-0016",
+    "competitor": "QuickCart",
+    "raw_text": "Pro Yoga Mat E7 $12.36 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "12.36",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 123,
+    "sku": "SKU-0047",
+    "competitor": "DealHub",
+    "raw_text": "Classic Headphones E3 $51.57 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "51.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 179,
+    "sku": "SKU-0014",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Charger C3 $30.59 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "30.59",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 187,
+    "sku": "SKU-0020",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Desk Lamp C5 $124.65 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "124.65",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 192,
+    "sku": "SKU-0037",
+    "competitor": "QuickCart",
+    "raw_text": "Compact Blender C5 $141.80 each, in stock",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "141.80",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": true,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

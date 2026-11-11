@@ -1,0 +1,26 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      REPRICER_EXTRACTOR: regex
+      REPRICER_LLM_MODE: replay
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e '.[dev]'
+      - run: ruff check .
+      - run: ruff format --check repricer tests scripts
+      - run: mypy
+      - run: pytest -q
+      - name: smoke (regex extractor, fresh DB)
+        run: |
+          python -m repricer --db smoke.db seed
+          python -m repricer --db smoke.db run
+          python -m repricer --db smoke.db audit verify

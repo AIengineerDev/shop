@@ -1,0 +1,59 @@
+[
+  {
+    "scrape_id": 81,
+    "sku": "SKU-0012",
+    "competitor": "MegaBuy",
+    "raw_text": "Classic Backpack H3 $1,078.65",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "1078.65",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 97,
+    "sku": "SKU-0038",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Speaker D6 $1,188.01",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "1188.01",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 146,
+    "sku": "SKU-0010",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker G5 $1,081.20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "1081.20",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

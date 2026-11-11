@@ -1,0 +1,173 @@
+[
+  {
+    "scrape_id": 17,
+    "sku": "SKU-0048",
+    "competitor": "PriceZone",
+    "raw_text": "Compact Mouse G9 (used - good) $147.29",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "147.29",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 86,
+    "sku": "SKU-0043",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Headphones C3 (used - good) $62.80",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "62.80",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 95,
+    "sku": "SKU-0009",
+    "competitor": "MegaBuy",
+    "raw_text": "Compact Charger D5 (used - good) $140.75",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "140.75",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 99,
+    "sku": "SKU-0021",
+    "competitor": "DealHub",
+    "raw_text": "Heavy-Duty Blender H9 (used - good) $64.57",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "64.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 100,
+    "sku": "SKU-0015",
+    "competitor": "ShopMart",
+    "raw_text": "Wireless Speaker E9 (used - good) $43.48",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "43.48",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 104,
+    "sku": "SKU-0027",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Monitor Stand E8 (used - good) $24.04",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "24.04",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 106,
+    "sku": "SKU-0044",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Monitor Stand C2 (used - good) $20.61",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "20.61",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 120,
+    "sku": "SKU-0037",
+    "competitor": "ShopMart",
+    "raw_text": "Compact Blender C5 (used - good) $155.98",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "155.98",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 128,
+    "sku": "SKU-0048",
+    "competitor": "MegaBuy",
+    "raw_text": "Compact Mouse G9 (used - good) $125.20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "125.20",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "used",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

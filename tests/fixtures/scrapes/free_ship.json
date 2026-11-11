@@ -1,0 +1,382 @@
+[
+  {
+    "scrape_id": 2,
+    "sku": "SKU-0001",
+    "competitor": "ShopMart",
+    "raw_text": "Brand new Acme Wireless Headphones X1 - $44.49 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "44.49",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 7,
+    "sku": "SKU-0019",
+    "competitor": "QuickCart",
+    "raw_text": "Heavy-Duty Monitor Stand B2 $31.79 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "31.79",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 13,
+    "sku": "SKU-0045",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Desk Lamp F5 $16.24 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "16.24",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 14,
+    "sku": "SKU-0008",
+    "competitor": "QuickCart",
+    "raw_text": "Smart Water Bottle D2 $113.55 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "113.55",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 32,
+    "sku": "SKU-0006",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Kettle F6 $21.81 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "21.81",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 51,
+    "sku": "SKU-0027",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Monitor Stand E8 $24.04 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "24.04",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 52,
+    "sku": "SKU-0032",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Blender B4 $104.01 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "104.01",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 55,
+    "sku": "SKU-0045",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Desk Lamp F5 $18.15 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "18.15",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 92,
+    "sku": "SKU-0010",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker G5 $85.06 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "85.06",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 102,
+    "sku": "SKU-0009",
+    "competitor": "PriceZone",
+    "raw_text": "Compact Charger D5 $155.57 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "155.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 107,
+    "sku": "SKU-0049",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Keyboard A9 $113.57 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "113.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 121,
+    "sku": "SKU-0048",
+    "competitor": "DealHub",
+    "raw_text": "Compact Mouse G9 $139.93 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "139.93",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 140,
+    "sku": "SKU-0014",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Charger C3 $28.98 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "28.98",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 156,
+    "sku": "SKU-0019",
+    "competitor": "MegaBuy",
+    "raw_text": "Heavy-Duty Monitor Stand B2 $30.34 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "30.34",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 175,
+    "sku": "SKU-0028",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Backpack A2 $130.52 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "130.52",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 176,
+    "sku": "SKU-0049",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Keyboard A9 $102.75 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "102.75",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 180,
+    "sku": "SKU-0001",
+    "competitor": "DealHub",
+    "raw_text": "Acme Wireless Headphones X1 $45.00 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "45.00",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 188,
+    "sku": "SKU-0005",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Kettle E3 $61.99 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "61.99",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 194,
+    "sku": "SKU-0031",
+    "competitor": "PriceZone",
+    "raw_text": "Pro Headphones A8 $109.60 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "109.60",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 195,
+    "sku": "SKU-0023",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Water Bottle F2 $160.60 FREE SHIPPING",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "160.60",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

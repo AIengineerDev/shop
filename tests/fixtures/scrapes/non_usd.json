@@ -1,0 +1,116 @@
+[
+  {
+    "scrape_id": 19,
+    "sku": "SKU-0005",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Kettle E3 \u20ac65.64",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "65.64",
+      "currency": "EUR",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  },
+  {
+    "scrape_id": 21,
+    "sku": "SKU-0010",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Speaker G5 \u20ac65.73",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "65.73",
+      "currency": "EUR",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  },
+  {
+    "scrape_id": 101,
+    "sku": "SKU-0031",
+    "competitor": "DealHub",
+    "raw_text": "Pro Headphones A8 \u20ac115.37",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "115.37",
+      "currency": "EUR",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  },
+  {
+    "scrape_id": 138,
+    "sku": "SKU-0048",
+    "competitor": "ShopMart",
+    "raw_text": "Compact Mouse G9 \u00a3147.29",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "147.29",
+      "currency": "GBP",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  },
+  {
+    "scrape_id": 169,
+    "sku": "SKU-0018",
+    "competitor": "PriceZone",
+    "raw_text": "Eco Monitor Stand A2 \u20ac66.97",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "66.97",
+      "currency": "EUR",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  },
+  {
+    "scrape_id": 181,
+    "sku": "SKU-0035",
+    "competitor": "PriceZone",
+    "raw_text": "Classic Backpack D9 \u00a386.57",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "86.57",
+      "currency": "GBP",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": "NON_USD"
+  }
+]

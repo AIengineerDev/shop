@@ -1,0 +1,553 @@
+[
+  {
+    "scrape_id": 1,
+    "sku": "SKU-0001",
+    "competitor": "DealHub",
+    "raw_text": "Brand new Acme Wireless Headphones X1 on sale for $42.99 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "42.99",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 3,
+    "sku": "SKU-0009",
+    "competitor": "DealHub",
+    "raw_text": "Compact Charger D5 on sale for $162.98 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "162.98",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 6,
+    "sku": "SKU-0044",
+    "competitor": "DealHub",
+    "raw_text": "Smart Monitor Stand C2 on sale for $20.61 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "20.61",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 8,
+    "sku": "SKU-0049",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Keyboard A9 on sale for $102.75 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "102.75",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 9,
+    "sku": "SKU-0003",
+    "competitor": "ShopMart",
+    "raw_text": "Wireless Blender G1 on sale for $52.91 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "52.91",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 18,
+    "sku": "SKU-0041",
+    "competitor": "DealHub",
+    "raw_text": "Pro Mouse A6 on sale for $41.70 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "41.70",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 26,
+    "sku": "SKU-0032",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Blender B4 on sale for $122.36 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "122.36",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 40,
+    "sku": "SKU-0050",
+    "competitor": "ShopMart",
+    "raw_text": "Classic Speaker E9 on sale for $138.44 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "138.44",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 46,
+    "sku": "SKU-0038",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker D6 on sale for $169.21 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "169.21",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 56,
+    "sku": "SKU-0047",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Headphones E3 on sale for $39.85 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "39.85",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 59,
+    "sku": "SKU-0013",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Backpack G6 on sale for $114.07 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "114.07",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 63,
+    "sku": "SKU-0004",
+    "competitor": "ShopMart",
+    "raw_text": "Heavy-Duty Charger G4 on sale for $67.77 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "67.77",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 71,
+    "sku": "SKU-0003",
+    "competitor": "MegaBuy",
+    "raw_text": "Wireless Blender G1 on sale for $58.20 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "58.20",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 76,
+    "sku": "SKU-0045",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Desk Lamp F5 on sale for $19.11 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "19.11",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 78,
+    "sku": "SKU-0039",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Headphones B7 on sale for $10.06 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "10.06",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 88,
+    "sku": "SKU-0014",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Charger C3 on sale for $28.98 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "28.98",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 91,
+    "sku": "SKU-0006",
+    "competitor": "ShopMart",
+    "raw_text": "Classic Kettle F6 on sale for $16.86 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "16.86",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 96,
+    "sku": "SKU-0033",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker F5 on sale for $72.67 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "72.67",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 117,
+    "sku": "SKU-0045",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Desk Lamp F5 on sale for $18.15 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "18.15",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 118,
+    "sku": "SKU-0007",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Tripod E6 on sale for $25.76 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "25.76",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 122,
+    "sku": "SKU-0023",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Water Bottle F2 on sale for $152.14 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "152.14",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 126,
+    "sku": "SKU-0012",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Backpack H3 on sale for $82.58 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "82.58",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 136,
+    "sku": "SKU-0007",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Tripod E6 on sale for $25.76 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "25.76",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 144,
+    "sku": "SKU-0037",
+    "competitor": "QuickCart",
+    "raw_text": "Compact Blender C5 on sale for $148.89 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "148.89",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 160,
+    "sku": "SKU-0043",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Headphones C3 on sale for $56.52 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "56.52",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 167,
+    "sku": "SKU-0037",
+    "competitor": "QuickCart",
+    "raw_text": "Compact Blender C5 on sale for $141.80 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "141.80",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 178,
+    "sku": "SKU-0003",
+    "competitor": "ShopMart",
+    "raw_text": "Wireless Blender G1 on sale for $55.56 with $3 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "55.56",
+      "currency": "USD",
+      "coupon_amount": "3.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 186,
+    "sku": "SKU-0007",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Tripod E6 on sale for $25.76 with $5 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "25.76",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 190,
+    "sku": "SKU-0010",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Speaker G5 on sale for $69.60 with $10 coupon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "69.60",
+      "currency": "USD",
+      "coupon_amount": "10.00",
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

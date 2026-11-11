@@ -1,0 +1,230 @@
+[
+  {
+    "scrape_id": 4,
+    "sku": "SKU-0020",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Desk Lamp C5 $117.72: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "117.72",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 16,
+    "sku": "SKU-0033",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Speaker F5 $89.76: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "89.76",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 22,
+    "sku": "SKU-0030",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Water Bottle H3 $45.39: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "45.39",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 66,
+    "sku": "SKU-0049",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Keyboard A9 $113.57: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "113.57",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 73,
+    "sku": "SKU-0013",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Backpack G6 $126.07: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "126.07",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 82,
+    "sku": "SKU-0023",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Water Bottle F2 $160.60: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "160.60",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 83,
+    "sku": "SKU-0022",
+    "competitor": "PriceZone",
+    "raw_text": "Wireless Blender D4 $140.91: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "140.91",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 93,
+    "sku": "SKU-0018",
+    "competitor": "MegaBuy",
+    "raw_text": "Eco Monitor Stand A2 $70.49: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "70.49",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 139,
+    "sku": "SKU-0040",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Thermos H9 $10.51: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "10.51",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 149,
+    "sku": "SKU-0048",
+    "competitor": "ShopMart",
+    "raw_text": "Compact Mouse G9 $125.20: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "125.20",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 158,
+    "sku": "SKU-0014",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Charger C3 $28.98: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "28.98",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  },
+  {
+    "scrape_id": 163,
+    "sku": "SKU-0008",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Water Bottle D2 $124.90: $5 off OR 10% off, cannot combine",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "124.90",
+      "currency": "USD",
+      "coupon_amount": "5.00",
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "AMBIGUOUS_COUPON"
+  }
+]

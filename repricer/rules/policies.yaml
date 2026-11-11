@@ -1,0 +1,36 @@
+# Pricing policies by price_class. Validated against repricer.models.Policy on load.
+# Money in cents, percentages in basis points (100 bp = 1%).
+#
+# Note on confidence: the regex fallback extractor reports confidence 40, the LLM
+# extractor up to 90. `default` admits regex offers; `premium` requires LLM-grade data.
+# A single eligible offer below confidence 70 is always blocked (SINGLE_SOURCE_LOW_CONF).
+
+default:
+  strategy: undercut_lowest
+  undercut_cents: 50
+  undercut_bp: 100
+  max_decrease_bp: 1000
+  max_increase_bp: 500
+  min_competitor_confidence: 40
+  max_offer_age_hours: 72
+  low_stock_threshold: 3
+  round_to_cents: 99
+
+clearance:
+  strategy: match_lowest
+  max_decrease_bp: 3000
+  max_increase_bp: 0
+  min_competitor_confidence: 40
+  max_offer_age_hours: 120
+  low_stock_threshold: 0
+  round_to_cents: 0
+
+premium:
+  strategy: target_margin
+  target_margin_bp: 4500
+  max_decrease_bp: 500
+  max_increase_bp: 500
+  min_competitor_confidence: 60
+  max_offer_age_hours: 72
+  low_stock_threshold: 5
+  round_to_cents: 0
