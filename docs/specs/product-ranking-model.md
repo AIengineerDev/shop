@@ -2,11 +2,19 @@
 
 | | |
 |---|---|
-| Status | Draft v1 |
+| Status | Draft v2 |
 | Owner | Alex Lavrenin |
-| Date | 2026-11-09 |
+| Date | 2026-11-11 (v1: 2026-11-09) |
 | Dataset | `data/ranking_items.csv` (schema below) |
 | Depends on | Existing `ranker_v1` artifacts (two-tower retrieval + multi-head heavy ranker, NDCG@20 = 0.440) |
+| Dev plan | [`docs/plans/product-ranking-model.dev-plan.md`](../plans/product-ranking-model.dev-plan.md) |
+
+### Changelog
+
+| Version | Change |
+|---|---|
+| v2 (2026-11-11) | Dwell excluded from the spec entirely: grade 1 = any click, grade 2 = wishlist (§4.2). Funnel priority made explicit (§3.1). `user_aov_tier` defined as a personalisation feature (§2). Max-history item and seller features added (§5.1). Popularity prior (best sellers up, unpopular down) added (§5.5). New §12 Serving (indexing, pagination, caching, latency, SLA) and §13 Test plan. CSV header extended with `impression_ts`, `wishlisted`, `seller_id`, `category` (§2, §9). |
+| v1 (2026-11-09) | Initial draft. |
 
 ## 1. Problem statement
 
@@ -23,6 +31,12 @@ This is a learning-to-rank (LTR) problem, not a classification problem. The unit
 - [ ] Training procedure: splits, loss, position-bias handling, hyperparameters, reproducibility.
 - [ ] Offline evaluation: metrics, slices, and promotion gates.
 - [ ] Online evaluation: experiment design, guardrails, and rollout.
+- [ ] Funnel priority: Search → Impressed → Clicked → Wishlist → Add to cart → **Purchase**; purchase is the highest-priority commitment and dominates the gain table (§3.1, §4.2).
+- [ ] Graded label: 0 no click, 1 click, 2 wishlist, 3 add to cart, 4 purchase (§4.2).
+- [ ] Max-history item data (review rating, review count, price history) and seller data (seller → items → reviews, highest-rated) are features (§5.1).
+- [ ] Ranking places best sellers (overall and per category) high and unpopular items low, without starving new items (§5.5).
+- [ ] Serving covers indexing, pagination, caching, latency budget and SLA (§12).
+- [ ] Test plan: unit, data, model, integration, performance and online tests, each with a pass criterion (§13).
 
 ### Success metrics
 
@@ -41,6 +55,10 @@ v1 is successful when every **ship gate** below is met at 100% rollout and holds
 | 30-day return rate on search-attributed orders | returned units / purchased units | TBD | no increase | Guardrail (delayed read) |
 | Merchant GMV concentration | share of search GMV to top 1% merchants | TBD | no increase > 1 pt | Guardrail |
 | Mean price of top-10 results | mean `price` over positions 1–10 | TBD | within ±5% | Guardrail |
+| Wishlist rate per search | wishlist (`save`) events / search sessions | TBD | +3% relative | Target |
+| Best-seller coverage in top 10 | share of queries where ≥ 1 of the category's top-20 sellers appears in positions 1–10, when one is in the candidate set | TBD | ≥ production | Target |
+| Long-tail exposure | share of top-10 impressions to items outside the top 20% by 30-day purchases | TBD | no drop > 10% relative | Guardrail (anti rich-get-richer, §5.5) |
+| New-item exposure | share of top-10 impressions to items published < 14 days | TBD | no drop > 10% relative | Guardrail |
 
 Twelve-month ambition (v1 → v3): +8–10% purchase conversion per search session, which at current traffic is the single largest lever on marketplace GMV available to the search team. Put the actual dollar figure here once the finance baseline is confirmed.
 
@@ -62,6 +80,11 @@ Twelve-month ambition (v1 → v3): +8–10% purchase conversion per search sessi
 | Reproducibility | re-run with same SHA + window reproduces `metrics.json` | n/a | exact to 3 decimals | Operability |
 | Model availability | ranker responses served from the model (not fallback) | n/a | ≥ 99.9% | Operability |
 | Fallback correctness | on timeout or error, serve `bm25` ordering | n/a | 100% of failures degrade, none 5xx | Operability |
+| Ranking service SLA | successful ranked responses within 50 ms / all requests, monthly | n/a | ≥ 99.9% | Ship gate (§12.5) |
+| Ranked-list cache hit rate (page ≥ 2) | page-2+ requests served from the ranked-list cache / page-2+ requests | n/a | ≥ 95% | Operability (§12.3) |
+| Pagination consistency | page-2+ responses with an item already shown on an earlier page | n/a | 0% | Ship gate (§12.2) |
+| Index freshness | age of price / stock / rating in the serving index | TBD | ≤ 15 min price & stock; ≤ 24 h aggregates | Guardrail (§12.1) |
+| Wishlist logging coverage | wishlist events with an attributed `query_id` | 91% of all events carry `impression_id` today | ≥ 95% | Data gate (§9) |
 
 #### Non-goals for the metrics
 
@@ -86,8 +109,8 @@ One row = one (query, candidate item) impression. Rows sharing a `qid` form one 
 | `user_id` | user_id | string | grouping / feature key | Join key to user features. Used for user-disjoint evaluation. |
 | `item_id` | item_id | string | feature key | Join key to item features. |
 | `device` | device_type | categorical | context | Observed values: `mobile`, `desktop`. |
-| `user_aov_tier` | user_aov_tier | categorical {Low, Mid, High} | user | Average order value affinity. Interacts strongly with `price`. |
-| `bm25` | bm25_score | float | relevance | Lexical query-item match. Observed range 7.5–16.2. |
+| `user_aov_tier` | user_aov_tier | categorical {Low, Mid, High} | user / **personalisation** | **Average Order Value** tier: the user's typical basket value, bucketed by tercile of trailing-180-day AOV over all users. It is *not* a "best value user" or loyalty score. It is the main personalisation input in v1: it tells the ranker what price band this user actually buys in, so a `High` user sees premium items earlier and a `Low` user is not shown items they will not buy. Used via the `price × aov_tier` cross feature (§5.1). Users with no orders get `Mid` plus `is_new_user = 1`. |
+| `bm25` | bm25_score | float | relevance | **Best Matching 25**: lexical query–item match from the search index (term frequency, inverse document frequency, length-normalised). Observed range 7.5–16.2. Not comparable across queries; use within-group rank (§5.1). |
 | `semantic_sim` | semantic_sim | float | relevance | Query-item cosine **similarity**, higher = closer. Confirmed from the sample: 0.88–0.91 on purchased items, 0.52–0.61 on bottom negatives. The brief's wording "cosine distance" is wrong; no sign flip needed. |
 | `price` | price | float | item | Item price at impression time. |
 | `hist_ctr_7d` | historical_ctr_7d | float | item | Trailing 7-day CTR for the item. Must be computed from data strictly *before* the impression timestamp. |
@@ -96,7 +119,11 @@ One row = one (query, candidate item) impression. Rows sharing a `qid` form one 
 | `clicked` | clicked | 0/1 | label | |
 | `added_to_cart` | added_to_cart | 0/1 | label | |
 | `purchased` | purchased | 0/1 | label | |
-| `relevance_grade` | relevance_grade | int 0–4 | **label** | 0 no click; 1 click; 2 wishlist; 3 add-to-cart; 4 purchase. Dwell is not used anywhere in this spec. |
+| `relevance_grade` | relevance_grade | int 0–4 | **label** | 0 no click; 1 click; 2 wishlist; 3 add-to-cart; 4 purchase. Derived, see §4.2. |
+| `impression_ts` | — | float (unix s) | ordering | From `impressions.parquet.ts`. Required for temporal splits and point-in-time features. |
+| `wishlisted` | — | 0/1 | label | From `events.type = save`. |
+| `seller_id` | sellers ID | string | feature key | `merchant_id` in the parquet sources. Join key for seller features (§5.1). |
+| `category` | — | categorical | feature key / slice | From `products.parquet.category`. Needed for per-category best-seller rank (§5.5) and slices. |
 
 ### Current state
 
@@ -110,16 +137,29 @@ Observations from the sample that the full dataset must preserve:
 
 ### Columns the CSV is missing that we need
 
+`impression_ts`, `wishlisted`, `seller_id` and `category` were on this list in v1. They are now in the header above because the parquet sources already have them (`impressions.ts`, `events.type = save`, `products.merchant_id`, `products.category`). Still missing:
+
 | Column | Why |
 |---|---|
-| `impression_ts` | Temporal splits, point-in-time feature correctness, recency decay. |
 | `candidate_set_size` | Normalising position; detecting truncated result pages. |
-| `item_category_id` | Query-category match features, slice evaluation. |
-| `merchant_id` | Merchant quality features, fairness slices. |
 | `query_intent` / `is_navigational` | Query-type slicing; navigational queries have degenerate label distributions. |
-| `in_stock`, `shipping_eta_days` | Strong purchase predictors, currently absent. |
+| `shipping_eta_days` | Strong purchase predictor. `merchants.fulfilment_days` is a seller-level proxy until then. |
 
-Request these from the logging pipeline. Train v1 without them if they cannot be backfilled; add in v1.1.
+`in_stock` exists in `products.parquet` but is a current snapshot, not point-in-time, so it is a serving filter (§12.1), not a training feature, until it is snapshotted per impression.
+
+Request the rest from the logging pipeline. Train v1 without them if they cannot be backfilled; add in v1.1.
+
+### Source data facts (as of 2026-11-11)
+
+| Source | Rows | Notes |
+|---|---|---|
+| `impressions.parquet` | 196,420 | 9,821 requests; 2025-05-01 → 2025-06-15 (45 days, not 90); has `ts`, `position` (0-based), `propensity`; **100% `source = logging_random`** |
+| `events.parquet` | 58,960 | types: view 23,069 · save 5,654 · add_to_cart 5,255 · purchase 4,510 · follow 4,048 · hide 2,524 · return 635 |
+| `products.parquet` | 4,000 | `merchant_id`, `category`, `price`, `in_stock`, `published_at` |
+| `merchants.parquet` | 60 | `review_score`, `return_rate`, `fulfilment_days`, `popularity` |
+| `users.parquet` | 2,000 | no AOV tier column: derive from purchase `value` (§2 `user_aov_tier`) |
+
+Consequences: (1) the whole log is randomised traffic, so propensities can be estimated directly (§5.4 option B, no EM needed) but there is no production-ordered baseline to compare against: "logged order" in §6.1 means the randomised order. (2) No `query_text` in impressions: the source is a feed, not search. Query features come from the search service log (§3.1) once it exists; the 10-row CSV is the only query-bearing data today. (3) `hide` and `return` are negative signals we do not currently use; see §4.3.
 
 ## 3. Data collection
 
@@ -127,16 +167,20 @@ Request these from the logging pipeline. Train v1 without them if they cannot be
 
 Log at the impression grain with a shared `query_id` so that every candidate rendered for a search result page is captured, including non-clicked ones. Negatives are the majority of the signal; a click-only log is useless for LTR.
 
-| Event | Fields | Source |
-|---|---|---|
-| `search_issued` | query_id, session_id, user_id, query_text, device_type, ts, candidate_set_size | search service |
-| `item_impressed` | query_id, item_id, displayed_position, ts, viewport_visible (bool) | client |
-| `item_clicked` | query_id, item_id, ts | client |
-| `wishlist_add` | query_id (attributed), item_id, ts | backend |
-| `add_to_cart` | query_id (attributed), item_id, ts | backend |
-| `purchase` | order_id, item_id, user_id, ts | backend |
+**Funnel priority.** Events are ordered by commitment. Logging completeness, alerting and label weight all follow this order, and purchase is the highest priority: a missing purchase event corrupts a grade-4 label, which is worth 20 clicks in the gain table (§4.2).
 
-Attribution: ATC and purchase are attributed to the most recent `query_id` in the same session that impressed the item, within a 24-hour window. Document the window; it changes label prevalence materially.
+| Priority | Event | Fields | Source | Grade it feeds | Max loss before alert |
+|---|---|---|---|---|---|
+| 1 (highest) | `purchase` | order_id, item_id, user_id, **query_id (attributed)**, price_paid, ts | backend | 4 | 0.1% |
+| 2 | `add_to_cart` | query_id (attributed), item_id, ts | backend | 3 | 0.5% |
+| 3 | `wishlist_add` | query_id (attributed), item_id, ts | backend | 2 | 1% |
+| 4 | `item_clicked` | query_id, item_id, ts | client | ≥ 1 | 2% |
+| 5 | `item_impressed` | query_id, item_id, displayed_position, ts, viewport_visible (bool) | client | 0 (negative) | 2% |
+| 6 | `search_issued` | query_id, session_id, user_id, query_text, device_type, ts, candidate_set_size, page, page_size | search service | group key | 0.1% |
+
+`wishlist_add` maps to `events.type = save` in the current parquet.
+
+Attribution: wishlist, ATC and purchase are attributed to the most recent `query_id` in the same session that impressed the item, within a 24-hour window. Document the window; it changes label prevalence materially. Backend events carry the attributed `query_id` at write time; do not reconstruct it at label-build time if the backend can stamp it.
 
 ### 3.2 Feature snapshots
 
@@ -183,7 +227,9 @@ Gain function for NDCG: **purchase-dominant**, `gain = {0, 1, 2, 5, 20}` for gra
 - Grades are monotone in the funnel: a purchased item is grade 4 regardless of other signals.
 - Returns/refunds within 30 days: demote grade 4 → 2 at label-build time when the return signal is available (`ranker_v1` already logs a `return` head). Not in v1 CSV; add when `order` data is joined.
 - Items clicked but never impressed (deep-link, external) are excluded from the group.
-- `relevance_grade` must be consistent with the binary columns: `purchased=1 ⇒ grade=4`, `added_to_cart=1 ⇒ grade≥3`, `clicked=0 ⇒ grade=0`. Assert this in the data-readiness check.
+- `relevance_grade` must be consistent with the binary columns: `purchased=1 ⇒ grade=4`, `added_to_cart=1 ⇒ grade≥3`, `wishlisted=1 ⇒ grade≥2`, `clicked=0 ⇒ grade=0`. Assert this in the data-readiness check.
+- A wishlist, ATC or purchase without a click (e.g. add-to-cart from the result card) still sets the grade; set `clicked = 1` for consistency and count these rows in the build report.
+- `hide` events: v1 sets grade 0 for the hidden item and excludes it from the group's positives. Do not invent a negative grade; LambdaMART gains must be ≥ 0.
 
 ### 4.4 Why not implicit-only (click) labels
 
@@ -196,20 +242,26 @@ Click-only labels over-reward items with attractive thumbnails and low prices an
 | Group | Features (v1, from CSV) | Additions for v1.1 |
 |---|---|---|
 | **Query–item relevance** | `bm25_score`, `semantic_sim` | title/attribute exact-match flags, query-category match, query term coverage |
-| **Item quality / popularity** | `historical_ctr_7d`, `review_rating`, `price` | review_count, 7d/30d purchase rate, 7d ATC rate, in_stock, shipping_eta_days, item_age_days, merchant rating, return rate |
-| **User** | `user_aov_tier` | user 30d purchase count, user category affinity vector (top-k categories), user price sensitivity (median purchased price), new vs returning |
+| **Item quality / popularity** | `historical_ctr_7d`, `review_rating`, `price` | review_count, 7d ATC rate, shipping_eta_days, return rate |
+| **Item max history** (v2) | `item_review_count`, `item_rating_smoothed` (Bayesian: `(n·r + m·C) / (n + m)`, `m = 20`, `C` = category mean), `item_purchases_30d`, `item_purchases_all` (all history up to `t`), `item_wishlist_30d`, `price_vs_item_median_90d` (current / own median), `price_is_item_min_90d`, `item_age_days` | price-drop recency |
+| **Seller** (v2) | `seller_review_score`, `seller_return_rate`, `seller_fulfilment_days`, `seller_item_count`, `seller_purchases_30d`, `seller_top_item_rating` (highest `item_rating_smoothed` among the seller's items with ≥ 20 reviews), `seller_review_weighted_rating` (mean item rating weighted by review count), `user_follows_seller` | seller tenure, seller dispute rate |
+| **Popularity prior** (v2, §5.5) | `item_bestseller_rank_category` (rank by 30-day purchases within `category`, 1 = best), `item_bestseller_pct_global`, `is_category_top20`, `is_unpopular` (0 purchases and < 1% CTR over 30 days with ≥ 200 impressions) | — |
+| **User** | `user_aov_tier`, `is_new_user` | user 30d purchase count, user category affinity vector (top-k categories), user price sensitivity (median purchased price) |
 | **Context** | `device_type` | hour-of-day, day-of-week, country/region, query length, query intent class |
 | **Cross** | `price / user_aov_tier median price` (price fit), `price` rank within group, `bm25` rank within group, `semantic_sim` z-score within group | user-category × item-category affinity, user's past engagement with this merchant |
 | **Group-level** | candidate_set_size, mean/max bm25 in group, mean/max semantic_sim in group | query popularity (searches / 7d), query historical CTR |
 
 Within-group normalised features (rank, z-score, ratio-to-max) matter a lot for GBDT rankers: raw `bm25_score` is not comparable across queries, but "this item has the top BM25 in its group" is.
 
+**"Max historical" means all history up to the impression, never after.** Every item and seller aggregate is computed over `[first_event, t)` for an impression at `t` (or the stated window ending at `t`). The current `products.parquet` / `merchants.parquet` scores (`review_score`, `popularity`) are present-day snapshots; using them directly on last month's impressions is leakage. Until snapshots exist, recompute from `events.parquet`, and treat the merchant snapshot columns as v1-acceptable only for slow-moving fields (`fulfilment_days`, `return_rate`) with a leakage note in `features.json`.
+
 ### 5.2 Features explicitly excluded from the model
 
 | Feature | Reason |
 |---|---|
 | `displayed_position` | Logging bias. Only used as a debiasing input during training (§5.4). At serving time position does not exist yet. |
-| `clicked`, `added_to_cart`, `purchased`, `relevance_grade` | Labels. |
+| `clicked`, `added_to_cart`, `purchased`, `wishlisted`, `relevance_grade` | Labels. |
+| `seller_id`, `category` as raw IDs | Memorisation. Use them only as join keys and through the aggregates in §5.1. `category` may be a LightGBM categorical feature if it has ≤ 200 levels. |
 | `session_id`, `query_id`, `user_id`, `item_id` as raw IDs | Memorisation. Item ID embeddings are allowed only in the neural ranker with dropout and a frequency floor. |
 | Any aggregate computed with a window that includes the impression time | Leakage. |
 
@@ -229,7 +281,26 @@ Logged clicks are biased toward low positions. Three options, in increasing comp
 | B. Inverse propensity weighting (IPW) | Estimate `P(examined | position)` from randomised traffic (§3.4) or via EM on the logs (regression-EM / intervention harvesting). Weight each clicked example by `1 / propensity`. Use LambdaMART's unbiased variant (`lambdarank_unbiased` in LightGBM). | Principled. Requires propensity estimates; high-variance at deep positions, so clip propensities at 0.1. |
 | C. Two-tower examination model | Jointly learn examination (position-conditioned) and relevance (feature-conditioned) towers, use only the relevance tower at serving. | Most flexible. Needs the neural ranker. v2. |
 
-Propensity curve estimation: with 1–2% randomised traffic, `propensity(k) = CTR_random(k) / CTR_random(1)`. Store as a versioned artefact next to the model.
+Propensity curve estimation: with 1–2% randomised traffic, `propensity(k) = CTR_random(k) / CTR_random(1)`. Store as a versioned artefact next to the model. The current log is 100% `logging_random` and already carries a per-row `propensity`: estimate the curve from it directly and cross-check against the logged value.
+
+### 5.5 Popularity prior: best sellers up, unpopular items down
+
+Product requirement: within a query's candidates, **best sellers (overall and per category) rank near the top and unpopular items near the bottom**.
+
+**How**: as learned features, not hard rules. The §5.1 popularity-prior features plus the purchase-dominant gain already push best sellers up, because best sellers are by definition the items that earn grade 4. The model learns how much popularity to trust per query; a hard "pin best sellers to the top" rule would put a best-selling phone case above the phone the user searched for.
+
+**Business rules on top of the model** (post-ranking, in `shopfeed/serving/ranker.py`, each behind a flag):
+
+| Rule | Behaviour | Default |
+|---|---|---|
+| Relevance floor | An item is eligible for positions 1–3 only if its `semantic_sim` is ≥ the group's median. Stops popularity from overriding relevance. | on |
+| Best-seller boost | If the category's #1 seller is in the candidate set and the model put it below position 10, move it to position 10. | off; enable only if the A/B shows best-seller coverage below production |
+| Unpopular demotion | Items with `is_unpopular = 1` cannot occupy positions 1–5. They are not removed. | on |
+| New-item exploration | Items with `item_age_days < 14` and < 200 impressions are exempt from unpopular demotion and get one slot in positions 6–10 per page, round-robin. | on |
+
+**Why the exploration slot is not optional**: "unpopular" is mostly "unseen". Without it, popularity features create a feedback loop where new and long-tail items never get impressions, never get purchases, and stay at the bottom permanently. The long-tail and new-item exposure guardrails in §1 measure this.
+
+**Offline check**: report NDCG@10 and Purchase MRR separately for groups where the purchased item is a category top-20 seller vs not. A model that wins only on best sellers is just a popularity sort; compare against baseline #2 (§6.1).
 
 ## 6. Models
 
@@ -239,7 +310,8 @@ Propensity curve estimation: with 1–2% randomised traffic, `propensity(k) = CT
 |---|---|---|---|
 | 0 | Current production order (as logged) | Reference point | 0 |
 | 1 | Sort by `bm25_score` | Lexical baseline | negative |
-| 2 | Sort by `historical_ctr_7d` | Popularity baseline | ~ 0 |
+| 2 | Sort by `historical_ctr_7d` | Popularity baseline (clicks) | ~ 0 |
+| 2a | Sort by `item_purchases_30d` (best-seller sort) | Popularity baseline (purchases); the bar §5.5 must clear | + small |
 | 3 | Pointwise GBDT (LightGBM, binary on `clicked`) | Sanity baseline | + small |
 | 4 | **LambdaMART (LightGBM `lambdarank`, graded label, IPW)** | **v1 production candidate** | + 5–10% |
 | 5 | Multi-task neural ranker (MLP over same features + item ID embedding, heads for click/ATC/purchase + ranking head) | v1.1 / v2 if embeddings and real-time features pay off | + on top of #4 |
@@ -345,7 +417,7 @@ Weekly full retrain on a rolling 90-day window. Trigger an off-cycle retrain if 
 
 ### 8.2 Slices
 
-Report every metric on: `device_type`, `user_aov_tier`, query length bucket (1 / 2–3 / 4+ terms), new vs returning user, candidate set size bucket, and (when available) top-20 categories. A model that wins overall but loses on `High` AOV tier or mobile is not shippable without discussion.
+Report every metric on: `device_type`, `user_aov_tier`, query length bucket (1 / 2–3 / 4+ terms), new vs returning user, candidate set size bucket, top-20 categories, seller size bucket (by `seller_item_count`), and purchased-item popularity (category top-20 seller vs long tail, §5.5). A model that wins overall but loses on `High` AOV tier or mobile is not shippable without discussion.
 
 ### 8.3 Unbiased offline evaluation
 
@@ -387,7 +459,9 @@ Track the correlation between offline NDCG@10 delta and online purchase-conversi
 
 Implemented as a script that fails loudly. All must pass.
 
-- [ ] Header matches §2 exactly (`session_id,qid,query_text,user_id,item_id,device,user_aov_tier,bm25,semantic_sim,price,hist_ctr_7d,rating,displayed_pos,clicked,added_to_cart,purchased,relevance_grade`).
+- [ ] Header matches §2 exactly (`session_id,qid,query_text,user_id,item_id,device,user_aov_tier,bm25,semantic_sim,price,hist_ctr_7d,rating,displayed_pos,clicked,added_to_cart,purchased,relevance_grade,impression_ts,wishlisted,seller_id,category`). The 10-row fixture is regenerated with the four v2 columns at M1.
+- [ ] Wishlist and purchase attribution: ≥ 95% of `save` and `purchase` events resolve to a `query_id`.
+- [ ] Every `seller_id` and `category` joins to `products.parquet` / `merchants.parquet` (0 orphans).
 - [ ] Row count ≥ 1M; group count ≥ 50K (the current 10-row fixture fails this by design).
 - [ ] No nulls in group keys or labels. Feature null rate < 5% per column; nulls encoded as NaN, not 0.
 - [ ] Label consistency: `purchased ⇒ grade 4`, `added_to_cart ⇒ grade ≥ 3`, `clicked = 0 ⇒ grade 0`.
@@ -410,6 +484,7 @@ Applied by `shopfeed/data/clean.py` **before** the §9 checks, in the dataset bu
 | `qid` | `^[0-9]{1,12}$` | drop_group | > 0.1% of groups |
 | `user_id` | `^u_[0-9]{1,12}$` or `^anon_[0-9a-f]{8,32}$` | drop_group | > 0.5% of groups |
 | `item_id` | `^p_[0-9]{1,12}$` | drop_row | > 0.5% of rows |
+| `seller_id` | `^m_[0-9]{1,12}$` | drop_row | > 0.5% of rows |
 
 Identifiers are normalised with `strip()` and lower-casing of the prefix before matching. Anything else that does not match is treated as corruption, never coerced.
 
@@ -451,7 +526,8 @@ Numeric columns arrive as strings in CSV. Parse only if the string matches the p
 | `hist_ctr_7d` | `^\d+(\.\d+)?$` | `[0, 1]` | NaN |
 | `rating` | `^\d(\.\d+)?$` | `[0, 5]` | NaN |
 | `displayed_pos` | `^[1-9]\d{0,2}$` | permutation of `1..n` within group | drop_group |
-| `clicked`, `added_to_cart`, `purchased` | `^[01]$` | — | drop_row |
+| `clicked`, `added_to_cart`, `purchased`, `wishlisted` | `^[01]$` | — | drop_row |
+| `impression_ts` | `^\d{9,10}(\.\d+)?$` | within the build's data window | drop_group |
 | `relevance_grade` | `^[0-4]$` | consistent with binary labels (§4.3) | drop_row |
 
 #### Duplicate and structural rules
@@ -481,6 +557,10 @@ Numeric columns arrive as strings in CSV. Parse only if the string matches the p
 | 8 | Purchase-dominant gain {0,1,2,5,20} is a design choice, not tuned. | Sweep the purchase gain over {10, 20, 40} on validation; pick by Purchase MRR, tie-break on NDCG@10. |
 | 9 | Revenue weighting of gains. | Deferred to v2; needs a business decision on relevance vs revenue trade-off. |
 | 10 | Diversity / merchant fairness re-ranking. | v2, as a post-ranking stage with its own spec. |
+| 11 | Popularity features create a rich-get-richer loop; unpopular items never recover. | Learned features over hard rules, new-item exploration slot, long-tail and new-item exposure guardrails (§5.5, §1). |
+| 12 | Present-day `review_score` / `popularity` in parquet leak future data. | Recompute point-in-time from events (§5.1); leakage test in §13. |
+| 13 | Source log is 45 days, 100% randomised, feed not search (no `query_text`). | 60/20/20 split on 45 days ≈ 27 / 9 / 9 days. Lower §9 row/group gates for this sample and record real counts in the dev plan. Query features wait on the `search_issued` log. |
+| 14 | `user_aov_tier` was read as "best value user". | Resolved: it is Average Order Value tier, a personalisation feature (§2). |
 
 ## 11. Deliverables for v1
 
@@ -491,4 +571,113 @@ Numeric columns arrive as strings in CSV. Parse only if the string matches the p
 4. `shopfeed/training/train_lambdamart.py`: §7 training, writes `artifacts/ranker_v2/`.
 5. `shopfeed/eval/offline.py`: §8.1–8.4 metrics with bootstrap CIs and slices; HTML report to `reports/`.
 6. Experiment plan document for the A/B in §8.5, including power calculation.
-7. Tests: label consistency, leakage (point-in-time CTR), group integrity in splits, NDCG implementation against a hand-computed example.
+7. Tests: the full §13 test plan.
+8. `shopfeed/labels.py`: event-derived grade ladder (§4.2) from `save`, `add_to_cart` and `purchase` events.
+9. `shopfeed/features/history.py`: point-in-time item max-history, seller and popularity-prior features (§5.1, §5.5).
+10. `shopfeed/serving/`: ranker, post-ranking rules, ranked-list cache, pagination and fallback (§5.5, §12).
+
+## 12. Serving
+
+### 12.1 Indexation
+
+- **Search index** holds per item: text fields for BM25, the embedding for `semantic_sim`, and filterable fields `in_stock`, `ships_to`, `category`, `seller_id`, `price`.
+- **Feature store** (key-value, keyed by `item_id` and `seller_id`) holds the §5.1 item, seller and popularity aggregates. Batch-computed daily from the event store; not in the search index, so a daily rebuild never forces a reindex.
+- **Update paths**: price and stock are streamed to the index (≤ 15 min). Ratings, review counts, purchase counts and best-seller ranks are batch (≤ 24 h). New items are indexed within 15 min of `published_at` with popularity features set to the cold-start defaults, not 0.
+- **Eligibility filters are applied before ranking**, in retrieval: out of stock, does not ship to the user's country, seller in the user's `blocked_merchants`, seller `status ≠ active`. The ranker never sees these items.
+
+### 12.2 Pagination
+
+- Rank the **whole candidate set once** (≤ 200 items) on page 1 and cache the ordered list (§12.3). Pages 2+ are slices of that list.
+- Never re-rank per page. Re-ranking moves items between pages, causing duplicates and gaps; the pagination-consistency gate in §1 is 0%.
+- Use an opaque cursor (`query_id` + offset), not a raw offset, so a cache miss can be detected and handled.
+- On a cache miss for page 2+ (expired or evicted), re-rank, drop every item already served for this `query_id` (logged in `item_impressed`), and continue. Count these events.
+- Log `page` and `page_size` in `search_issued`; `displayed_position` is the absolute position across pages (page 3, slot 2 of 20 = 42), so propensities stay comparable.
+
+### 12.3 Caching
+
+| Cache | Key | Value | TTL | Invalidation |
+|---|---|---|---|---|
+| Ranked list | `query_id` | ordered `item_id`s + model version | 30 min | none; tied to one search session |
+| Query result | normalised `query_text` + `device` + `user_aov_tier` + country + filters | ordered `item_id`s | 5 min | price/stock change on any item in the list; model deploy |
+| Item / seller features | `item_id`, `seller_id` | feature vector | 24 h | daily batch overwrite |
+| Model | model version | loaded LightGBM booster | until deploy | blue/green swap |
+
+The query-result cache key includes `user_aov_tier` and nothing more user-specific: it is the only personalisation input in v1, so three tiers × devices keeps the cache hit rate useful. Adding per-user features in v1.1 means dropping this cache or moving personalisation to a re-rank stage after it.
+
+### 12.4 Latency budget (p99, page 1)
+
+| Stage | Budget |
+|---|---|
+| Retrieval + filters (BM25 + ANN) | 25 ms |
+| Feature fetch (batched multi-get) | 8 ms |
+| Feature transform (within-group normalisation) | 2 ms |
+| Model scoring, 200 candidates | 8 ms (p50 2 ms) |
+| Post-ranking rules (§5.5) | 1 ms |
+| Cache write + serialisation | 2 ms |
+| **Ranking path total** | **≤ 21 ms** after retrieval; end-to-end ≤ 50 ms |
+
+Pages 2+ from cache: ≤ 10 ms p99. Hard timeout on the ranking path: 30 ms, after which the fallback serves BM25 order.
+
+### 12.5 SLA
+
+| Item | Commitment |
+|---|---|
+| Availability | ≥ 99.9% monthly of search requests return a ranked list within 50 ms (≈ 43 min/month error budget). |
+| Degradation | Model timeout or error → BM25 order; feature-store miss → cold-start defaults for that item; cache down → rank uncached. None of these return 5xx. |
+| Fallback budget | Fallback-served responses ≤ 0.1% of requests per day; above that, page on-call. |
+| Model rollback | Previous model version stays loaded; rollback ≤ 5 min, no deploy. |
+| Data freshness | §12.1 update paths; a feature batch older than 48 h fires an alert and freezes retraining. |
+| Error budget policy | If the monthly budget is spent, freeze model launches until the next window. |
+
+## 13. Test plan
+
+Every row is a test in `tests/` (or a scripted check where stated) with a binary pass criterion. CI runs unit, data-fixture and model-smoke tests on every PR; performance and full-data tests run nightly.
+
+### 13.1 Unit tests
+
+| Test | File | Pass criterion |
+|---|---|---|
+| Schema contract | `test_schema.py` | Fixture header equals §2 exactly; dtypes match. |
+| Regex guardrails | `test_clean.py` | One positive and one negative string per §9.1 rule; synthetic dirty CSV yields exact expected `clean_report.json` counts. |
+| Grade ladder | `test_labels.py` | Table-driven: no click → 0; click → 1; click + wishlist → 2; wishlist, no click → 2, `clicked` set to 1; ATC → 3; ATC + wishlist → 3; purchase → 4. |
+| Label consistency | `test_labels.py` | Every §4.3 implication holds on the regenerated fixture. |
+| Attribution | `test_labels.py` | Purchase 23 h after impression in same session attributes; 25 h or other session does not; most recent of two impressing queries wins. |
+| Point-in-time features | `test_features.py` | `hist_ctr_7d`, `item_purchases_all`, `item_rating_smoothed`, `seller_*` at `t` are unchanged when events after `t` are appended. |
+| Bayesian rating | `test_features.py` | Item with 1 review of 5.0 scores below an item with 500 reviews at 4.7 when category mean is 4.2. |
+| Best-seller rank | `test_features.py` | Hand-built category of 5 items gets ranks 1–5 by 30-day purchases; ties broken by `item_id`. |
+| Within-group features | `test_features.py` | Rank / z-score / ratio-to-max correct on a 5-row group; identical output from train and serve code paths. |
+| NDCG / MRR / Purchase@k | `test_metrics.py` | Match hand-computed values for both gain tables to 1e-9. |
+| Splits | `test_splits.py` | Session shares 60/20/20 ± 1 pt; no `session_id` or `qid` in two partitions; max train ts < min val ts < min test ts. |
+| Post-ranking rules | `test_rules.py` | Relevance floor, unpopular demotion and new-item slot each produce the expected order on a crafted 12-item group; each flag off is a no-op. |
+| Pagination | `test_pagination.py` | 200-item list paged by 20 yields 200 unique items in order; cache-miss on page 3 yields no item from pages 1–2. |
+
+### 13.2 Data tests (scripted, `scripts/check_ranking_data.py`)
+
+All §9 checks plus: `save` / `purchase` attribution ≥ 95%; seller and category joins with 0 orphans; feature null rate < 5%; and a 1K-sample point-in-time recomputation of every max-history feature against `events.parquet` with 0 mismatches.
+
+### 13.3 Model tests
+
+| Test | Pass criterion |
+|---|---|
+| Train smoke (`test_train_smoke.py`) | 5 trees on the fixture train without error; artefact directory has all six §7.4 files. |
+| Reproducibility | Two runs with the same SHA, window and seed give identical `metrics.json` to 3 decimals. |
+| Leakage | No feature > 50% of gain importance; test NDCG not more than 10% above validation NDCG. |
+| Excluded features | `features.json` contains none of §5.2. |
+| Directional sanity | Raising `semantic_sim`, `item_rating_smoothed` or `item_purchases_30d` for one item, all else fixed, does not lower its score on ≥ 95% of sampled groups. |
+| Popularity sanity | On the test split, the model beats baseline #2a (best-seller sort) on Purchase MRR, and does not lose on the long-tail purchased-item slice (§8.2). |
+| Ship gates | Every §1 technical ship gate, read from `metrics.json`. |
+
+### 13.4 Integration and performance tests
+
+| Test | Pass criterion |
+|---|---|
+| Serving parity | 1K logged requests re-scored offline and online give identical scores (train–serve skew < 0.1%). |
+| Scoring benchmark (`test_serving.py`) | 200 candidates: p50 ≤ 2 ms, p99 ≤ 8 ms on serving CPU class. |
+| End-to-end load | At 2× peak QPS for 30 min: p99 ≤ 50 ms page 1, ≤ 10 ms page 2+, 0 5xx. |
+| Fallback | Injected model timeout, feature-store outage and cache outage each return BM25 / cold-start order, no 5xx. |
+| Cache | Page-2+ hit rate ≥ 95% in the load test; price change invalidates the query-result cache entry within TTL. |
+| Rollback | Switch to previous model version in ≤ 5 min under load with no failed requests. |
+
+### 13.5 Online tests
+
+Team-draft interleaving (3 days) then A/B per §8.5. Pass = every §1 business ship gate, guardrails green including long-tail and new-item exposure, and SLA held at each rollout stage.
