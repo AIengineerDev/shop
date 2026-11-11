@@ -1,0 +1,135 @@
+[
+  {
+    "scrape_id": 27,
+    "sku": "SKU-0043",
+    "competitor": "DealHub",
+    "raw_text": "Smart Headphones C3 2 for $120.60",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "120.60",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 35,
+    "sku": "SKU-0031",
+    "competitor": "DealHub",
+    "raw_text": "Pro Headphones A8 2 for $237.28",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "237.28",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 53,
+    "sku": "SKU-0026",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Desk Lamp B4 2 for $256.82",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "256.82",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 79,
+    "sku": "SKU-0049",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Keyboard A9 2 for $200.50",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "200.50",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 113,
+    "sku": "SKU-0040",
+    "competitor": "QuickCart",
+    "raw_text": "Smart Thermos H9 2 for $17.12",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "17.12",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 153,
+    "sku": "SKU-0028",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Backpack A2 2 for $256.04",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "256.04",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  },
+  {
+    "scrape_id": 177,
+    "sku": "SKU-0044",
+    "competitor": "QuickCart",
+    "raw_text": "Smart Monitor Stand C2 2 for $36.22",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "36.22",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": true
+    },
+    "expected_status": "needs_review",
+    "expected_reason": "BUNDLE_PRICE"
+  }
+]

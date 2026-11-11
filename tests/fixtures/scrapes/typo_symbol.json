@@ -1,0 +1,40 @@
+[
+  {
+    "scrape_id": 5,
+    "sku": "SKU-0028",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Backpack A2 137.05 USD",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "137.05",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 49,
+    "sku": "SKU-0023",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Water Bottle F2 160.60 USD",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "160.60",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

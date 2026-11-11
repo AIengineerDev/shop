@@ -1,0 +1,97 @@
+[
+  {
+    "scrape_id": 24,
+    "sku": "SKU-0001",
+    "competitor": "MegaBuy",
+    "raw_text": "Brand new Acme Wireless Headphones X1 $42.75 ships free",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "42.75",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 38,
+    "sku": "SKU-0002",
+    "competitor": "MegaBuy",
+    "raw_text": "Brand new Classic Desk Lamp B1 $56.51 ships free",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "56.51",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 72,
+    "sku": "SKU-0015",
+    "competitor": "QuickCart",
+    "raw_text": "Brand new Wireless Speaker E9 $47.83 ships free",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "47.83",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 115,
+    "sku": "SKU-0030",
+    "competitor": "QuickCart",
+    "raw_text": "Brand new Ultra Water Bottle H3 $55.47 ships free",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "55.47",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 132,
+    "sku": "SKU-0041",
+    "competitor": "DealHub",
+    "raw_text": "Brand new Pro Mouse A6 $33.75 ships free",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "33.75",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "0.00",
+      "condition": "new",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

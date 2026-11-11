@@ -1,0 +1,59 @@
+[
+  {
+    "scrape_id": 12,
+    "sku": "SKU-0050",
+    "competitor": "DealHub",
+    "raw_text": "Refurbished Classic Speaker E9 $125.85",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "125.85",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "refurbished",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 43,
+    "sku": "SKU-0041",
+    "competitor": "DealHub",
+    "raw_text": "Refurbished Pro Mouse A6 $39.71",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "39.71",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "refurbished",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 133,
+    "sku": "SKU-0040",
+    "competitor": "PriceZone",
+    "raw_text": "Refurbished Smart Thermos H9 $11.61",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "11.61",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "refurbished",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

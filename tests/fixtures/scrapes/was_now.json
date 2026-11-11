@@ -1,0 +1,230 @@
+[
+  {
+    "scrape_id": 33,
+    "sku": "SKU-0015",
+    "competitor": "ShopMart",
+    "raw_text": "Wireless Speaker E9: was $53.83, now $47.83",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "47.83",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 68,
+    "sku": "SKU-0037",
+    "competitor": "DealHub",
+    "raw_text": "Compact Blender C5: was $156.89, now $148.89",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "148.89",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 69,
+    "sku": "SKU-0017",
+    "competitor": "DealHub",
+    "raw_text": "Eco Kettle D3: was $54.34, now $42.34",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "42.34",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 75,
+    "sku": "SKU-0020",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Desk Lamp C5: was $159.42, now $145.42",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "145.42",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 108,
+    "sku": "SKU-0016",
+    "competitor": "ShopMart",
+    "raw_text": "Pro Yoga Mat E7: was $23.18, now $11.18",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "11.18",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 109,
+    "sku": "SKU-0049",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Keyboard A9: was $110.94, now $91.94",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "91.94",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 114,
+    "sku": "SKU-0030",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Water Bottle H3: was $63.43, now $50.43",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "50.43",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 124,
+    "sku": "SKU-0041",
+    "competitor": "ShopMart",
+    "raw_text": "Pro Mouse A6: was $56.72, now $37.72",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "37.72",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 134,
+    "sku": "SKU-0015",
+    "competitor": "PriceZone",
+    "raw_text": "Wireless Speaker E9: was $66.83, now $47.83",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "47.83",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 143,
+    "sku": "SKU-0042",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker F4: was $41.47, now $35.47",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "35.47",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 147,
+    "sku": "SKU-0008",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Water Bottle D2: was $105.52, now $96.52",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "96.52",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 198,
+    "sku": "SKU-0037",
+    "competitor": "QuickCart",
+    "raw_text": "Compact Blender C5: was $154.71, now $134.71",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "134.71",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

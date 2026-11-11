@@ -1,0 +1,325 @@
+[
+  {
+    "scrape_id": 10,
+    "sku": "SKU-0041",
+    "competitor": "MegaBuy",
+    "raw_text": "Pro Mouse A6 $43.68 + $8.00 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "43.68",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "8.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 23,
+    "sku": "SKU-0050",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Speaker E9 $138.44 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "138.44",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 25,
+    "sku": "SKU-0027",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Monitor Stand E8 $29.38 + $8.00 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "29.38",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "8.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 29,
+    "sku": "SKU-0038",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Speaker D6 $159.81 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "159.81",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 44,
+    "sku": "SKU-0047",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Headphones E3 $51.57 + $6.95 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "51.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "6.95",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 50,
+    "sku": "SKU-0018",
+    "competitor": "ShopMart",
+    "raw_text": "Eco Monitor Stand A2 $74.01 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "74.01",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 54,
+    "sku": "SKU-0036",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Charger C8 $157.17 + $8.00 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "157.17",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "8.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 62,
+    "sku": "SKU-0001",
+    "competitor": "MegaBuy",
+    "raw_text": "Acme Wireless Headphones X1 $45.00 + $6.95 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "45.00",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "6.95",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 64,
+    "sku": "SKU-0005",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Kettle E3 $80.22 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "80.22",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 84,
+    "sku": "SKU-0049",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Keyboard A9 $108.16 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "108.16",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 141,
+    "sku": "SKU-0024",
+    "competitor": "ShopMart",
+    "raw_text": "Heavy-Duty Kettle H4 $99.21 + $6.95 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "99.21",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "6.95",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 148,
+    "sku": "SKU-0016",
+    "competitor": "PriceZone",
+    "raw_text": "Pro Yoga Mat E7 $10.00 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "10.00",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 155,
+    "sku": "SKU-0041",
+    "competitor": "MegaBuy",
+    "raw_text": "Pro Mouse A6 $43.68 + $6.95 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "43.68",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "6.95",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 165,
+    "sku": "SKU-0007",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Tripod E6 $22.08 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "22.08",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 168,
+    "sku": "SKU-0042",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Speaker F4 $43.82 + $8.00 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "43.82",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "8.00",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 170,
+    "sku": "SKU-0010",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Speaker G5 $77.33 + $4.99 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "77.33",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "4.99",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 183,
+    "sku": "SKU-0021",
+    "competitor": "MegaBuy",
+    "raw_text": "Heavy-Duty Blender H9 $61.64 + $6.95 shipping",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "61.64",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": "6.95",
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

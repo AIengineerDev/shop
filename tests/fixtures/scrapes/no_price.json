@@ -1,0 +1,78 @@
+[
+  {
+    "scrape_id": 34,
+    "sku": "SKU-0013",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Backpack G6 - currently unavailable, check back soon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": null,
+      "currency": "UNKNOWN",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": false,
+      "is_bundle": false
+    },
+    "expected_status": "rejected",
+    "expected_reason": "NO_PRICE_FOUND"
+  },
+  {
+    "scrape_id": 74,
+    "sku": "SKU-0018",
+    "competitor": "ShopMart",
+    "raw_text": "Eco Monitor Stand A2 - currently unavailable, check back soon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": null,
+      "currency": "UNKNOWN",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": false,
+      "is_bundle": false
+    },
+    "expected_status": "rejected",
+    "expected_reason": "NO_PRICE_FOUND"
+  },
+  {
+    "scrape_id": 127,
+    "sku": "SKU-0018",
+    "competitor": "MegaBuy",
+    "raw_text": "Eco Monitor Stand A2 - currently unavailable, check back soon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": null,
+      "currency": "UNKNOWN",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": false,
+      "is_bundle": false
+    },
+    "expected_status": "rejected",
+    "expected_reason": "NO_PRICE_FOUND"
+  },
+  {
+    "scrape_id": 185,
+    "sku": "SKU-0030",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Water Bottle H3 - currently unavailable, check back soon",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": null,
+      "currency": "UNKNOWN",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": false,
+      "is_bundle": false
+    },
+    "expected_status": "rejected",
+    "expected_reason": "NO_PRICE_FOUND"
+  }
+]

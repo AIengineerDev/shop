@@ -1,0 +1,363 @@
+[
+  {
+    "scrape_id": 31,
+    "sku": "SKU-0030",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Water Bottle H3 $50.43 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "50.43",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 41,
+    "sku": "SKU-0003",
+    "competitor": "PriceZone",
+    "raw_text": "Wireless Blender G1 $52.91 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "52.91",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 42,
+    "sku": "SKU-0042",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Speaker F4 $41.73 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "41.73",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 67,
+    "sku": "SKU-0034",
+    "competitor": "QuickCart",
+    "raw_text": "Eco Kettle E8 $30.62 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "30.62",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 87,
+    "sku": "SKU-0034",
+    "competitor": "MegaBuy",
+    "raw_text": "Eco Kettle E8 $30.62 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "30.62",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 98,
+    "sku": "SKU-0031",
+    "competitor": "MegaBuy",
+    "raw_text": "Pro Headphones A8 $121.14 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "121.14",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 105,
+    "sku": "SKU-0017",
+    "competitor": "ShopMart",
+    "raw_text": "Eco Kettle D3 $51.74 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "51.74",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 130,
+    "sku": "SKU-0036",
+    "competitor": "PriceZone",
+    "raw_text": "Classic Charger C8 $157.17 - take 10% off at checkout with code SAVE10",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "157.17",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 131,
+    "sku": "SKU-0030",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Water Bottle H3 $55.47 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "55.47",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 145,
+    "sku": "SKU-0015",
+    "competitor": "ShopMart",
+    "raw_text": "Wireless Speaker E9 $39.13 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "39.13",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 150,
+    "sku": "SKU-0050",
+    "competitor": "MegaBuy",
+    "raw_text": "Classic Speaker E9 $132.14 - take 10% off at checkout with code SAVE10",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "132.14",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 154,
+    "sku": "SKU-0006",
+    "competitor": "DealHub",
+    "raw_text": "Classic Kettle F6 $17.85 - take 10% off at checkout with code SAVE10",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "17.85",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 159,
+    "sku": "SKU-0030",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Water Bottle H3 $55.47 - take 10% off at checkout with code SAVE10",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "55.47",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 166,
+    "sku": "SKU-0007",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Tripod E6 $25.76 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "25.76",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 172,
+    "sku": "SKU-0030",
+    "competitor": "PriceZone",
+    "raw_text": "Ultra Water Bottle H3 $47.91 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "47.91",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 189,
+    "sku": "SKU-0050",
+    "competitor": "DealHub",
+    "raw_text": "Classic Speaker E9 $138.44 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "138.44",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 193,
+    "sku": "SKU-0040",
+    "competitor": "DealHub",
+    "raw_text": "Smart Thermos H9 $12.17 - take 15% off at checkout with code SAVE15",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "12.17",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "15.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 196,
+    "sku": "SKU-0004",
+    "competitor": "ShopMart",
+    "raw_text": "Heavy-Duty Charger G4 $64.38 - take 10% off at checkout with code SAVE10",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "64.38",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "10.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 197,
+    "sku": "SKU-0033",
+    "competitor": "ShopMart",
+    "raw_text": "Ultra Speaker F5 $89.76 - take 20% off at checkout with code SAVE20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "89.76",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": "20.00",
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]

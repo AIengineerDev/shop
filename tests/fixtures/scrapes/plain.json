@@ -1,0 +1,648 @@
+[
+  {
+    "scrape_id": 11,
+    "sku": "SKU-0016",
+    "competitor": "ShopMart",
+    "raw_text": "Pro Yoga Mat E7 - $12.95",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "12.95",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 20,
+    "sku": "SKU-0035",
+    "competitor": "DealHub",
+    "raw_text": "Classic Backpack D9 - $74.20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "74.20",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 30,
+    "sku": "SKU-0030",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Water Bottle H3 - $47.91",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "47.91",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 37,
+    "sku": "SKU-0046",
+    "competitor": "PriceZone",
+    "raw_text": "Eco Speaker B5 - $128.62",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "128.62",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 39,
+    "sku": "SKU-0013",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Backpack G6 - $132.08",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "132.08",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 48,
+    "sku": "SKU-0022",
+    "competitor": "DealHub",
+    "raw_text": "Wireless Blender D4 - $133.86",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "133.86",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 57,
+    "sku": "SKU-0045",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Desk Lamp F5 - $17.20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "17.20",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 60,
+    "sku": "SKU-0035",
+    "competitor": "ShopMart",
+    "raw_text": "Classic Backpack D9 - $70.08",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "70.08",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 70,
+    "sku": "SKU-0011",
+    "competitor": "QuickCart",
+    "raw_text": "Compact Desk Lamp G5 - $139.27",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "139.27",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 77,
+    "sku": "SKU-0029",
+    "competitor": "MegaBuy",
+    "raw_text": "Smart Headphones A3 - $102.76",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "102.76",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 80,
+    "sku": "SKU-0049",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Keyboard A9 - $113.57",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "113.57",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 89,
+    "sku": "SKU-0032",
+    "competitor": "QuickCart",
+    "raw_text": "Smart Blender B4 - $134.60",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "134.60",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 90,
+    "sku": "SKU-0046",
+    "competitor": "ShopMart",
+    "raw_text": "Eco Speaker B5 - $150.06",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "150.06",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 94,
+    "sku": "SKU-0036",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Charger C8 - $141.45",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "141.45",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 103,
+    "sku": "SKU-0029",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Headphones A3 - $120.89",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "120.89",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 110,
+    "sku": "SKU-0002",
+    "competitor": "PriceZone",
+    "raw_text": "Classic Desk Lamp B1 - $45.75",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "45.75",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 111,
+    "sku": "SKU-0028",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Backpack A2 - $137.05",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "137.05",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 112,
+    "sku": "SKU-0012",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Backpack H3 - $66.85",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "66.85",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 119,
+    "sku": "SKU-0019",
+    "competitor": "MegaBuy",
+    "raw_text": "Heavy-Duty Monitor Stand B2 - $31.79",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "31.79",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 125,
+    "sku": "SKU-0047",
+    "competitor": "PriceZone",
+    "raw_text": "Classic Headphones E3 - $44.54",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "44.54",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 135,
+    "sku": "SKU-0008",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Water Bottle D2 - $96.52",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "96.52",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 151,
+    "sku": "SKU-0040",
+    "competitor": "QuickCart",
+    "raw_text": "Smart Thermos H9 - $12.17",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "12.17",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 157,
+    "sku": "SKU-0045",
+    "competitor": "QuickCart",
+    "raw_text": "Ultra Desk Lamp F5 - $21.02",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "21.02",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 161,
+    "sku": "SKU-0006",
+    "competitor": "PriceZone",
+    "raw_text": "Classic Kettle F6 - $16.86",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "16.86",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 162,
+    "sku": "SKU-0036",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Charger C8 - $165.03",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "165.03",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 164,
+    "sku": "SKU-0047",
+    "competitor": "QuickCart",
+    "raw_text": "Classic Headphones E3 - $44.54",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "44.54",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 171,
+    "sku": "SKU-0002",
+    "competitor": "DealHub",
+    "raw_text": "Classic Desk Lamp B1 - $56.51",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "56.51",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 173,
+    "sku": "SKU-0039",
+    "competitor": "DealHub",
+    "raw_text": "Classic Headphones B7 - $10.06",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "10.06",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 174,
+    "sku": "SKU-0040",
+    "competitor": "PriceZone",
+    "raw_text": "Smart Thermos H9 - $9.40",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "9.40",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 182,
+    "sku": "SKU-0048",
+    "competitor": "MegaBuy",
+    "raw_text": "Compact Mouse G9 - $125.20",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "125.20",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 184,
+    "sku": "SKU-0026",
+    "competitor": "DealHub",
+    "raw_text": "Ultra Desk Lamp B4 - $130.91",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "130.91",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 191,
+    "sku": "SKU-0042",
+    "competitor": "MegaBuy",
+    "raw_text": "Ultra Speaker F4 - $45.90",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "45.90",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 199,
+    "sku": "SKU-0029",
+    "competitor": "ShopMart",
+    "raw_text": "Smart Headphones A3 - $114.85",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "114.85",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  },
+  {
+    "scrape_id": 200,
+    "sku": "SKU-0012",
+    "competitor": "MegaBuy",
+    "raw_text": "Classic Backpack H3 - $86.52",
+    "expected": {
+      "sku_hint": null,
+      "listed_price": "86.52",
+      "currency": "USD",
+      "coupon_amount": null,
+      "coupon_percent": null,
+      "shipping": null,
+      "condition": "unknown",
+      "in_stock": null,
+      "is_bundle": false
+    },
+    "expected_status": "accepted",
+    "expected_reason": null
+  }
+]
