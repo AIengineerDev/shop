@@ -1,6 +1,6 @@
 # Spec: Dynamic Competitive Pricing & Repricing Engine
 
-**Status:** Draft v1 — 2026-11-11
+**Status:** v1.1 — 2026-11-11 (implemented on branch `task/repricer-v1`; §11 lists decisions taken)
 **Domain:** FinTech / E-Commerce Operations / Rule Systems
 **Package:** `repricer/` (Python 3.11, FastAPI, Pydantic v2, SQLite via stdlib `sqlite3`, Anthropic SDK)
 **Sibling spec:** `catalog-onboarding-taxonomy.spec.md` (same stack, same conventions)
@@ -51,8 +51,7 @@ Build an end-to-end repricing pipeline that:
 ### Out of scope (v1)
 - Live scraping of competitor sites (scrapes arrive pre-loaded in the table).
 - Multi-currency conversion (non-USD offers are extracted, flagged, and excluded from pricing).
-- Auto-apply without human review (see §6.4 — `auto_apply` exists as a policy flag but defaults
-  to `false` and requires explicit opt-in per SKU class).
+- Auto-apply. Every price change goes through human review (decided 2026-11-11).
 - Demand elasticity / ML-driven pricing. Rules only.
 - Auth on the API. Single-tenant, internal tool. Add a header-token guard behind a flag only.
 
@@ -82,8 +81,9 @@ and a SQLite trigger raises on any attempt.
 | updated_at           | TEXT    |                                                |
 
 The source table arrives with `cost_price`, `min_margin_percent`, `current_price` as REAL.
-Migration `0001` converts them to the integer columns above with `ROUND(x * 100)` and
-asserts no row lost precision beyond 0.5 cent. The original REAL columns are dropped.
+Migration `0001` converts them to the integer columns above with `ROUND(x * 100)` after
+asserting every REAL is a 2-decimal value (up to float noise); a sub-cent value such as
+`12.344` aborts the migration rather than being rounded. The original REAL columns are dropped.
 
 ### 3.2 `competitor_scrapes` (given)
 
@@ -137,7 +137,6 @@ scrape is a no-op unless `--force`, which inserts a new row and marks the old on
 | max_offer_age_hours      | INTEGER | stale offers ignored                                    |
 | low_stock_threshold      | INTEGER | stock ≤ threshold → suppress decreases                  |
 | round_to_cents           | INTEGER | e.g. `99` → price ends in `.99`; `0` = no rounding      |
-| auto_apply               | INTEGER | 0/1; default 0                                          |
 | version                  | INTEGER | bumped on every YAML reload; recorded on recommendations|
 
 ### 3.5 `repricing_runs`
@@ -175,7 +174,7 @@ scrape is a no-op unless `--force`, which inserts a new row and marks the old on
 | reason_codes             | TEXT       | JSON array, ordered, e.g. `["UNDERCUT","CLAMP_MAX_DECREASE","FLOOR_APPLIED"]` |
 | explanation              | TEXT       | human-readable, generated from reason codes (templated, not LLM) |
 | policy_version           | INTEGER    |                                                         |
-| review_status            | TEXT       | `pending` / `approved` / `rejected` / `applied` / `expired` / `auto_applied` |
+| review_status            | TEXT       | `pending` / `approved` / `rejected` / `applied` / `expired` |
 | created_at               | TEXT       |                                                         |
 
 `review_status` is the single mutable column, and only via the state machine in §6.3.
@@ -227,12 +226,14 @@ Rows from `competitor_scrapes` where `extracted = 0`. Batched (default 20 per LL
 ### 4.2 LLM extractor
 - Model: latest Claude (configured in `repricer/config.py`, default `claude-sonnet-5-5`;
   overridable via `REPRICER_MODEL`).
-- Uses tool-use / structured output with the `ExtractedOffer` JSON schema. No free text.
+- Uses structured outputs (`output_config.format`, JSON schema) — not forced tool use, which
+  current models reject. No free text. Amounts are decimal strings.
 - System prompt forbids arithmetic: *"Report prices exactly as written. Do not subtract
   coupons, do not compute totals, do not convert currencies."*
 - Input to the model is **only** `raw_text` and the `scrape_id`. The model is never shown
   `cost_price`, `min_margin`, or `current_price`.
-- Temperature 0. Prompt-cached system prompt. Retries ×3 with backoff on 429/5xx.
+- No sampling parameters (rejected by current models); determinism for tests comes from
+  recorded cassettes. Prompt-cached system prompt. SDK retries ×3 on 429/5xx, then fallback.
 
 `ExtractedOffer` schema (Pydantic, `extra='forbid'`):
 
@@ -291,8 +292,8 @@ Cover: plain price, coupon $, coupon %, both (ambiguous), free shipping, paid sh
 "was/now" strike-through pricing (must extract *now* price), bundle pricing ("2 for $50" →
 `needs_review`), non-USD, price-per-unit, typo'd currency symbols, no price at all.
 
-The LLM test suite runs against recorded responses (`tests/fixtures/llm_cassettes/`);
-live calls are gated behind `REPRICER_LIVE_LLM=1`.
+The LLM test suite runs against recorded responses (`tests/fixtures/llm_cassettes/`).
+`REPRICER_LLM_MODE=live|record|replay` selects real calls, real calls + save, or replay only.
 
 ---
 
@@ -316,8 +317,9 @@ live calls are gated behind `REPRICER_LIVE_LLM=1`.
                          hi = current × (1 + max_increase_bp/10000))
 5. floored       = max(bounded, floor)
 6. stock guard   = if stock ≤ low_stock_threshold and floored < current → floored = current
-7. rounded       = round_to(floored, policy.round_to_cents)     → never rounds below floor;
-                                                                  if it would, round up instead
+7. rounded       = round_to(floored, policy.round_to_cents)     → only if floored != current;
+                                                                  never below floor or the step-4
+                                                                  lower bound; rounds up instead
 8. decision      = propose if rounded != current
                    hold    if rounded == current
                    blocked if any hard guardrail fired (5.4)
@@ -360,7 +362,6 @@ default:
   max_offer_age_hours: 72
   low_stock_threshold: 3
   round_to_cents: 99
-  auto_apply: false
 clearance:
   strategy: match_lowest
   max_decrease_bp: 3000
@@ -415,15 +416,13 @@ pending ──approve──▶ approved ──apply──▶ applied
    ├──reject──▶ rejected│
    ├──override─▶ approved (with override_price, re-validated)
    └──(new run for same sku)──▶ expired
-auto_apply policies: pending ──▶ auto_applied (only if decision='propose' and no guardrail)
 ```
 
 Illegal transitions return 409 from the API and raise `IllegalTransition` from the service.
 
 ### 6.4 Auto-apply
-Only when `policy.auto_apply = true` **and** `decision='propose'` **and**
-`|delta_bp| ≤ policy.max_auto_apply_bp` (default 300). Everything else queues for review.
-Auto-applied changes still produce `price_changes` rows with `source='auto_apply'`.
+
+Removed from v1. Every change is reviewed by a human.
 
 ### 6.5 Audit queries
 - `repricer audit sku <SKU>` — full price history with recommendation + action chain.
@@ -525,7 +524,8 @@ Each AC is a test or a command that must pass.
 - AC-R2: Given cost $30.00, min margin 20%, current $45.00, competitor $42.99 − $5 coupon,
   policy `undercut_lowest` (50¢, max_decrease 10%, round .99): floor = $36.00,
   lowest = $37.99, raw = $37.49, clamped to $40.50, rounded to $40.99, decision `propose`,
-  reason codes `["UNDERCUT","CLAMP_MAX_DECREASE","ROUNDED"]`.
+  reason codes `["UNDERCUT","CLAMP_MAX_DECREASE","ROUNDED"]` (plus `SHIPPING_UNKNOWN` after
+  `UNDERCUT` when the scrape text does not mention shipping, as the brief's example does not).
 - AC-R3: Same as R2 but current $35.00 → `blocked`, `FLOOR_ABOVE_CURRENT`.
 - AC-R4: Stock = 2 with threshold 3 → `hold`, `LOW_STOCK_NO_DECREASE`.
 - AC-R5: No `float` in `repricer/engine/` or `repricer/money.py` (AST test).
@@ -576,3 +576,20 @@ them with the above; confirm or redirect:
    synthetic snippets (deterministic seed) for development and the golden fixtures?
 7. **Auth.** None assumed. If this is exposed beyond localhost, a static bearer token
    behind `REPRICER_API_TOKEN` is the minimum.
+
+---
+
+## 11. Decisions taken during implementation (2026-11-11)
+
+| topic | decision |
+|-------|----------|
+| Auto-apply | Removed from v1 (CTO). |
+| Price increases | Allowed, bounded by `max_increase_bp` (CTO). |
+| Seed data | Deterministic generator, seed 42, 50 SKUs / 200 scrapes (CTO). |
+| LLM tests | Cassette replay; `REPRICER_LLM_MODE` replaces `REPRICER_LIVE_LLM` (CTO). |
+| Model | `claude-sonnet-5-5` default, structured outputs, no forced tool choice, no temperature. |
+| ULID | stdlib implementation in `repricer/ids.py`; no extra dependency. |
+| Default policy confidence | `min_competitor_confidence: 40` so regex offers (40) qualify; `premium` keeps 60. |
+| Rounding | Skipped when the price does not move; floored at `max(floor, lower bound)`. |
+| Override | Allowed on `pending` recs of any decision (can rescue `FLOOR_ABOVE_CURRENT`), re-validated. |
+| Cassettes | Not recorded yet: no API key in the build environment. `scripts/record_cassettes.py` ready. |
