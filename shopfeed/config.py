@@ -14,7 +14,8 @@ RANKING_CSV = DATA_DIR / "ranking_items.csv"
 SEED = 42
 
 # Labels (§3.1, §4)
-ATTRIBUTION_WINDOW_S = 24 * 3600  # wishlist / ATC / purchase -> most recent impressing query
+ATTRIBUTION_WINDOW_S = 24 * 3600  # reconstruction window for events without impression_id
+STAMPED_MAX_LAG_S = 7 * 24 * 3600  # sanity cap for backend-stamped impression_id (§3.1)
 RETURN_WINDOW_S = 30 * 24 * 3600  # return within 30 d demotes grade 4 -> 2 (§4.3)
 SESSION_GAP_S = 30 * 60  # new session after 30 min without a request
 

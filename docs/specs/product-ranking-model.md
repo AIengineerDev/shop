@@ -159,7 +159,21 @@ Request the rest from the logging pipeline. Train v1 without them if they cannot
 | `merchants.parquet` | 60 | `review_score`, `return_rate`, `fulfilment_days`, `popularity` |
 | `users.parquet` | 2,000 | no AOV tier column: derive from purchase `value` (§2 `user_aov_tier`) |
 
-Consequences: (1) the whole log is randomised traffic, so propensities can be estimated directly (§5.4 option B, no EM needed) but there is no production-ordered baseline to compare against: "logged order" in §6.1 means the randomised order. (2) No `query_text` in impressions: the source is a feed, not search. Query features come from the search service log (§3.1) once it exists; the 10-row CSV is the only query-bearing data today. (3) `hide` and `return` are negative signals we do not currently use; see §4.3.
+Consequences: (1) the whole log is randomised traffic, so propensities can be estimated directly (§5.4 option B, no EM needed) but there is no production-ordered baseline to compare against: "logged order" in §6.1 means the randomised order. (2) No `query_text` in impressions: the source is a feed, not search. Query features come from the search service log (§3.1) once it exists; the 10-row CSV is the only query-bearing data today. (3) `hide` demotes click-only rows (§4.3); `return` is not yet applied (§4.3). (4) `users.parquet` gains `aov_tier`, `aov_value`, `aov_order_count`, `aov_asof_ts` via `scripts/build_user_aov.py` (serving snapshot only; training uses the point-in-time tier).
+
+### Build mapping (feed log → CSV), implemented in `shopfeed/data/build.py`
+
+| Column | Source / rule |
+|---|---|
+| `qid` | integer part of `request_id` |
+| `session_id` | per user, new session when a request starts > 30 min after the previous one |
+| `displayed_pos` | `position + 1`. Duplicate (request, item) impressions (2,568 rows) are merged: earliest position kept, labels = max. This leaves documented position gaps in 1,096 groups. |
+| `clicked` / `wishlisted` / `added_to_cart` / `purchased` | `view` / `save` / `add_to_cart` / `purchase` events (see attribution, §3.1) |
+| `user_aov_tier` | point-in-time tier as of the impression day's start (`shopfeed/data/aov.py`) |
+| `semantic_sim` | cosine(user `t0..t7`, product `c0..c7`): **user–item proxy**, not query–item |
+| `bm25`, `rating` | NaN (not in the feed log; exempt from the §9 null-rate check) |
+| `query_text` | empty (feed mode; §9.1 query rules apply only to non-empty queries) |
+| `device` | `unknown` (added to the §9.1 allowed set) |
 
 ## 3. Data collection
 
@@ -180,7 +194,9 @@ Log at the impression grain with a shared `query_id` so that every candidate ren
 
 `wishlist_add` maps to `events.type = save` in the current parquet.
 
-Attribution: wishlist, ATC and purchase are attributed to the most recent `query_id` in the same session that impressed the item, within a 24-hour window. Document the window; it changes label prevalence materially. Backend events carry the attributed `query_id` at write time; do not reconstruct it at label-build time if the backend can stamp it.
+Attribution: backend events carry the attributed impression / `query_id` at write time, and a stamp is **trusted** up to a 7-day sanity cap (`STAMPED_MAX_LAG_S`). Only events without a stamp are reconstructed: attributed to the user's most recent impression of the item within 24 h (`ATTRIBUTION_WINDOW_S`). Events that match no impression are non-search and excluded.
+
+Why not a hard 24 h window on stamped events: in the current log, stamped purchases arrive up to 48 h after the impression (median 24.8 h). 1,719 of 3,353 (51%) are beyond 24 h, so a 24 h cut would discard half of grade 4. The window changes label prevalence materially; `reports/build_report.json` records the lag counts on every build.
 
 ### 3.2 Feature snapshots
 
@@ -229,7 +245,7 @@ Gain function for NDCG: **purchase-dominant**, `gain = {0, 1, 2, 5, 20}` for gra
 - Items clicked but never impressed (deep-link, external) are excluded from the group.
 - `relevance_grade` must be consistent with the binary columns: `purchased=1 ⇒ grade=4`, `added_to_cart=1 ⇒ grade≥3`, `wishlisted=1 ⇒ grade≥2`, `clicked=0 ⇒ grade=0`. Assert this in the data-readiness check.
 - A wishlist, ATC or purchase without a click (e.g. add-to-cart from the result card) still sets the grade; set `clicked = 1` for consistency and count these rows in the build report.
-- `hide` events: v1 sets grade 0 for the hidden item and excludes it from the group's positives. Do not invent a negative grade; LambdaMART gains must be ≥ 0.
+- `hide` events: a click-only row that is hidden becomes grade 0. Wishlist, ATC and purchase outrank a hide (so the implications above always hold). Do not invent a negative grade; LambdaMART gains must be ≥ 0.
 
 ### 4.4 Why not implicit-only (click) labels
 
@@ -492,7 +508,7 @@ Identifiers are normalised with `strip()` and lower-casing of the prefix before 
 
 | Column | Normalisation | Allowed set (regex) | Action on miss |
 |---|---|---|---|
-| `device` | `strip().lower()`; map `{"iphone","android","phone"} → mobile`, `{"pc","web","laptop"} → desktop`, `{"ios_app","android_app"} → app` | `^(mobile\|desktop\|app)$` | drop_row |
+| `device` | `strip().lower()`; map `{"iphone","android","phone"} → mobile`, `{"pc","web","laptop"} → desktop`, `{"ios_app","android_app"} → app` | `^(mobile\|desktop\|app\|unknown)$` | drop_row |
 | `user_aov_tier` | `strip().title()` | `^(Low\|Mid\|High)$` | drop_group (tier is per user, so one bad value means the user join failed) |
 
 #### Query text

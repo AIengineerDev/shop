@@ -110,15 +110,17 @@ Carried over from spec §10 and the repo audit.
 
 | Fact | Value |
 |---|---|
-| Rows | TBD (source: 196,420 impressions) |
-| Query groups | TBD (source: 9,821 requests) |
-| Sessions / users / items | TBD / ≤ 2,000 / ≤ 4,000 |
+| Rows | 195,133 (196,420 impressions; 2,568 duplicate impressions merged) |
+| Query groups | 9,821 (feed requests; no query text) |
+| Sessions / users / items | 9,782 / 1,604 / 3,830 |
 | Date range | 2025-05-01 → 2025-06-15 (45 days) |
-| Sellers / categories | 60 / TBD |
-| Grade distribution 0 / 1 / 2 / 3 / 4 | TBD |
-| CTR at position 1 vs 10 | TBD |
-| Median candidates per group | TBD |
-| Rows / groups dropped by §9.1 cleaning, by rule | TBD |
+| Sellers / categories | 60 / 16 |
+| Grade distribution 0 / 1 / 2 / 3 / 4 | 88.3% / 7.1% / 2.0% / 1.0% / 1.7% (172,256 / 13,765 / 3,859 / 1,901 / 3,352) |
+| CTR at position 1 vs 10 | 19.3% vs 10.1% |
+| Median candidates per group | 20 (min 17 after dedup) |
+| Rows / groups dropped by §9.1 cleaning, by rule | 0 / 0 |
+| Purchases: stamped / lag > 24 h / non-search | 3,353 / 1,719 / 1,157 |
+| §9 readiness (`--profile sample`) | 12 / 12 pass |
 
 ## 7. Definition of done for v1
 
