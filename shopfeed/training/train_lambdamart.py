@@ -21,8 +21,8 @@ import pandas as pd
 
 from shopfeed import config
 from shopfeed.eval.metrics import mean_ipw_ndcg, per_query
-from shopfeed.eval.propensity import estimate_from_randomised, lookup
 from shopfeed.eval.offline import evaluate, paired_delta
+from shopfeed.eval.propensity import estimate_from_randomised, lookup
 from shopfeed.features.history import UNAVAILABLE
 from shopfeed.features.ranking import CATEGORICAL, EXCLUDED, WITHIN_GROUP
 from shopfeed.training.baselines import heuristic_scores
