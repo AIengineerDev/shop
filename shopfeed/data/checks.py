@@ -66,7 +66,8 @@ def check_groups(df):
 
 def check_semantic_direction(df):
     r = df[["semantic_sim", "clicked"]].corr().iloc[0, 1]
-    return CheckResult("semantic_sim_direction", bool(r > 0), f"corr(semantic_sim, clicked)={r:.3f}")
+    return CheckResult("semantic_sim_direction", bool(r > 0),
+                       f"corr(semantic_sim, clicked)={r:.3f}")
 
 
 def check_hist_ctr_point_in_time(df, src: Sources | None, n=1000):
