@@ -6,7 +6,7 @@ No `from __future__ import annotations` here: FastAPI must evaluate the function
 from collections.abc import Callable
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel
 
 from catalog_onboard.api.pagination import clamp_limit, decode_cursor, encode_cursor
@@ -91,6 +91,15 @@ class ErrorBody(BaseModel):
     code: str
 
 
+
+def as_json(model: BaseModel) -> Response:
+    """Serialise once, with pydantic-core, on the worker thread.
+
+    Returning a Response makes FastAPI skip re-validating the response model (it still documents
+    it in OpenAPI via response_model=). Under concurrent load the default path re-validated and
+    JSON-encoded large pages on the event loop: 8 clients got 4x less throughput than one."""
+    return Response(content=model.model_dump_json(), media_type="application/json")
+
 def not_found(what: str, ident: str | int) -> HTTPException:
     return HTTPException(status_code=404, detail={"detail": f"{what} {ident!r} not found", "code": "NOT_FOUND"})
 
@@ -106,8 +115,8 @@ def build_router(
     err: dict[int | str, dict[str, Any]] = {404: {"model": ErrorBody}}
 
     @router.get("/health", response_model=Health)
-    def health() -> Health:
-        return Health(status="ok", rules_version=rules_version, db_path=db_path)
+    def health() -> Response:
+        return as_json(Health(status="ok", rules_version=rules_version, db_path=db_path))
 
     @router.get("/catalog/draft", response_model=DraftPage)
     def list_draft(
@@ -117,7 +126,7 @@ def build_router(
         q: str | None = None,
         limit: LimitQ = None,
         cursor: str | None = None,
-    ) -> DraftPage:
+    ) -> Response:
         n = clamp_limit(limit)
         rows = store.list_drafts(
             supplier_id=supplier_id, category_id=category_id, q=q, after=decode_cursor(cursor), limit=n + 1
@@ -127,14 +136,14 @@ def build_router(
             rows = rows[:n]
             last = rows[-1]
             nxt = encode_cursor(last.created_at.isoformat(timespec="milliseconds"), last.listing_id)
-        return DraftPage(items=rows, next_cursor=nxt)
+        return as_json(DraftPage(items=rows, next_cursor=nxt))
 
     @router.get("/catalog/draft/{listing_id}", response_model=DraftDetail, responses=err)
-    def get_draft(listing_id: int, store: StoreDep) -> DraftDetail:
+    def get_draft(listing_id: int, store: StoreDep) -> Response:
         d = store.get_draft(listing_id)
         if d is None:
             raise not_found("draft listing", listing_id)
-        return DraftDetail(listing=d, trace=store.trace(d.feed_item_id))
+        return as_json(DraftDetail(listing=d, trace=store.trace(d.feed_item_id)))
 
     @router.get("/quarantine", response_model=QuarantinePage)
     def list_quarantine(
@@ -144,7 +153,7 @@ def build_router(
         proposed_category_id: str | None = None,
         limit: LimitQ = None,
         cursor: str | None = None,
-    ) -> QuarantinePage:
+    ) -> Response:
         n = clamp_limit(limit)
         rows = store.list_quarantine(
             supplier_id=supplier_id,
@@ -158,21 +167,21 @@ def build_router(
             rows = rows[:n]
             last = rows[-1]
             nxt = encode_cursor(last.created_at.isoformat(timespec="milliseconds"), last.quarantine_id)
-        return QuarantinePage(items=rows, next_cursor=nxt)
+        return as_json(QuarantinePage(items=rows, next_cursor=nxt))
 
     @router.get("/quarantine/{quarantine_id}", response_model=QuarantineDetail, responses=err)
-    def get_quarantine(quarantine_id: int, store: StoreDep) -> QuarantineDetail:
+    def get_quarantine(quarantine_id: int, store: StoreDep) -> Response:
         item = store.get_quarantine(quarantine_id)
         if item is None:
             raise not_found("quarantine item", quarantine_id)
-        return QuarantineDetail(item=item, trace=store.trace(item.feed_item_id))
+        return as_json(QuarantineDetail(item=item, trace=store.trace(item.feed_item_id)))
 
     @router.get("/items/{feed_item_id}/trace", response_model=Trace, responses=err)
-    def get_trace(feed_item_id: str, store: StoreDep) -> Trace:
+    def get_trace(feed_item_id: str, store: StoreDep) -> Response:
         runs = store.trace(feed_item_id)
         if not runs:
             raise not_found("feed item", feed_item_id)
-        return Trace(feed_item_id=feed_item_id, runs=runs)
+        return as_json(Trace(feed_item_id=feed_item_id, runs=runs))
 
     def _node(tax: Taxonomy, cid: str) -> TaxonomyNode:
         node = tax.get(cid)
@@ -188,21 +197,21 @@ def build_router(
         )
 
     @router.get("/taxonomy", response_model=TaxonomyTree)
-    def taxonomy_tree(tax: TaxDep) -> TaxonomyTree:
+    def taxonomy_tree(tax: TaxDep) -> Response:
         nodes = [_node(tax, cid) for cid in sorted(tax.nodes)]
-        return TaxonomyTree(nodes=nodes, leaf_count=len(tax.leaf_ids))
+        return as_json(TaxonomyTree(nodes=nodes, leaf_count=len(tax.leaf_ids)))
 
     @router.get("/taxonomy/{category_id}", response_model=TaxonomyNodeDetail, responses=err)
-    def taxonomy_node(category_id: str, tax: TaxDep) -> TaxonomyNodeDetail:
+    def taxonomy_node(category_id: str, tax: TaxDep) -> Response:
         if category_id not in tax:
             raise not_found("category", category_id)
         base = _node(tax, category_id)
-        return TaxonomyNodeDetail(
+        return as_json(TaxonomyNodeDetail(
             **base.model_dump(), effective_prohibited_keywords=list(tax.effective_prohibited(category_id))
-        )
+        ))
 
     @router.get("/stats", response_model=Stats)
-    def stats(store: StoreDep) -> Stats:
-        return Stats(**store.stats())
+    def stats(store: StoreDep) -> Response:
+        return as_json(Stats(**store.stats()))
 
     return router

@@ -52,15 +52,6 @@ class JsonFormatter(logging.Formatter):
 
 
 @contextmanager
-def run_context(run_id: str) -> Iterator[None]:
-    token = _RUN_ID.set(run_id)
-    try:
-        yield
-    finally:
-        _RUN_ID.reset(token)
-
-
-@contextmanager
 def item_context(run_id: str, feed_item_id: str) -> Iterator[None]:
     run_token = _RUN_ID.set(run_id)
     item_token = _FEED_ITEM_ID.set(feed_item_id)

@@ -35,7 +35,11 @@ def make_llm(settings: Settings) -> LLMClient:
 
 def _open(args: argparse.Namespace, *, llm_override: LLMClient | None = None) -> tuple[Engine, Settings] | int:
     """Shared setup. Returns (engine, settings) or an EXIT_CONFIG code (AC-3.6)."""
-    settings = Settings.from_env()
+    try:
+        settings = Settings.from_env()
+    except ValueError as exc:  # bad LLM_PROVIDER / LLM_EFFORT / numeric env: a configuration error
+        print(f"error: config: {exc}", file=sys.stderr)
+        return EXIT_CONFIG
     if getattr(args, "llm", None):
         settings = Settings(**{**settings.__dict__, "llm_provider": args.llm})
     if getattr(args, "concurrency", None):

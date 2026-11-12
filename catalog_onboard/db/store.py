@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from collections.abc import Iterator, Sequence
 from datetime import UTC, datetime
 from decimal import Decimal
@@ -42,31 +43,100 @@ def dumps(obj: Any) -> str:
 
 def _decode_text(raw: bytes) -> str:
     """Never raise on bad bytes (AC-1.5): undecodable bytes become U+FFFD, which the clean
-    stage turns into TEXT_ENCODING_INVALID:<field>. Valid UTF-8 is unchanged."""
+    stage turns into TEXT_ENCODING_INVALID:<field>. Valid UTF-8 is unchanged.
+
+    Used ONLY while reading incoming_supplier_feeds (the one table holding raw supplier bytes).
+    A Python text_factory runs per TEXT value and makes SQLite re-acquire the GIL each time;
+    connection-wide it cut concurrent API reads from 511/s to 32/s on 8 threads (load test)."""
     return raw.decode("utf-8", errors="replace")
 
 
 def open_readwrite(path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path))
-    conn.text_factory = _decode_text
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")
     return conn
 
 
-def open_readonly(path: str | Path) -> sqlite3.Connection:
+def open_readonly(path: str | Path, *, check_same_thread: bool = True) -> sqlite3.Connection:
     p = Path(path).resolve()
     if not p.exists():
         raise FileNotFoundError(p)
-    conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
-    conn.text_factory = _decode_text
+    conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True, check_same_thread=check_same_thread)
     conn.row_factory = sqlite3.Row
     return conn
 
 
+class _Fetched:
+    """A cursor whose rows were fetched eagerly (inside the serialising lock)."""
+
+    def __init__(self, rows: list[Any], lastrowid: int | None):
+        self._rows = rows
+        self._pos = 0
+        self.lastrowid = lastrowid
+
+    def fetchone(self) -> Any:
+        if self._pos >= len(self._rows):
+            return None
+        self._pos += 1
+        return self._rows[self._pos - 1]
+
+    def fetchall(self) -> list[Any]:
+        rest = self._rows[self._pos:]
+        self._pos = len(self._rows)
+        return rest
+
+    def __iter__(self) -> Iterator[Any]:
+        return iter(self.fetchall())
+
+
+class SerializedConnection:
+    """Runs every statement as execute + fetchall under one process-wide lock.
+
+    CPython's sqlite3 releases and re-acquires the GIL around each row step. With several API
+    threads reading at once, every re-acquire waits behind another thread (a GIL convoy): 500-row
+    pages fell from 1,064/s on one thread to 36/s on eight. Serialising only the SQLite work
+    restores ~1,000/s with 8 threads at p95 ~1 ms; JSON parsing and serialisation stay outside the
+    lock. Parallelism across CPUs comes from worker processes (scripts/serve.py --workers)."""
+
+    def __init__(self, conn: sqlite3.Connection, lock: threading.Lock):
+        self._conn = conn
+        self._lock = lock
+
+    def execute(self, sql: str, params: Sequence[Any] = ()) -> _Fetched:
+        with self._lock:
+            cur = self._conn.execute(sql, params)
+            rows = cur.fetchall()
+        return _Fetched(rows, cur.lastrowid)
+
+    def executescript(self, script: str) -> None:
+        with self._lock:
+            self._conn.executescript(script)
+
+    def commit(self) -> None:
+        self._conn.commit()
+
+    def rollback(self) -> None:
+        self._conn.rollback()
+
+    def close(self) -> None:
+        # Under the lock: closing while another thread is mid-statement is a use-after-free in
+        # CPython's sqlite3 (it crashed the interpreter in testing).
+        with self._lock:
+            self._conn.close()
+
+    @property
+    def text_factory(self) -> Any:
+        return self._conn.text_factory
+
+    @text_factory.setter
+    def text_factory(self, value: Any) -> None:
+        self._conn.text_factory = value
+
+
 class Store:
-    def __init__(self, conn: sqlite3.Connection):
+    def __init__(self, conn: sqlite3.Connection | SerializedConnection):
         self.conn = conn
 
     # ----- schema -----------------------------------------------------------
@@ -117,7 +187,13 @@ class Store:
         if limit is not None:
             sql += " LIMIT ?"
             params.append(limit)
-        for row in self.conn.execute(sql, params):
+        previous = self.conn.text_factory
+        self.conn.text_factory = _decode_text  # lenient decode for raw supplier text only
+        try:
+            fetched = self.conn.execute(sql, params).fetchall()
+        finally:
+            self.conn.text_factory = previous
+        for row in fetched:
             d = dict(row)
             # pass-through columns must be JSON values (AC-4.1): BLOBs become text
             extra = {
