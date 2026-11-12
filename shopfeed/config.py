@@ -1,4 +1,4 @@
-"""Project-wide constants. Spec references in comments are to docs/specs/product-ranking-model.md."""
+"""Project-wide constants. Spec references (§) point to docs/specs/product-ranking-model.md."""
 
 from __future__ import annotations
 
