@@ -179,6 +179,14 @@ Popularity alone ranks **worse than random** on this data. Best sellers up (§5.
 - vs logged: NDCG@10 +50.4% (lower CI +45.1%), MRR +84.6%, Purchase@10 +30.9 pts. All technical gates pass.
 - vs semantic sort: NDCG@10 **+3.0% (CI +1.6, +4.7; Wilcoxon p = 2e-6)**; MRR +1.7% and Purchase@10 +0.8 pts, both n.s.
 
+### M8 serving
+
+- `Ranker` loads the artefact, builds features with the training code path, scores with 4 threads, applies the §5.5 rules, and logs per-request features. On an error, a feature-store outage or a timeout it serves BM25 order, falling back to retrieval order when BM25 is missing.
+- Rules: relevance floor, unpopular demotion and new-item slot are on; best-seller boost is off.
+- Caches: rank-once ranked-list cache, query-result cache with item invalidation and model-deploy flush. Cursor pagination with dedup after a cache miss.
+- Latency on real requests (200 candidates): total 20.7 / 25.3 ms p50 / p99, 0 fallbacks. Scoring is 0.6 ms; features are about 18 ms and **over budget** (spec §12.4). Next step: a precomputed feature key-value table.
+- The 500-tree scoring benchmark is a `perf`-marked test (nightly, `pytest -m perf`). It sits at about 1.8–2.0 ms p50, too close to the gate to run on every PR.
+
 ## 7. Definition of done for v1
 
 - M0–M9 merged to `main`.

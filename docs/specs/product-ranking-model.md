@@ -341,7 +341,7 @@ Product requirement: within a query's candidates, **best sellers (overall and pe
 - Trains in minutes on tens of millions of rows; no GPU.
 - Native support for `qid` groups, graded labels, and unbiased lambdarank in LightGBM.
 - Interpretable feature importance, which matters for the leakage checks in §5.3.
-- Latency: scoring 200 candidates with 500 trees is < 2 ms on CPU.
+- Latency (measured, M8): scoring 200 candidates with 500 trees × 63 leaves is 7.1 ms p50 on one thread and 1.8 ms on 4 threads (`SCORING_THREADS = 4`). The single-thread budget is about 150 trees × 63 leaves. The shipped v1 model (one 7-leaf tree) scores in 0.6 ms.
 
 The neural ranker (#5) is justified only when we add high-cardinality sparse features (item ID, user-history sequences, text) that trees cannot exploit. `ranker_v1` already has a multi-head heavy model; its per-head AUCs (0.64–0.73) are modest, which suggests the feature set, not the architecture, is the bottleneck. Fix features first.
 
@@ -635,6 +635,15 @@ The query-result cache key includes `user_aov_tier` and nothing more user-specif
 | **Ranking path total** | **≤ 21 ms** after retrieval; end-to-end ≤ 50 ms |
 
 Pages 2+ from cache: ≤ 10 ms p99. Hard timeout on the ranking path: 30 ms, after which the fallback serves BM25 order.
+
+**Measured (M8, `scripts/bench_serving.py`, in-process feature store, test-split requests):**
+
+| Candidates | features p50 / p99 | scoring p50 / p99 | rules p50 / p99 | total p50 / p99 |
+|---|---|---|---|---|
+| 20 | 15.2 / 20.2 ms | 0.6 / 0.8 ms | 1.2 / 1.7 ms | 17.1 / 22.4 ms |
+| 200 | 17.9 / 22.1 ms | 0.6 / 0.8 ms | 2.1 / 2.6 ms | 20.7 / 25.3 ms |
+
+Scoring and rules are within budget. **Feature fetch + transform misses the 10 ms budget**: about 18 ms, spent in per-request pandas group-bys over the in-process `HistoryStore`. The total p99 (25 ms) is 4 ms over the 21 ms budget but under the 30 ms timeout, with 0 fallbacks in 600 requests. Fix before launch: serve history features from a precomputed (item, day) key-value table (a batched multi-get) instead of computing them per request.
 
 ### 12.5 SLA
 

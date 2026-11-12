@@ -185,3 +185,7 @@ class HistoryStore:
             self._published_by_seller = _index(self.products["merchant_id"],
                                                self.products["published_at"])
         return _count(self._published_by_seller, seller, t, None)
+
+    def item_impressions(self, items, t: np.ndarray, window_s: float = 30 * DAY_S) -> np.ndarray:
+        """Impressions per item in [t - window, t). Serving-rule input, not a model feature."""
+        return _count(self.impressions_by_item, items, np.asarray(t, dtype=float), window_s)

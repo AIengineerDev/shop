@@ -47,3 +47,6 @@ RANK_TIMEOUT_S = 0.030
 RANKED_LIST_TTL_S = 30 * 60
 QUERY_CACHE_TTL_S = 5 * 60
 PROPENSITY_CLIP = 0.1
+# Scoring threads. Measured (Apple silicon, 200 candidates): 500 trees x 63 leaves is
+# 7.1 ms p50 on 1 thread vs 1.8 ms on 4; single-thread budget is ~150 trees x 63 leaves.
+SCORING_THREADS = 4

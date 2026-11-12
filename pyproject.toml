@@ -23,7 +23,8 @@ include = ["shopfeed*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q -m 'not perf'"
+markers = ["perf: latency benchmarks; run nightly with `pytest -m perf` (spec §13)"]
 
 [tool.ruff]
 line-length = 100
