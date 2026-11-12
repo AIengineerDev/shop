@@ -77,6 +77,16 @@ a test greps for it.
 The real client uses the Anthropic SDK with structured JSON-schema output and server-side
 refusal fallbacks enabled.
 
+## Re-validation (AC-2.4)
+
+```bash
+# after editing canonical_categories.required_attributes_json / prohibited_keywords:
+.venv/bin/python -m catalog_onboard revalidate --db data/starter.sqlite   # 0 LLM calls
+```
+
+Outcomes are versioned by rule files + taxonomy content, so a spec change supersedes old outcomes
+(the trail in `pipeline_runs` is kept) and a re-run at the same version is a no-op.
+
 ## Reason codes
 
 `blocking` codes quarantine; `warning`/`info` are kept on the draft row for review.

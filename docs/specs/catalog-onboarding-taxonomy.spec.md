@@ -223,7 +223,17 @@ Acceptance criteria:
   `Literal` candidate set and a second explicit leaf check).
 - AC-2.4 Changing `required_attributes_json` for a category and re-running
   validation (without re-running the LLM) re-evaluates outcomes from stored
-  `CandidateListing` data.
+  `CandidateListing` data. Implemented as
+  `python -m catalog_onboard revalidate --db … [--limit N] [--dry-run]`:
+  every draft and quarantine row stores its candidate; revalidate keeps the
+  upstream (clean / candidates / classify) decisions, reuses the LLM
+  attributes from the stored successful extract attempt, and re-runs
+  reconcile → validate → comply → route with **zero** LLM calls. The
+  outcome version is a hash of the rule files **and** the taxonomy content,
+  so a spec change is a new version: `ingest` supersedes with fresh LLM
+  calls, `revalidate` supersedes from stored data, and either is a no-op
+  when re-run at the same version. A newly required attribute the LLM was
+  never asked for becomes `ATTR_MISSING` (re-ingest to fill it).
 - AC-2.5 Validation logic has 100 % branch coverage over the table above
   with table-driven unit tests; no LLM client is imported by the validation
   module.

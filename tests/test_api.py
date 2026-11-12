@@ -14,9 +14,13 @@ def client(ingested_db: Path) -> TestClient:
     return TestClient(create_app(ingested_db))
 
 
-def test_health(client: TestClient, rules):
+def test_health(client: TestClient, rules, taxonomy):
+    from catalog_onboard.rules import pipeline_version
+
     r = client.get("/health")
-    assert r.status_code == 200 and r.json()["rules_version"] == rules.version
+    # the API reports the version stamped on outcomes: rule files + taxonomy content
+    expected = pipeline_version(rules.version, taxonomy.content_hash())
+    assert r.status_code == 200 and r.json()["rules_version"] == expected
 
 
 def test_ac_4_1_openapi_has_no_any_typed_fields(client: TestClient):

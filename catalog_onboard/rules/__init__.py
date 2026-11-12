@@ -53,6 +53,11 @@ def compute_rules_version(rules_dir: Path) -> str:
     return h.hexdigest()[:16]
 
 
+def pipeline_version(rules_version: str, taxonomy_hash: str) -> str:
+    """The version stamped on outcomes: rule files + taxonomy content (AC-2.4, AC-3.4)."""
+    return hashlib.sha256(f"{rules_version}:{taxonomy_hash}".encode()).hexdigest()[:16]
+
+
 def load_rules(rules_dir: Path) -> Rules:
     missing = [n for n in RULE_FILES if not (rules_dir / n).exists()]
     if missing:

@@ -73,7 +73,24 @@ class Store:
 
     def migrate(self) -> None:
         self.conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+        cols = {r[1] for r in self.conn.execute("PRAGMA table_info(draft_catalog)")}
+        if "candidate_json" not in cols:  # DBs created before v1.1
+            self.conn.execute("ALTER TABLE draft_catalog ADD COLUMN candidate_json TEXT")
         self.conn.commit()
+
+    def iter_stored_candidates(self, *, limit: int | None = None) -> Iterator[tuple[str, str]]:
+        """(feed_item_id, candidate_json) for every current outcome that kept its candidate."""
+        sql = (
+            "SELECT feed_item_id, candidate_json FROM draft_catalog WHERE candidate_json IS NOT NULL "
+            "UNION ALL SELECT feed_item_id, candidate_json FROM quarantine WHERE candidate_json IS NOT NULL "
+            "ORDER BY feed_item_id"
+        )
+        params: list[Any] = []
+        if limit is not None:
+            sql += " LIMIT ?"
+            params.append(limit)
+        for row in self.conn.execute(sql, params).fetchall():
+            yield str(row[0]), str(row[1])
 
     def has_starter_tables(self) -> bool:
         rows = self.conn.execute(
@@ -153,11 +170,12 @@ class Store:
         fingerprint: str,
         run_id: str,
         rules_version: str,
+        candidate: dict[str, Any] | None = None,
     ) -> int:
         cur = self.conn.execute(
             "INSERT INTO draft_catalog(feed_item_id, supplier_id, category_id, clean_title, attributes_json, "
-            "reason_codes_json, price, fingerprint, pipeline_run_id, rules_version, created_at) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+            "reason_codes_json, price, fingerprint, pipeline_run_id, rules_version, created_at, candidate_json) "
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 feed_item_id,
                 supplier_id,
@@ -170,6 +188,7 @@ class Store:
                 run_id,
                 rules_version,
                 _now(),
+                None if candidate is None else dumps(candidate),
             ),
         )
         return int(cur.lastrowid or 0)

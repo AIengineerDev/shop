@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from catalog_onboard.api.routes import build_router
 from catalog_onboard.config import Settings
 from catalog_onboard.db.store import Store, open_readonly
-from catalog_onboard.rules import compute_rules_version
+from catalog_onboard.rules import compute_rules_version, pipeline_version
 from catalog_onboard.taxonomy import Taxonomy
 
 
@@ -37,7 +37,13 @@ def create_app(db_path: str | Path, settings: Settings | None = None) -> FastAPI
         title="Catalog Inspection API", version="0.1.0", description="Read-only view of the onboarding pipeline."
     )
     app.include_router(
-        build_router(get_store, get_taxonomy, rules_version=compute_rules_version(settings.rules_dir), db_path=db)
+        build_router(
+            get_store,
+            get_taxonomy,
+            # same version string the engine stamps on outcomes: rule files + taxonomy content
+            rules_version=pipeline_version(compute_rules_version(settings.rules_dir), taxonomy.content_hash()),
+            db_path=db,
+        )
     )
 
     @app.exception_handler(HTTPException)

@@ -30,7 +30,7 @@ from catalog_onboard.models import (
 from catalog_onboard.pipeline import candidates as cand_mod
 from catalog_onboard.pipeline import clean, comply, reconcile, route, validate
 from catalog_onboard.pipeline.llm import LLMClient, runner
-from catalog_onboard.rules import Rules
+from catalog_onboard.rules import Rules, pipeline_version
 from catalog_onboard.taxonomy import Taxonomy
 
 log = logging.getLogger("catalog_onboard.engine")
@@ -118,6 +118,18 @@ def llm_failure_code(trace: list[LLMAttempt], *, candidate_ids: set[str] | None 
     return "LLM_SCHEMA_INVALID"
 
 
+UPSTREAM_STAGES = frozenset({"clean", "candidates", "classify"})
+
+
+def stored_llm_attrs(trace: list[LLMAttempt]) -> dict[str, Any] | None:
+    """The attributes the LLM extracted at ingest time (last successful extract attempt)."""
+    for attempt in reversed(trace):
+        if attempt.purpose == "extract" and attempt.ok and attempt.raw_response:
+            data = json.loads(attempt.raw_response)
+            return data if isinstance(data, dict) else None
+    return None
+
+
 class Engine:
     def __init__(
         self,
@@ -136,6 +148,9 @@ class Engine:
         self.settings = settings
         self.dry_run = dry_run
         self.index = cand_mod.CandidateIndex(taxonomy)
+        # Outcomes are stamped with rules + taxonomy content, so a changed category spec is a new
+        # version: ingest supersedes, revalidate re-decides from stored candidates (AC-2.4, AC-3.4).
+        self.version = pipeline_version(rules.version, taxonomy.content_hash())
 
     # ------------------------------------------------------------------ batch
 
@@ -167,7 +182,7 @@ class Engine:
     # ------------------------------------------------------------------- item
 
     def process_item(self, row: RawFeedRow, run_id: str) -> ItemOutcome:
-        rv = self.rules.version
+        rv = self.version
         if self.store.processed_status(row.feed_item_id, rv) is not None:
             return ItemOutcome(feed_item_id=row.feed_item_id, status=None, skipped=True)
 
@@ -178,7 +193,7 @@ class Engine:
             status = route.route(result)
             stage = "route"
             t0 = time.perf_counter()
-            self._persist(row, candidate, result, status, run_id)
+            self._persist(row.feed_item_id, row.supplier_id, candidate, result, status, run_id)
             trail.record("route", None, {"status": status, "codes": [c.code for c in result.reason_codes]}, t0)
             self.store.mark_processed(row.feed_item_id, rv, status, run_id)
             self._commit()
@@ -213,6 +228,65 @@ class Engine:
                 self.store.rollback()
                 log.exception("could not record failure for %s", row.feed_item_id)
             return ItemOutcome(row.feed_item_id, "quarantined", error=err, reason_codes=[code])
+
+    # ------------------------------------------------------------- revalidate
+
+    def revalidate_batch(
+        self, *, limit: int | None = None, on_item: Callable[[ItemOutcome], None] | None = None
+    ) -> BatchSummary:
+        """AC-2.4: re-decide every stored outcome under the current rules + taxonomy without calling
+        the LLM. Items already decided under this version are skipped (idempotent)."""
+        run_id = uuid.uuid4().hex[:12]
+        summary = BatchSummary(run_id=run_id)
+        for feed_item_id, candidate_json in list(self.store.iter_stored_candidates(limit=limit)):
+            if self.store.processed_status(feed_item_id, self.version) is not None:
+                summary.skipped += 1
+                continue
+            outcome = self.revalidate_item(CandidateListing.model_validate_json(candidate_json), run_id)
+            summary.processed += 1
+            summary.errors += 1 if outcome.error else 0
+            summary.draft += 1 if outcome.status == "draft" else 0
+            summary.quarantined += 1 if outcome.status == "quarantined" else 0
+            if on_item:
+                on_item(outcome)
+        return summary
+
+    def revalidate_item(self, candidate: CandidateListing, run_id: str) -> ItemOutcome:
+        listing = candidate.normalized
+        fid = listing.feed_item_id
+        trail = _Trail(self.store, run_id, fid)
+        try:
+            t0 = time.perf_counter()
+            # Upstream decisions (clean, candidates, classification) are kept as they were made.
+            codes = [c for c in candidate.reason_codes if c.stage in UPSTREAM_STAGES]
+            category_id = candidate.category_id
+            if category_id is not None and (category_id not in self.taxonomy or not self.taxonomy.is_leaf(category_id)):
+                codes.append(ReasonCode(code="CLASSIFICATION_NOT_LEAF", severity="blocking", stage="classify",
+                                        detail=f"{category_id} is no longer a leaf in the taxonomy"))
+                category_id = None
+            llm_attrs = stored_llm_attrs(candidate.llm_trace)
+            trail.record("revalidate", {"rules_version": self.version, "llm_calls": 0},
+                         {"category_id": category_id, "llm_attrs": llm_attrs}, t0)
+            attrs, extra, decided = self._reconcile_validate(listing, category_id, llm_attrs, trail)
+            codes.extend(decided)
+            updated = candidate.model_copy(update={
+                "category_id": category_id, "attributes": attrs, "extra_attributes": extra,
+                "reason_codes": list(codes),
+            })
+            codes.extend(self._comply(listing, category_id, attrs, trail))
+            result = ValidationResult(reason_codes=codes)
+            status = route.route(result)
+            t0 = time.perf_counter()
+            self._persist(fid, listing.supplier_id, updated, result, status, run_id)
+            trail.record("route", None, {"status": status, "codes": [c.code for c in codes]}, t0)
+            self.store.mark_processed(fid, self.version, status, run_id)
+            self._commit()
+            return ItemOutcome(fid, status, reason_codes=codes)
+        except Exception as exc:  # noqa: BLE001 - one bad stored candidate must not abort the run
+            self.store.rollback()
+            err = f"{type(exc).__name__}: {exc}"
+            log.exception("revalidate failed for %s", fid)
+            return ItemOutcome(fid, None, error=err)
 
     def _commit(self) -> None:
         if self.dry_run:
@@ -252,13 +326,10 @@ class Engine:
             llm_raw=cls_trace,
         )
 
-        attrs: dict[str, AttrValue] = {}
-        extra: dict[str, AttrValue] = {}
         ext_trace: list[LLMAttempt] = []
+        llm_attrs: dict[str, Any] | None = None
         if category_id is not None:
-            specs = self.taxonomy.required_attributes(category_id)
-            missing = reconcile.missing_specs(specs, listing.det_attrs)
-            llm_attrs: dict[str, Any] | None = None
+            missing = reconcile.missing_specs(self.taxonomy.required_attributes(category_id), listing.det_attrs)
             if missing:
                 t0 = time.perf_counter()
                 parsed, ext_trace = _staged(
@@ -276,20 +347,8 @@ class Engine:
                     "classify", {"missing": [m.key for m in missing]}, {"llm_attrs": llm_attrs}, t0, llm_raw=ext_trace
                 )
 
-            t0 = time.perf_counter()
-            attrs, extra, rec_codes = _staged(
-                "reconcile", reconcile.merge_attributes, specs, listing.det_attrs, llm_attrs
-            )
-            codes.extend(rec_codes)
-            trail.record(
-                "reconcile", {"det": listing.det_attrs, "llm": llm_attrs}, {"attrs": attrs, "extra": extra}, t0
-            )
-
-            t0 = time.perf_counter()
-            attrs, val_codes = _staged("validate", validate.validate_attributes, specs, attrs)
-            codes.extend(val_codes)
-            trail.record("validate", None, {"attrs": attrs, "codes": [c.code for c in val_codes]}, t0)
-
+        attrs, extra, decided = self._reconcile_validate(listing, category_id, llm_attrs, trail)
+        codes.extend(decided)
         candidate = CandidateListing(
             normalized=listing,
             category_id=category_id,
@@ -299,12 +358,38 @@ class Engine:
             attributes=attrs,
             extra_attributes=extra,
             llm_trace=[*cls_trace, *ext_trace],
-            reason_codes=codes,
+            reason_codes=list(codes),
         )
+        codes.extend(self._comply(listing, category_id, attrs, trail))
+        return candidate, ValidationResult(reason_codes=codes)
 
+    # ------------------------------------------ deterministic decision (shared)
+
+    def _reconcile_validate(
+        self,
+        listing: NormalizedListing,
+        category_id: str | None,
+        llm_attrs: dict[str, Any] | None,
+        trail: _Trail,
+    ) -> tuple[dict[str, AttrValue], dict[str, AttrValue], list[ReasonCode]]:
+        """reconcile -> validate. Pure Python; used by ingest and by revalidate (AC-2.4)."""
+        if category_id is None:
+            return {}, {}, []
+        specs = self.taxonomy.required_attributes(category_id)
+        t0 = time.perf_counter()
+        attrs, extra, rec_codes = _staged("reconcile", reconcile.merge_attributes, specs, listing.det_attrs, llm_attrs)
+        trail.record("reconcile", {"det": listing.det_attrs, "llm": llm_attrs}, {"attrs": attrs, "extra": extra}, t0)
+        t0 = time.perf_counter()
+        attrs, val_codes = _staged("validate", validate.validate_attributes, specs, attrs)
+        trail.record("validate", None, {"attrs": attrs, "codes": [c.code for c in val_codes]}, t0)
+        return attrs, extra, [*rec_codes, *val_codes]
+
+    def _comply(
+        self, listing: NormalizedListing, category_id: str | None, attrs: dict[str, AttrValue], trail: _Trail
+    ) -> list[ReasonCode]:
         t0 = time.perf_counter()
         fp = comply.fingerprint(listing.supplier_id, listing.clean_title, attrs)
-        comp_codes = _staged(
+        comp_codes: list[ReasonCode] = _staged(
             "comply",
             comply.check_compliance,
             clean_title=listing.clean_title,
@@ -314,10 +399,8 @@ class Engine:
             price_min=listing.price_min,
             duplicate_exists=lambda: self.store.fingerprint_exists(fp, exclude_feed_item_id=listing.feed_item_id),
         )
-        codes.extend(comp_codes)
         trail.record("comply", {"fingerprint": fp}, {"codes": [c.code for c in comp_codes]}, t0)
-
-        return candidate, ValidationResult(reason_codes=codes)
+        return comp_codes
 
     def _classify(
         self, listing: NormalizedListing, cands: list[Candidate]
@@ -374,16 +457,22 @@ class Engine:
     # ---------------------------------------------------------------- persist
 
     def _persist(
-        self, row: RawFeedRow, candidate: CandidateListing, result: ValidationResult, status: Status, run_id: str
+        self,
+        feed_item_id: str,
+        supplier_id: str,
+        candidate: CandidateListing,
+        result: ValidationResult,
+        status: Status,
+        run_id: str,
     ) -> None:
-        self.store.supersede(row.feed_item_id)
+        self.store.supersede(feed_item_id)
         listing = candidate.normalized
         if status == "draft":
             if candidate.category_id is None:  # explicit: asserts vanish under python -O
                 raise RuntimeError("routing invariant broken: draft listing without category_id")
             self.store.insert_draft(
-                feed_item_id=row.feed_item_id,
-                supplier_id=row.supplier_id,
+                feed_item_id=feed_item_id,
+                supplier_id=supplier_id,
                 category_id=candidate.category_id,
                 clean_title=listing.clean_title,
                 attributes=candidate.attributes,
@@ -391,17 +480,18 @@ class Engine:
                 price=listing.price_min,
                 fingerprint=comply.fingerprint(listing.supplier_id, listing.clean_title, candidate.attributes),
                 run_id=run_id,
-                rules_version=self.rules.version,
+                rules_version=self.version,
+                candidate=candidate.model_dump(mode="json"),
             )
         else:
             self.store.insert_quarantine(
-                feed_item_id=row.feed_item_id,
-                supplier_id=row.supplier_id,
+                feed_item_id=feed_item_id,
+                supplier_id=supplier_id,
                 proposed_category_id=candidate.category_id,
                 candidate=candidate.model_dump(mode="json"),
                 reason_codes=result.reason_codes,
                 run_id=run_id,
-                rules_version=self.rules.version,
+                rules_version=self.version,
             )
 
 

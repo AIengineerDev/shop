@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import dataclass, field
@@ -87,6 +88,19 @@ class Taxonomy:
         if not nodes:
             raise TaxonomyConfigError("canonical_categories is empty")
         return cls(nodes=nodes)
+
+    def content_hash(self) -> str:
+        """Stable hash of everything validation and compliance read from the taxonomy (AC-2.4):
+        a changed required_attributes_json or prohibited list yields a new pipeline version."""
+        h = hashlib.sha256()
+        for cid in sorted(self.nodes):
+            n = self.nodes[cid]
+            h.update(json.dumps(
+                [cid, n.name, n.parent_id, [s.model_dump() for s in n.required_attributes],
+                 list(n.prohibited_keywords)],
+                sort_keys=True,
+            ).encode("utf-8"))
+        return h.hexdigest()[:16]
 
     def __contains__(self, category_id: object) -> bool:
         return category_id in self.nodes

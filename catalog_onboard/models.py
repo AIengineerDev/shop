@@ -172,7 +172,7 @@ class QuarantineItem(BaseModel):
 class PipelineRunRecord(BaseModel):
     run_id: str
     feed_item_id: str
-    stage: Stage | Literal["error"]
+    stage: Stage | Literal["error", "revalidate"]
     seq: int
     input: dict[str, Any] | None
     output: dict[str, Any] | None

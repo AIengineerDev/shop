@@ -68,7 +68,10 @@ def test_ac_3_4_rerun_is_noop_and_new_rules_supersede(
         == 20
     )
     assert store.conn.execute("SELECT COUNT(*) FROM pipeline_runs").fetchone()[0] > runs_before
-    assert [tuple(r) for r in store.conn.execute("SELECT DISTINCT rules_version FROM draft_catalog")] == [("v2",)]
+    assert [tuple(r) for r in store.conn.execute("SELECT DISTINCT rules_version FROM draft_catalog")] == [
+        (eng2.version,)
+    ]
+    assert eng2.version != engine.version
 
 
 def test_ac_3_5_bad_row_is_quarantined_not_fatal(store: Store, taxonomy: Taxonomy, rules: Rules, settings):

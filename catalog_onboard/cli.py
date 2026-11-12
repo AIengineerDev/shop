@@ -12,7 +12,7 @@ from catalog_onboard.config import Settings
 from catalog_onboard.db.store import Store, open_readwrite
 from catalog_onboard.pipeline.engine import Engine, ItemOutcome
 from catalog_onboard.pipeline.llm import LLMClient
-from catalog_onboard.pipeline.llm.fake import FakeLLM
+from catalog_onboard.pipeline.llm.fake import FakeLLM, ForbiddenLLM
 from catalog_onboard.rules import load_rules
 from catalog_onboard.taxonomy import Taxonomy, TaxonomyConfigError
 
@@ -47,9 +47,10 @@ def make_llm(settings: Settings) -> LLMClient:
     return AnthropicClient(model=settings.llm_model, max_tokens=settings.llm_max_tokens)
 
 
-def cmd_ingest(args: argparse.Namespace) -> int:
+def _open(args: argparse.Namespace, *, llm_override: LLMClient | None = None) -> tuple[Engine, Settings] | int:
+    """Shared setup. Returns (engine, settings) or an EXIT_CONFIG code (AC-3.6)."""
     settings = Settings.from_env()
-    if args.llm:
+    if getattr(args, "llm", None):
         settings = Settings(**{**settings.__dict__, "llm_provider": args.llm})
     db = Path(args.db)
     if not db.exists():
@@ -71,10 +72,22 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     except TaxonomyConfigError as exc:
         print(f"error: taxonomy: {exc}", file=sys.stderr)
         return EXIT_CONFIG
+    llm = llm_override or make_llm(settings)
+    engine = Engine(store=store, taxonomy=taxonomy, rules=rules, llm=llm, settings=settings, dry_run=args.dry_run)
+    return engine, settings
 
-    engine = Engine(
-        store=store, taxonomy=taxonomy, rules=rules, llm=make_llm(settings), settings=settings, dry_run=args.dry_run
-    )
+
+def _print_summary(rows: list[tuple[str, str]]) -> None:
+    width = max(len(k) for k, _ in rows)
+    for k, v in rows:
+        print(f"{k.ljust(width)}  {v}")
+
+
+def cmd_ingest(args: argparse.Namespace) -> int:
+    opened = _open(args)
+    if isinstance(opened, int):
+        return opened
+    engine, settings = opened
 
     def report(o: ItemOutcome) -> None:
         if args.verbose and not o.skipped:
@@ -84,7 +97,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     summary = engine.run_batch(supplier_id=args.supplier, limit=args.limit, on_item=report)
     rows = [
         ("run_id", summary.run_id),
-        ("rules_version", rules.version),
+        ("rules_version", engine.version),
         ("llm", settings.llm_provider),
         ("dry_run", str(args.dry_run)),
         ("processed", str(summary.processed)),
@@ -93,9 +106,28 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         ("errors", str(summary.errors)),
         ("skipped (already processed)", str(summary.skipped)),
     ]
-    width = max(len(k) for k, _ in rows)
-    for k, v in rows:
-        print(f"{k.ljust(width)}  {v}")
+    _print_summary(rows)
+    return EXIT_OK
+
+
+def cmd_revalidate(args: argparse.Namespace) -> int:
+    """AC-2.4: re-decide stored outcomes under the current rules + taxonomy, with no LLM calls."""
+    opened = _open(args, llm_override=ForbiddenLLM())
+    if isinstance(opened, int):
+        return opened
+    engine, _ = opened
+    summary = engine.revalidate_batch(limit=args.limit)
+    _print_summary([
+        ("run_id", summary.run_id),
+        ("rules_version", engine.version),
+        ("llm", "none (stored candidates)"),
+        ("dry_run", str(args.dry_run)),
+        ("revalidated", str(summary.processed)),
+        ("draft", str(summary.draft)),
+        ("quarantined", str(summary.quarantined)),
+        ("errors", str(summary.errors)),
+        ("skipped (already at this version)", str(summary.skipped)),
+    ])
     return EXIT_OK
 
 
@@ -110,6 +142,12 @@ def build_parser() -> argparse.ArgumentParser:
     ing.add_argument("--llm", choices=["anthropic", "fake"], default=None)
     ing.add_argument("-v", "--verbose", action="store_true")
     ing.set_defaults(func=cmd_ingest)
+    rev = sub.add_parser("revalidate", help="re-run validate / comply / route from stored candidates (no LLM)")
+    rev.add_argument("--db", required=True)
+    rev.add_argument("--limit", type=int, default=None)
+    rev.add_argument("--dry-run", action="store_true")
+    rev.add_argument("-v", "--verbose", action="store_true")
+    rev.set_defaults(func=cmd_revalidate)
     return p
 
 

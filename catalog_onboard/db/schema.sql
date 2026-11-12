@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS draft_catalog (
     fingerprint      TEXT NOT NULL,
     pipeline_run_id  TEXT NOT NULL,
     rules_version    TEXT NOT NULL,
-    created_at       TEXT NOT NULL
+    created_at       TEXT NOT NULL,
+    candidate_json   TEXT  -- stored CandidateListing, so validation can re-run without the LLM (AC-2.4)
 );
 CREATE INDEX IF NOT EXISTS idx_draft_supplier ON draft_catalog(supplier_id);
 CREATE INDEX IF NOT EXISTS idx_draft_category ON draft_catalog(category_id);
