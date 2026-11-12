@@ -1,12 +1,9 @@
 """Online ranker: parity with offline scoring, fallback injection, latency (spec §13.4)."""
 
-import time
 
-import lightgbm as lgb
 import numpy as np
 import pytest
 
-from shopfeed import config
 from shopfeed.features.ranking import build_features
 from shopfeed.serving.ranker import Ranker, fallback_order
 from shopfeed.serving.rules import RuleFlags
@@ -82,28 +79,3 @@ def test_timeout_falls_back(fixture_rows, fixture_store, artefact):
 def test_fallback_with_missing_bm25_keeps_retrieval_order(fixture_rows):
     req = _req(fixture_rows).assign(bm25=np.nan)
     assert fallback_order(req) == req["item_id"].tolist()
-
-
-@pytest.mark.perf
-def test_scoring_latency_200_candidates():
-    """Spec §1/§12.4: 200 candidates, 500 trees x 63 leaves, config.SCORING_THREADS:
-    p50 <= 2 ms, p99 <= 8 ms."""
-    rng = np.random.default_rng(0)
-    n_feat = 42
-    Xtr = rng.normal(size=(5000, n_feat))
-    y = Xtr[:, 0] + rng.normal(size=5000)
-    booster = lgb.train({"objective": "regression", "num_leaves": 63, "min_data_in_leaf": 5,
-                         "learning_rate": 0.1, "verbose": -1, "num_threads": 1},
-                        lgb.Dataset(Xtr, y), num_boost_round=500)
-    assert booster.num_trees() == 500
-    X = rng.normal(size=(200, n_feat))
-    for _ in range(20):
-        booster.predict(X, num_threads=config.SCORING_THREADS)
-    times = []
-    for _ in range(300):
-        t0 = time.perf_counter()
-        booster.predict(X, num_threads=config.SCORING_THREADS)
-        times.append((time.perf_counter() - t0) * 1e3)
-    p50, p99 = np.percentile(times, [50, 99])
-    assert p50 <= 2.0, f"p50={p50:.2f} ms"
-    assert p99 <= 8.0, f"p99={p99:.2f} ms"

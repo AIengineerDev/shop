@@ -35,7 +35,7 @@ def main() -> int:
         chunk = qids[(i * per) % len(qids): (i * per) % len(qids) + per]
         r = te[te["qid"].isin(chunk)].copy()
         r["qid"] = int(chunk[0])
-        reqs.append(r.reset_index(drop=True))
+        reqs.append(r.drop_duplicates("item_id").reset_index(drop=True))
     for r in reqs[:10]:
         ranker.rank(r)
     timings = [ranker.rank(r).timings_ms for r in reqs]

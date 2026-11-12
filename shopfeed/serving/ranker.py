@@ -6,14 +6,21 @@ fallback order: BM25 descending, then the incoming (retrieval) order for ties / 
 Python cannot pre-empt a running call, so the timeout is checked after scoring; the caller's
 RPC deadline remains the hard stop.
 
+GC: `Ranker.load(..., freeze_gc=True)` runs gc.collect() + gc.freeze() once the model and
+HistoryStore are in memory. Without it, full (gen-2) collections walk the store's object graph
+and pause the process for ~50 ms, which the load test showed as timeout fallbacks (spec §12.5
+budget 0.1%). Frozen objects are never scanned; call it again after a store reload.
+
 Every request appends its feature rows to `request_log` (a sink with `.append(dict)`) so
 train-serve skew can be measured by recomputing features offline (§13.4).
 """
 
 from __future__ import annotations
 
+import gc
 import json
 import time
+from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -25,6 +32,8 @@ from shopfeed import config
 from shopfeed.features.history import HistoryStore
 from shopfeed.features.ranking import build_features
 from shopfeed.serving.rules import RuleFlags, apply_rules
+
+REQUEST_LOG_MAXLEN = 1000
 
 
 @dataclass
@@ -53,11 +62,15 @@ class Ranker:
         self.model_version = model_version
         self.flags = flags or RuleFlags()
         self.timeout_s = timeout_s
-        self.request_log = request_log if request_log is not None else []
+        # Bounded by default: an unbounded in-process log is a memory leak. Production should
+        # pass a sink that ships records off-process (append-only interface).
+        self.request_log = request_log if request_log is not None else deque(
+            maxlen=REQUEST_LOG_MAXLEN)
         self.counters = {"requests": 0, "fallback": 0}
 
     @classmethod
-    def load(cls, artefact_dir: Path, store: HistoryStore, **kw) -> Ranker:
+    def load(cls, artefact_dir: Path, store: HistoryStore, freeze_gc: bool = True,
+             **kw) -> Ranker:
         artefact_dir = Path(artefact_dir)
         booster = lgb.Booster(model_file=str(artefact_dir / "model.txt"))
         names = json.loads((artefact_dir / "features.json").read_text())["features"]
@@ -65,7 +78,11 @@ class Ranker:
         meta = artefact_dir / "meta.json"
         if meta.exists():
             version = json.loads(meta.read_text()).get("git_sha", "")[:12]
-        return cls(booster, names, store, model_version=version, **kw)
+        ranker = cls(booster, names, store, model_version=version, **kw)
+        if freeze_gc:
+            gc.collect()
+            gc.freeze()
+        return ranker
 
     def score(self, X: pd.DataFrame) -> np.ndarray:
         return self.booster.predict(X[self.feature_names].to_numpy(dtype=np.float64),
@@ -78,6 +95,11 @@ class Ranker:
         t0 = time.perf_counter()
         timings = {}
         try:
+            dup = candidates["item_id"].duplicated()
+            if dup.any():  # retrieval should not emit duplicates; never show one twice
+                self.counters["duplicate_candidates"] = (
+                    self.counters.get("duplicate_candidates", 0) + int(dup.sum()))
+                candidates = candidates[~dup]
             if len(candidates) > config.MAX_CANDIDATES:
                 candidates = candidates.iloc[: config.MAX_CANDIDATES]
             cand = candidates.reset_index(drop=True)
@@ -90,10 +112,12 @@ class Ranker:
             t3 = time.perf_counter()
             timings = {"features": (t1 - t0) * 1e3, "scoring": (t2 - t1) * 1e3,
                        "rules": (t3 - t2) * 1e3, "total": (t3 - t0) * 1e3}
+            # numpy arrays, not Python lists: one object per request instead of ~8K floats
+            # for the garbage collector to walk.
             self.request_log.append({"qid": int(cand["qid"].iloc[0]),
                                      "model_version": self.model_version,
-                                     "item_ids": cand["item_id"].tolist(),
-                                     "features": X[self.feature_names].to_numpy().tolist()})
+                                     "item_ids": cand["item_id"].to_numpy(dtype=object),
+                                     "features": X[self.feature_names].to_numpy()})
             if t3 - t0 > self.timeout_s:
                 return self._fallback(candidates, "timeout", timings)
             return RankResult(ranked["item_id"].tolist(), ranked["score"].tolist(), False,

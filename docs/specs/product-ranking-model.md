@@ -638,14 +638,18 @@ The query-result cache key includes `user_aov_tier` and nothing more user-specif
 
 Pages 2+ from cache: ≤ 10 ms p99. Hard timeout on the ranking path: 30 ms, after which the fallback serves BM25 order.
 
-**Measured (M8, `scripts/bench_serving.py`, in-process feature store, test-split requests):**
+**Measured (`scripts/bench_serving.py`, in-process feature store, test-split requests):**
 
-| Candidates | features p50 / p99 | scoring p50 / p99 | rules p50 / p99 | total p50 / p99 |
-|---|---|---|---|---|
-| 20 | 15.2 / 20.2 ms | 0.6 / 0.8 ms | 1.2 / 1.7 ms | 17.1 / 22.4 ms |
-| 200 | 17.9 / 22.1 ms | 0.6 / 0.8 ms | 2.1 / 2.6 ms | 20.7 / 25.3 ms |
+| Candidates | Version | features p50 / p99 | scoring p50 / p99 | rules p50 / p99 | total p50 / p99 |
+|---|---|---|---|---|---|
+| 200 | M8 (pandas group-bys) | 17.9 / 22.1 ms | 0.6 / 0.8 ms | 2.1 / 2.6 ms | 20.7 / 25.3 ms |
+| 200 | CI PR (vectorised) | 3.9 / 4.3 ms | 0.2 / 0.3 ms | 1.6 / 2.6 ms | **5.8 / 6.9 ms** |
 
-Scoring and rules are within budget. **Feature fetch + transform misses the 10 ms budget**: about 18 ms, spent in per-request pandas group-bys over the in-process `HistoryStore`. The total p99 (25 ms) is 4 ms over the 21 ms budget but under the 30 ms timeout, with 0 fallbacks in 600 requests. Fix before launch: serve history features from a precomputed (item, day) key-value table (a batched multi-get) instead of computing them per request.
+The M8 feature path missed its 10 ms budget because of fixed pandas overhead per request (a 180K-row merge, group-bys, column inserts). It was replaced by sort-based key grouping, an integer-keyed popularity lookup and `bincount` within-group statistics. The output is identical to the old path on the full dataset (max abs diff 2.7e-15, no NaN mismatches), and the ranking path is now within budget.
+
+Two serving-process defects were found by the CI load test (§13.4) and fixed:
+1. Gen-2 garbage-collection pauses of about 50 ms over the `HistoryStore` object graph caused timeout fallbacks. `Ranker.load` now runs `gc.collect(); gc.freeze()`.
+2. The request feature log was an unbounded list of Python floats: a memory leak, and about 8K GC-tracked objects per request. It is now a bounded sink of numpy arrays.
 
 ### 12.5 SLA
 
@@ -660,7 +664,16 @@ Scoring and rules are within budget. **Feature fetch + transform misses the 10 m
 
 ## 13. Test plan
 
-Every row is a test in `tests/` (or a scripted check where stated) with a binary pass criterion. CI runs unit, data-fixture and model-smoke tests on every PR; performance and full-data tests run nightly.
+Every row is a test in `tests/` (or a scripted check where stated) with a binary pass criterion. Everything runs in CI on every push and PR (`.github/workflows/ci.yml`); there are no scheduled jobs. Integration, e2e and load tests run on a synthetic log (`shopfeed/testing/synth.py`) with the same parquet schema as `data/`, because the real data is not in the repo.
+
+| CI job | Command | Gate |
+|---|---|---|
+| lint | `ruff check .` | 0 findings (lints git-excluded dirs too) |
+| unit | `pytest` | all pass, coverage ≥ 85% |
+| integration | `pytest -m "not e2e and not load"` | all pass, coverage ≥ 95% |
+| e2e | `pytest -m e2e` | every CLI exits as expected; gates pass on synthetic data |
+| load | `pytest -m load` | §13.4 load gates |
+| security | `pip-audit .`, `bandit -r shopfeed scripts`, `gitleaks git .` | 0 known CVEs in project deps, 0 bandit findings at any severity (justified `nosec` only), 0 secrets in history |
 
 ### 13.1 Unit tests
 
@@ -700,12 +713,18 @@ All §9 checks plus: `save` / `purchase` attribution ≥ 95%; seller and categor
 
 | Test | Pass criterion |
 |---|---|
-| Serving parity | 1K logged requests re-scored offline and online give identical scores (train–serve skew < 0.1%). |
-| Scoring benchmark (`test_serving.py`) | 200 candidates: p50 ≤ 2 ms, p99 ≤ 8 ms on serving CPU class. |
-| End-to-end load | At 2× peak QPS for 30 min: p99 ≤ 50 ms page 1, ≤ 10 ms page 2+, 0 5xx. |
-| Fallback | Injected model timeout, feature-store outage and cache outage each return BM25 / cold-start order, no 5xx. |
-| Cache | Page-2+ hit rate ≥ 95% in the load test; price change invalidates the query-result cache entry within TTL. |
-| Rollback | Switch to previous model version in ≤ 5 min under load with no failed requests. |
+| Test | Where | Pass criterion |
+|---|---|---|
+| Module boundaries | `tests/integration/test_pipeline.py` | build → clean → checks (`ci` profile) → features → split → train → artefacts → `Ranker` → pagination, all on one synthetic log; online scores equal offline; logged features equal recomputed; batch vs per-request features equal |
+| CLI pipeline | `tests/e2e/test_cli_pipeline.py` | generate → `build_user_aov` (rerun refused) → `build_ranking_dataset` → `check_ranking_data` (`ci` passes, `production` fails on scale) → `baselines` → `train` → `sweep` → `bench_serving`; all technical gates pass; 0 fallbacks |
+| Sustained load | `tests/load/test_ranker_load.py` | open-loop 25 rps × 40 s of 200-candidate requests (env `LOAD_RPS` / `LOAD_SECONDS` / `LOAD_WORKERS`), production 30 ms timeout, rules on; 0 escaped exceptions; fallbacks ≤ 0.1%; e2e p99 ≤ 50 ms (measured from scheduled arrival); ranking p50 ≤ 21 ms; scoring p50 ≤ 2 ms and p99 ≤ 8 ms; throughput ≥ 95% of offered |
+| Pagination under load | same | pages 2–10 for every query: cache hit rate ≥ 95%, p99 ≤ 10 ms, no item served twice |
+| Chaos | same | 10% injected feature-store failures: fallbacks equal injected failures exactly, nothing raised, no empty or duplicate pages |
+| Fallback | `tests/test_serving.py` | model error, store outage and timeout each return BM25 / retrieval order |
+| Cache | `tests/test_pagination.py` | price change invalidates the query-result entry; model deploy flushes |
+| Rollback | not yet testable | needs the deployed service (blue/green); write it with the service |
+
+Load rate and duration are sized for a CI runner, not production peak. Re-run with `LOAD_RPS` set to 2× the production per-instance peak once that number is known.
 
 ### 13.5 Online tests
 

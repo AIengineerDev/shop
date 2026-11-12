@@ -55,10 +55,26 @@ def _value_index(keys: pd.Series, ts: pd.Series, values: pd.Series) -> dict:
     return out
 
 
+def _key_groups(keys):
+    """Yield (key, row indices) per distinct non-null key, via one stable sort.
+
+    Avoids pandas groupby, whose fixed overhead dominates on a 200-row request."""
+    codes, uniques = pd.factorize(pd.Series(keys).to_numpy(dtype=object), use_na_sentinel=True)
+    if not len(codes):
+        return
+    order = np.argsort(codes, kind="stable")
+    sorted_codes = codes[order]
+    starts = np.flatnonzero(np.r_[True, sorted_codes[1:] != sorted_codes[:-1]])
+    ends = np.r_[starts[1:], len(order)]
+    for a, b in zip(starts, ends, strict=True):
+        c = sorted_codes[a]
+        if c >= 0:
+            yield uniques[c], order[a:b]
+
+
 def _window_mean(index: dict, keys, t: np.ndarray, window_s: float) -> np.ndarray:
     out = np.full(len(t), np.nan)
-    keys = pd.Series(list(keys))
-    for k, idx in keys.groupby(keys).indices.items():
+    for k, idx in _key_groups(keys):
         if k not in index:
             continue
         ts, csum = index[k]
@@ -73,8 +89,7 @@ def _window_mean(index: dict, keys, t: np.ndarray, window_s: float) -> np.ndarra
 def _count(index: dict, keys, t: np.ndarray, window_s: float | None) -> np.ndarray:
     """Number of events per key in [t - window, t) (or (-inf, t) when window is None)."""
     out = np.zeros(len(t), dtype=np.int64)
-    keys = pd.Series(list(keys))
-    for k, idx in keys.groupby(keys).indices.items():
+    for k, idx in _key_groups(keys):
         arr = index.get(k)
         if arr is None or not len(arr):
             continue
@@ -124,7 +139,32 @@ class HistoryStore:
             d0, d1 = int(impressions["ts"].min() // DAY_S), int(impressions["ts"].max() // DAY_S)
             days = range(d0, d1 + 1)
         store.daily_popularity = store._popularity(days)
+        store._build_lookups()
         return store
+
+    POP_COLUMNS = ("item_bestseller_rank_category", "item_bestseller_pct_global",
+                   "is_category_top20", "is_unpopular")
+
+    def _build_lookups(self) -> None:
+        """Integer-keyed (product code, day) table for O(log n) popularity lookups."""
+        self._prod_code = {pid: i for i, pid in enumerate(self.products.index)}
+        dp = self.daily_popularity
+        codes = dp["product_id"].map(self._prod_code).to_numpy(dtype=np.int64)
+        keys = codes * 1_000_000 + dp["day"].to_numpy(dtype=np.int64)
+        order = np.argsort(keys)
+        self._pop_keys = keys[order]
+        self._pop_values = {c: dp[c].to_numpy(dtype=float)[order] for c in self.POP_COLUMNS}
+        self._published = self.products["published_at"].to_dict()
+        self._published_by_seller = _index(self.products["merchant_id"],
+                                           self.products["published_at"])
+
+    def _popularity_lookup(self, items, day: np.ndarray) -> dict:
+        codes = np.array([self._prod_code.get(i, -1) for i in items], dtype=np.int64)
+        keys = codes * 1_000_000 + day
+        pos = np.searchsorted(self._pop_keys, keys)
+        pos_c = np.minimum(pos, len(self._pop_keys) - 1)
+        found = (codes >= 0) & (len(self._pop_keys) > 0) & (self._pop_keys[pos_c] == keys)
+        return {c: np.where(found, v[pos_c], np.nan) for c, v in self._pop_values.items()}
 
     def _popularity(self, days: range) -> pd.DataFrame:
         items = self.products.index.to_numpy()
@@ -153,38 +193,29 @@ class HistoryStore:
     def features(self, rows: pd.DataFrame) -> pd.DataFrame:
         """rows needs: item_id, seller_id, user_id, impression_ts. Returns HISTORY_FEATURES."""
         t = rows["impression_ts"].to_numpy(dtype=float)
-        item, seller, user = rows["item_id"], rows["seller_id"], rows["user_id"]
-        out = pd.DataFrame(index=rows.index)
+        item = rows["item_id"].to_numpy(dtype=object)
+        seller = rows["seller_id"].to_numpy(dtype=object)
+        user = rows["user_id"].to_numpy(dtype=object)
+        out: dict[str, np.ndarray] = {}
         out["item_purchases_30d"] = _count(self.purchases_by_item, item, t, 30 * DAY_S)
         out["item_purchases_all"] = _count(self.purchases_by_item, item, t, None)
         out["item_wishlist_30d"] = _count(self.saves_by_item, item, t, 30 * DAY_S)
-        published = item.map(self.products["published_at"]).to_numpy(dtype=float)
+        published = np.array([self._published.get(i, np.nan) for i in item], dtype=float)
         out["item_age_days"] = np.clip((t - published) / DAY_S, 0, None)
-        m = self.merchants.reindex(seller.to_numpy())
+        m = self.merchants.reindex(seller)
         out["seller_return_rate"] = m["return_rate"].to_numpy()
         out["seller_fulfilment_days"] = m["fulfilment_days"].to_numpy()
-        out["seller_item_count"] = self._seller_item_count(seller, t)
+        out["seller_item_count"] = _count(self._published_by_seller, seller, t, None)
         out["seller_purchases_30d"] = _count(self.purchases_by_seller, seller, t, 30 * DAY_S)
-        follows = _count(self.follows_by_user_seller, user + "|" + seller, t, None)
+        pair = np.array([f"{u}|{s}" for u, s in zip(user, seller, strict=True)], dtype=object)
+        follows = _count(self.follows_by_user_seller, pair, t, None)
         out["user_follows_seller"] = (follows > 0).astype("int64")
         out["user_order_count"] = _count(self.purchases_by_user, user, t, None)
         out["is_new_user"] = (out["user_order_count"] == 0).astype("int64")
         out["user_aov_value"] = _window_mean(self.purchase_values_by_user, user, t,
                                              config.AOV_LOOKBACK_S)
-
-        day = (t // DAY_S).astype(np.int64)
-        key = pd.DataFrame({"product_id": item.to_numpy(), "day": day})
-        pop = key.merge(self.daily_popularity, on=["product_id", "day"], how="left")
-        for c in ("item_bestseller_rank_category", "item_bestseller_pct_global",
-                  "is_category_top20", "is_unpopular"):
-            out[c] = pop[c].to_numpy()
-        return out[HISTORY_FEATURES]
-
-    def _seller_item_count(self, seller: pd.Series, t: np.ndarray) -> np.ndarray:
-        if not hasattr(self, "_published_by_seller"):
-            self._published_by_seller = _index(self.products["merchant_id"],
-                                               self.products["published_at"])
-        return _count(self._published_by_seller, seller, t, None)
+        out.update(self._popularity_lookup(item, (t // DAY_S).astype(np.int64)))
+        return pd.DataFrame({c: out[c] for c in HISTORY_FEATURES}, index=rows.index)
 
     def item_impressions(self, items, t: np.ndarray, window_s: float = 30 * DAY_S) -> np.ndarray:
         """Impressions per item in [t - window, t). Serving-rule input, not a model feature."""

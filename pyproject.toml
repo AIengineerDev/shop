@@ -16,15 +16,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7", "ruff>=0.5", "hypothesis>=6"]
+dev = ["pytest>=7", "pytest-cov>=5", "ruff>=0.5", "hypothesis>=6"]
+security = ["pip-audit>=2.7", "bandit>=1.7"]
 
 [tool.setuptools.packages.find]
 include = ["shopfeed*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q -m 'not perf'"
-markers = ["perf: latency benchmarks; run nightly with `pytest -m perf` (spec §13)"]
+addopts = "-q -m 'not integration and not e2e and not load'"
+markers = [
+  "integration: module boundaries on a synthetic log (CI job: integration)",
+  "e2e: every CLI end to end on a synthetic data root (CI job: e2e)",
+  "load: open-loop load against the ranker with SLA gates (CI job: load)",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+
+[tool.coverage.run]
+source = ["shopfeed"]
 
 [tool.ruff]
 line-length = 100

@@ -12,7 +12,7 @@ term jointly (unbiased LambdaMART) when a Dataset has `position` set. There is n
 from __future__ import annotations
 
 import json
-import subprocess
+import subprocess  # nosec B404
 from pathlib import Path
 
 import lightgbm as lgb
@@ -118,9 +118,12 @@ def evaluate_test(te_rows: pd.DataFrame, model_scores: np.ndarray,
 
 
 def git_sha() -> str:
+    """Commit of the training code, stamped into meta.json. Fixed argv, no user input, no
+    shell; `git` resolved from PATH on purpose (dev machines and CI differ)."""
     try:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=config.ROOT,
-                                       text=True).strip()
+        argv = ["git", "rev-parse", "HEAD"]
+        out = subprocess.check_output(argv, cwd=config.ROOT, text=True)  # nosec B603
+        return out.strip()
     except Exception:  # noqa: BLE001
         return "unknown"
 

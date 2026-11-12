@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = ROOT / "data"
-ARTIFACTS_DIR = ROOT / "artifacts"
-REPORTS_DIR = ROOT / "reports"
+# Overridable so e2e tests (and other environments) can run the CLIs on another data root.
+DATA_DIR = Path(os.environ.get("SHOPFEED_DATA_DIR", ROOT / "data"))
+ARTIFACTS_DIR = Path(os.environ.get("SHOPFEED_ARTIFACTS_DIR", ROOT / "artifacts"))
+REPORTS_DIR = Path(os.environ.get("SHOPFEED_REPORTS_DIR", ROOT / "reports"))
 FIXTURE_CSV = ROOT / "tests" / "fixtures" / "ranking_items.csv"
 RANKING_CSV = DATA_DIR / "ranking_items.csv"
 
@@ -33,6 +35,7 @@ AOV_DEFAULT_TIER = "Mid"
 GATES = {
     "production": {"min_rows": 1_000_000, "min_groups": 50_000, "min_purchase_attribution": 0.95},
     "sample": {"min_rows": 100_000, "min_groups": 5_000, "min_purchase_attribution": 0.70},
+    "ci": {"min_rows": 10_000, "min_groups": 500, "min_purchase_attribution": 0.70},
 }
 
 # Popularity prior (§5.5)

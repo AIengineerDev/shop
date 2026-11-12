@@ -184,8 +184,14 @@ Popularity alone ranks **worse than random** on this data. Best sellers up (§5.
 - `Ranker` loads the artefact, builds features with the training code path, scores with 4 threads, applies the §5.5 rules, and logs per-request features. On an error, a feature-store outage or a timeout it serves BM25 order, falling back to retrieval order when BM25 is missing.
 - Rules: relevance floor, unpopular demotion and new-item slot are on; best-seller boost is off.
 - Caches: rank-once ranked-list cache, query-result cache with item invalidation and model-deploy flush. Cursor pagination with dedup after a cache miss.
-- Latency on real requests (200 candidates): total 20.7 / 25.3 ms p50 / p99, 0 fallbacks. Scoring is 0.6 ms; features are about 18 ms and **over budget** (spec §12.4). Next step: a precomputed feature key-value table.
-- The 500-tree scoring benchmark is a `perf`-marked test (nightly, `pytest -m perf`). It sits at about 1.8–2.0 ms p50, too close to the gate to run on every PR.
+- Latency on real requests (200 candidates): M8 total 20.7 / 25.3 ms p50 / p99, with features over budget. **Fixed in the CI PR**: vectorised features give a 5.8 / 6.9 ms total (spec §12.4).
+
+### CI quality gates (PR on top of M9)
+
+- Jobs: lint, unit (coverage ≥ 85%, currently 86%), integration (≥ 95%, currently 97%), e2e (8 CLIs, ~16 s), load (25 rps × 40 s, SLA gates), security (pip-audit, bandit, gitleaks). No scheduled jobs.
+- The load test found two real defects, both fixed: ~50 ms gen-2 GC pauses causing timeout fallbacks (`gc.freeze()` on load), and an unbounded Python-float request log (now a bounded numpy-array sink).
+- Ranker now drops duplicate candidates (counted).
+- Security baseline: 0 CVEs in project deps, 0 bandit findings (one justified `nosec` for `git rev-parse`), 0 secrets across 61 commits.
 
 ## 7. Definition of done for v1
 
