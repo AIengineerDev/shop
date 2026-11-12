@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "catalog-onboard"
+version = "0.1.0"
+description = "Automated catalog onboarding & taxonomy normalization engine"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.0",
+  "fastapi>=0.100",
+  "uvicorn>=0.22",
+  "anthropic>=0.40",
+  "pyyaml>=6.0",
+  "typing-extensions>=4.6",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7",
+  "httpx>=0.24",
+  "hypothesis>=6",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "types-PyYAML",
+  "pytest-cov>=5",
+]
+security = ["pip-audit>=2.7", "bandit>=1.7"]
+
+[tool.setuptools.packages.find]
+include = ["catalog_onboard*"]
+
+[tool.setuptools.package-data]
+catalog_onboard = ["rules/*.yaml", "db/*.sql"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -m 'not integration and not e2e and not load'"
+markers = [
+  "integration: starter DB -> engine -> store -> API in-process (CI job: integration)",
+  "e2e: CLIs and a live HTTP server end to end (CI job: e2e)",
+  "load: AC-4.6 API latency on 10k rows and §8 ingest throughput (CI job: load)",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["catalog_onboard"]
+branch = true
+# Count code run by e2e CLI / server subprocesses (pytest-cov >= 7 relies on coverage for this).
+patch = ["subprocess"]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
