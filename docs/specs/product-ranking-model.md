@@ -381,7 +381,7 @@ On a 90-day window this is roughly days 1–54 / 55–72 / 73–90. Cut points a
 ```text
 objective          = lambdarank
 metric             = ndcg
-eval_at            = 5,10,20
+eval_at            = 10,5,20   # NDCG@10 first: early stopping uses the first metric only
 label_gain         = 0,1,2,5,20   # purchase-dominant, see §4.2
 lambdarank_truncation_level = 20
 num_leaves         = 63
@@ -392,9 +392,9 @@ bagging_fraction   = 0.8, bagging_freq = 1
 lambda_l2          = 1.0
 num_boost_round    = 2000, early_stopping_rounds = 100
 # position debiasing
-lambdarank_unbiased = true
+# LightGBM >= 4.1 has no `lambdarank_unbiased` flag: unbiased LambdaMART is enabled by
+# passing Dataset(position=displayed_position - 1) (training only).
 lambdarank_position_bias_regularization = 1.0
-position column    = displayed_position (training only)
 ```
 
 Tune `num_leaves`, `learning_rate`, `min_data_in_leaf`, `feature_fraction` with ~30 trials of random search on the validation split. Do not tune on test.

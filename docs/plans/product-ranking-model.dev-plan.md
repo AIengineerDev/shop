@@ -122,6 +122,30 @@ Carried over from spec §10 and the repo audit.
 | Purchases: stamped / lag > 24 h / non-search | 3,353 / 1,719 / 1,157 |
 | §9 readiness (`--profile sample`) | 12 / 12 pass |
 
+## 6a. Results log
+
+### M4 baselines (test split, 1,956 sessions; vs randomised logged order)
+
+| Scorer | NDCG@10 | Purchase MRR | Purchase@10 | NDCG@10 rel. Δ (95% CI) |
+|---|---|---|---|---|
+| logged (random) | 0.356 | 0.287 | 0.626 | — |
+| CTR sort | 0.278 | 0.209 | 0.536 | −22% (−26, −18) |
+| best-seller sort | 0.293 | 0.268 | 0.607 | −18% (−22, −14) |
+| semantic sort | 0.519 | 0.520 | 0.927 | +46% (+40, +52) |
+| pointwise LightGBM | 0.519 | 0.515 | 0.926 | +46% (+40, +52) |
+
+Popularity alone ranks **worse than random** on this data. Best sellers up (§5.5) has to come from the model combining popularity with relevance, not from a sort or a hard boost.
+
+### M5 LambdaMART v1 (§7.3 config, test split)
+
+- NDCG@10 0.518, Purchase MRR 0.533, Purchase@10 0.912. All three technical gates vs logged pass (NDCG@10 +45.5%, lower CI +39.8%; MRR +86%; Purchase@10 +28.6 pts).
+- **Not better than the semantic-sort baseline**: NDCG@10 −0.3% (CI −1.4, +0.8), MRR +2.4% (CI −0.5, +5.6), Purchase@10 −1.6%. None significant.
+- `best_iteration = 1`: validation NDCG@10 peaks at the first tree. Train keeps rising (0.54 → 0.82 by 300 trees) while validation falls: overfitting.
+- **Leakage check flagged**: `semantic_sim_z_in_group` holds 91% of gain. Not temporal leakage: it is a static user–product embedding cosine with no label or future input. It is almost certainly the simulator's own preference signal, so on this dataset it is an oracle-like feature.
+- Ablation without semantic features: validation NDCG@10 0.28, below random (0.356). History/popularity counts are non-stationary (they grow over the window) and trees overfit their absolute thresholds.
+- Regularised probe (lr 0.01, 15 leaves, min_data_in_leaf 500): validation NDCG@10 0.531 vs semantic sort 0.520. This is input for the M7 sweep, not a selected config.
+- Reproducibility: two full runs give byte-identical `metrics.json`.
+
 ## 7. Definition of done for v1
 
 - M0–M9 merged to `main`.
