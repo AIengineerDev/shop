@@ -1,0 +1,11 @@
+session_id,qid,query_text,user_id,item_id,device,user_aov_tier,bm25,semantic_sim,price,hist_ctr_7d,rating,displayed_pos,clicked,added_to_cart,purchased,relevance_grade,impression_ts,wishlisted,seller_id,category
+s_101,1,wireless headphones,u_89,p_301,mobile,High,14.8,0.88,199.99,0.082,4.6,1,1,1,1,4,1746100000.0,0,m_3,headphones
+s_101,1,wireless headphones,u_89,p_302,mobile,High,12.1,0.82,89.99,0.065,4.3,2,1,1,0,3,1746100000.0,0,m_7,headphones
+s_101,1,wireless headphones,u_89,p_303,mobile,High,13.5,0.74,24.99,0.041,3.9,3,0,0,0,0,1746100000.0,0,m_3,headphones
+s_101,1,wireless headphones,u_89,p_304,mobile,High,10.9,0.79,149.50,0.071,4.5,4,1,0,0,2,1746100000.0,1,m_12,headphones
+s_101,1,wireless headphones,u_89,p_305,mobile,High,8.2,0.61,12.00,0.015,3.6,5,0,0,0,0,1746100000.0,0,m_20,headphones
+s_102,2,mechanical keyboard,u_42,p_811,desktop,Mid,16.2,0.91,79.99,0.093,4.7,1,1,1,1,4,1746200000.0,0,m_5,keyboards
+s_102,2,mechanical keyboard,u_42,p_812,desktop,Mid,15.1,0.85,119.00,0.054,4.4,2,1,0,0,1,1746200000.0,0,m_5,keyboards
+s_102,2,mechanical keyboard,u_42,p_813,desktop,Mid,11.4,0.69,45.00,0.038,4.0,3,0,0,0,0,1746200000.0,0,m_9,keyboards
+s_102,2,mechanical keyboard,u_42,p_814,desktop,Mid,9.7,0.58,299.99,0.021,4.8,4,0,0,0,0,1746200000.0,0,m_14,keyboards
+s_102,2,mechanical keyboard,u_42,p_815,desktop,Mid,7.5,0.52,15.99,0.019,3.8,5,0,0,0,0,1746200000.0,0,m_31,keyboards
