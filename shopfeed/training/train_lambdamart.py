@@ -31,12 +31,14 @@ PARAMS = {
     "objective": "lambdarank",
     "metric": "ndcg",
     "eval_at": [10, 5, 20],  # NDCG@10 first: early stopping uses the first metric only
-    "label_gain": config.GAIN_PURCHASE_DOMINANT,
+    # M7 sweep winner (reports/sweep.json): purchase gain 40 for training. Evaluation NDCG
+    # keeps the spec §4.2 table {0,1,2,5,20}.
+    "label_gain": [0, 1, 2, 5, 40],
     "lambdarank_truncation_level": 20,
-    "num_leaves": 63,
-    "learning_rate": 0.05,
-    "min_data_in_leaf": 100,
-    "feature_fraction": 0.8,
+    "num_leaves": 7,
+    "learning_rate": 0.1,
+    "min_data_in_leaf": 500,
+    "feature_fraction": 0.7,
     "bagging_fraction": 0.8,
     "bagging_freq": 1,
     "lambda_l2": 1.0,

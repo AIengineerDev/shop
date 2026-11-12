@@ -572,7 +572,7 @@ Numeric columns arrive as strings in CSV. Parse only if the string matches the p
 | 5 | Purchase attribution window undefined. | Fix at 24h, same session; document. |
 | 6 | Model learns to favour cheap items (CTR-driven). | Mean-price guardrail (§8.1), `user_aov_tier × price` cross feature. |
 | 7 | Feedback loop: the ranker trains on data its predecessor produced. | Randomised slice + IPW; monitor item exposure entropy over time. |
-| 8 | Purchase-dominant gain {0,1,2,5,20} is a design choice, not tuned. | Sweep the purchase gain over {10, 20, 40} on validation; pick by Purchase MRR, tie-break on NDCG@10. |
+| 8 | Purchase-dominant gain {0,1,2,5,20} is a design choice, not tuned. | Done (M7): gain 10 / 20 / 40 differ by < 0.001 validation MRR; training uses 40, evaluation NDCG keeps {0,1,2,5,20}. |
 | 9 | Revenue weighting of gains. | Deferred to v2; needs a business decision on relevance vs revenue trade-off. |
 | 10 | Diversity / merchant fairness re-ranking. | v2, as a post-ranking stage with its own spec. |
 | 11 | Popularity features create a rich-get-richer loop; unpopular items never recover. | Learned features over hard rules, new-item exploration slot, long-tail and new-item exposure guardrails (§5.5, §1). |

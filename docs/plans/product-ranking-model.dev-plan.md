@@ -162,6 +162,23 @@ Popularity alone ranks **worse than random** on this data. Best sellers up (§5.
 - Debiasing makes training more stable (26 trees vs 1) and recovers Purchase@10. Differences against the semantic sort are not significant on any metric.
 - The whole log is randomised, so raw test NDCG is also the §8.3 randomised-slice number.
 
+### M7 sweep (validation only; test read once)
+
+- 90 fits: purchase gain {10, 20, 40} × 30 random configs (`reports/sweep.csv`), position debiasing on.
+- Purchase gain barely matters: best validation MRR 0.5070 / 0.5070 / 0.5072 for gain 10 / 20 / 40.
+- **Chosen**: gain 40, `num_leaves 7`, `learning_rate 0.1`, `min_data_in_leaf 500`, `feature_fraction 0.7`, `lambda_l2 1.0`. Validation NDCG@10 0.5375 (semantic sort: 0.520). It is now the default `PARAMS`.
+- The model is **one 7-leaf tree** (`best_iteration = 1` for every top config). More trees overfit the non-stationary history features (see M5).
+- **Frozen test numbers:**
+
+| | NDCG@10 | IPW-NDCG@10 | Purchase MRR | Purchase@10 |
+|---|---|---|---|---|
+| logged (random) | 0.356 | 0.315 | 0.287 | 0.626 |
+| semantic sort | 0.519 | 0.512 | 0.520 | 0.927 |
+| **ranker_v2 (M7)** | **0.535** | **0.517** | **0.529** | **0.935** |
+
+- vs logged: NDCG@10 +50.4% (lower CI +45.1%), MRR +84.6%, Purchase@10 +30.9 pts. All technical gates pass.
+- vs semantic sort: NDCG@10 **+3.0% (CI +1.6, +4.7; Wilcoxon p = 2e-6)**; MRR +1.7% and Purchase@10 +0.8 pts, both n.s.
+
 ## 7. Definition of done for v1
 
 - M0–M9 merged to `main`.
