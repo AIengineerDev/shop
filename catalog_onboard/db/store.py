@@ -40,8 +40,15 @@ def dumps(obj: Any) -> str:
     return json.dumps(obj, default=_json_default, sort_keys=True, ensure_ascii=False)
 
 
+def _decode_text(raw: bytes) -> str:
+    """Never raise on bad bytes (AC-1.5): undecodable bytes become U+FFFD, which the clean
+    stage turns into TEXT_ENCODING_INVALID:<field>. Valid UTF-8 is unchanged."""
+    return raw.decode("utf-8", errors="replace")
+
+
 def open_readwrite(path: str | Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(path))
+    conn.text_factory = _decode_text
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA journal_mode = WAL")
@@ -53,6 +60,7 @@ def open_readonly(path: str | Path) -> sqlite3.Connection:
     if not p.exists():
         raise FileNotFoundError(p)
     conn = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
+    conn.text_factory = _decode_text
     conn.row_factory = sqlite3.Row
     return conn
 

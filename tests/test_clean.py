@@ -126,3 +126,53 @@ def test_ac_1_4_snapshot(rules, store):
     golden = json.loads(GOLDEN.read_text())
     assert golden["rules_version"] == rules.version, "rules changed: run with UPDATE_GOLDEN=1 and review the diff"
     assert golden["rows"] == out
+
+
+# ---- C1: robust ingestion ---------------------------------------------------------------
+
+@pytest.mark.parametrize("raw,lo,hi", [
+    ("$1,299.99", "1299.99", "1299.99"),      # US thousands + decimal
+    ("€1.299,99", "1299.99", "1299.99"),      # EU thousands + decimal
+    ("USD 1,000", "1000", "1000"),            # thousands only (was 0..1.00 -> PRICE_INVALID)
+    ("1.299.000", "1299000", "1299000"),      # repeated dot groups are thousands
+    ("12,50 €", "12.50", "12.50"),            # EU decimal comma
+    ("$1,299 - $1,499", "1299", "1499"),      # range with thousands
+    ("$5.", "5", "5"),                        # trailing separator
+])
+def test_price_thousands_separators(raw, lo, hi):
+    assert ex.parse_price(raw)[:2] == (Decimal(lo), Decimal(hi))
+
+
+@pytest.mark.parametrize("title,count,rest", [
+    ("Crew Socks 3x", 3, "Crew Socks"),
+    ("Crew Socks 3X", 3, "Crew Socks"),
+    ("Crew Socks x3", 3, "Crew Socks"),
+    ("Box 2x4 Lumber", None, "Box 2x4 Lumber"),   # dimension, not a pack
+    ("Frame 3 x 4", None, "Frame 3 x 4"),         # spaced dimension
+    ("Hoodie 3XL", None, "Hoodie 3XL"),           # size token
+])
+def test_pack_count_nx_form(title, count, rest):
+    assert ex.extract_pack_count(title) == (rest, count)
+
+
+def test_undecodable_field_is_unset_and_flagged(rules):
+    bad = "Men's �� Shorts"  # what the store's lenient decode yields for bad bytes
+    n = normalize(row(raw_title=bad, raw_price="$9.99"), rules)
+    codes = {c.code: c for c in n.reason_codes}
+    assert codes["TEXT_ENCODING_INVALID:raw_title"].severity == "warning"
+    assert "TITLE_EMPTY" in codes and n.clean_title == ""
+    assert n.raw_json["raw_title"] is None
+    assert n.price_min == Decimal("9.99")  # other fields still processed
+
+
+@pytest.mark.parametrize("title,flag", [
+    ("Мужские шорты для бега", True),          # Cyrillic
+    ("跑步短裤 Men Shorts", True),               # mixed CJK
+    ("Café Crème Mug", False),                 # accented Latin is English-compatible
+    ("Men Running Shorts", False),
+])
+def test_lang_unsupported_warning(rules, title, flag):
+    codes = {c.code: c.severity for c in normalize(row(raw_title=title), rules).reason_codes}
+    assert ("LANG_UNSUPPORTED" in codes) is flag
+    if flag:
+        assert codes["LANG_UNSUPPORTED"] == "warning"

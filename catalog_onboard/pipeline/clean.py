@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import unicodedata
 from typing import Any
 
 from catalog_onboard.models import AttrValue, NormalizedListing, RawFeedRow, ReasonCode, Severity
@@ -32,16 +33,36 @@ def _merge_attr(
         codes.append(_code(f"ATTR_CONFLICT:{key}", "warning", f"kept {existing!r}, {source} said {value!r}"))
 
 
+_TEXT_FIELDS = ("raw_title", "raw_bullets", "raw_tags", "raw_price")
+
+
+def _drop_undecodable(row: RawFeedRow, codes: list[ReasonCode]) -> RawFeedRow:
+    """AC-1.5: a field with undecodable bytes (U+FFFD after the store's lenient decode) is unset
+    and flagged; the rest of the row is still processed."""
+    bad = [f for f in _TEXT_FIELDS if isinstance(getattr(row, f), str) and "\ufffd" in getattr(row, f)]
+    for f in bad:
+        codes.append(_code(f"TEXT_ENCODING_INVALID:{f}", "warning", "field unset: invalid UTF-8"))
+    return row.model_copy(update={f: None for f in bad}) if bad else row
+
+
+def is_unsupported_language(text: str) -> bool:
+    """§10: English only. Letters outside the Latin script (accented Latin is fine) -> warn."""
+    return any(ch.isalpha() and not unicodedata.name(ch, "").startswith("LATIN") for ch in text)
+
+
 def normalize(row: RawFeedRow, rules: Rules) -> NormalizedListing:
     codes: list[ReasonCode] = []
     attrs: dict[str, AttrValue] = {}
     abbrev = ex.build_abbreviation_regex(rules)
+    row = _drop_undecodable(row, codes)
 
     # --- title ---------------------------------------------------------------
     raw_title = row.raw_title or ""
     title = ex.normalize_text(raw_title)
     if not title:
         codes.append(_code("TITLE_EMPTY", "blocking"))
+    elif is_unsupported_language(title):
+        codes.append(_code("LANG_UNSUPPORTED", "warning", "non-Latin script in title"))
     title, tail = ex.extract_tail(title)
     title, colors, sizes = ex.extract_variations(title)
     title, pack = ex.extract_pack_count(title)

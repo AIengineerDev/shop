@@ -63,7 +63,9 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _WS = re.compile(r"\s+")
 _PAREN = re.compile(r"\(([^()]*)\)")
 _PACK = re.compile(
-    r"(?<!\w)(?:pack of (\d{1,3})|set of (\d{1,3})|(\d{1,3})\s*-?\s*(?:pack|pk|pcs|pieces|count|ct)(?!\w))",
+    r"(?<!\w)(?:pack of (\d{1,3})|set of (\d{1,3})|(\d{1,3})\s*-?\s*(?:pack|pk|pcs|pieces|count|ct)(?!\w)"
+    # "3x" / "3 x" (not "2x4" or "3 x 4" dimensions, not "3XL" sizes) and "x3"
+    r"|(\d{1,3})\s*x(?!\w)(?!\s*\d)|x(\d{1,3})(?!\w))",
     re.IGNORECASE,
 )
 _TAIL = re.compile(r"\s+[-–—|]\s+(?P<tail>[^-–—|]+?)\s*$")
@@ -71,7 +73,8 @@ _SIZE_TOKEN = re.compile(r"^(?:size\s*)?(\d{1,2}(?:\.5)?)$", re.IGNORECASE)
 _CAPACITY = re.compile(
     r"(?<!\w)(\d+(?:\.\d+)?)\s*-?\s*(oz|ounce|ounces|l|liter|liters|litre|litres)(?!\w)", re.IGNORECASE
 )
-_PRICE_NUM = re.compile(r"\d+(?:[.,]\d{1,2})?")
+_PRICE_NUM = re.compile(r"\d[\d.,]*")
+_THOUSANDS_ONLY = re.compile(r"\d{1,3}(?:([.,])\d{3})(?:\1\d{3})*")
 _MATERIAL = re.compile(r"^(?:material|made of|made from|fabric|upper)\s*:?\s*(.+)$", re.IGNORECASE)
 _CONNECTOR = re.compile(r"^connector\s*:?\s*(.+)$", re.IGNORECASE)
 _KV = re.compile(r"^\s*([^=:]+?)\s*[=:]\s*(.*?)\s*$")
@@ -237,6 +240,24 @@ def coerce_tag_value(key: str, value: str, supplier_id: str, rules: Rules) -> At
     return rules.tag_value(supplier_id, key, value)
 
 
+def _price_token(token: str) -> str:
+    """Normalise one numeric token to a plain decimal string.
+
+    "1,299.99" / "1.299,99" -> "1299.99" (the last separator is the decimal point when both
+    appear); "1,000" / "1.000.000" -> thousands groups; "12,50" -> "12.50"; "19.99" unchanged.
+    A lone "1.299" stays a decimal (US style) - ambiguous, and dot-decimal is the common case.
+    """
+    t = token.rstrip(".,")
+    if "." in t and "," in t:
+        dec = "." if t.rfind(".") > t.rfind(",") else ","
+        thousands = "," if dec == "." else "."
+        return t.replace(thousands, "").replace(dec, ".")
+    m = _THOUSANDS_ONLY.fullmatch(t)
+    if m and (m.group(1) == "," or t.count(".") > 1):
+        return t.replace(m.group(1), "")
+    return t.replace(",", ".")
+
+
 def parse_price(raw: str | None) -> tuple[Decimal | None, Decimal | None, bool]:
     """Returns (min, max, parse_ok). Ranges yield min<max; a single value yields min==max."""
     if raw is None or not raw.strip():
@@ -247,7 +268,7 @@ def parse_price(raw: str | None) -> tuple[Decimal | None, Decimal | None, bool]:
     values: list[Decimal] = []
     for n in nums[:2]:
         try:
-            values.append(Decimal(n.replace(",", ".")))
+            values.append(Decimal(_price_token(n)))
         except InvalidOperation:
             continue
     if not values:

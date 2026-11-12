@@ -40,3 +40,23 @@ def test_cli_supplier_filter(db_path: Path, capsys):
         "SELECT DISTINCT supplier_id FROM draft_catalog UNION SELECT DISTINCT supplier_id FROM quarantine"
     ).fetchall()
     assert sup == [("sup_acme",)]
+
+
+def test_non_utf8_row_is_quarantined_not_fatal(db_path: Path, capsys):
+    """AC-1.5 / AC-3.5 / AC-3.6: one row with invalid UTF-8 bytes must not abort the batch."""
+    conn = sqlite3.connect(str(db_path))
+    fid = conn.execute("SELECT feed_item_id FROM incoming_supplier_feeds ORDER BY received_at LIMIT 1 OFFSET 3"
+                       ).fetchone()[0]
+    conn.execute("UPDATE incoming_supplier_feeds SET raw_title = CAST(x'4d656e2773fffe2053686f727473' AS TEXT) "
+                 "WHERE feed_item_id = ?", (fid,))
+    conn.commit()
+    total = conn.execute("SELECT COUNT(*) FROM incoming_supplier_feeds").fetchone()[0]
+    conn.close()
+
+    assert main(["ingest", "--db", str(db_path), "--llm", "fake"]) == 0
+    conn = sqlite3.connect(str(db_path))
+    done = (conn.execute("SELECT COUNT(*) FROM draft_catalog").fetchone()[0]
+            + conn.execute("SELECT COUNT(*) FROM quarantine").fetchone()[0])
+    assert done == total
+    codes = conn.execute("SELECT reason_codes_json FROM quarantine WHERE feed_item_id = ?", (fid,)).fetchone()[0]
+    assert "TEXT_ENCODING_INVALID:raw_title" in codes and "PIPELINE_ERROR" not in codes
