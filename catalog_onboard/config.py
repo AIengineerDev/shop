@@ -69,6 +69,7 @@ class Settings:
     llm_effort: Effort = "low"
     llm_max_retries: int = 2
     llm_max_tokens: int = 4096
+    llm_concurrency: int = 8  # §8: >= 200 items/min with concurrency 8 against a real LLM
     high_conf_threshold: float = 0.75
     disagree_quarantine_below: float = 0.8
     candidate_k: int = 8
@@ -94,6 +95,7 @@ class Settings:
             llm_effort=effort_raw,  # type: ignore[arg-type]
             llm_max_retries=_env_int(env, "LLM_MAX_RETRIES", cls.llm_max_retries),
             llm_max_tokens=_env_int(env, "LLM_MAX_TOKENS", cls.llm_max_tokens),
+            llm_concurrency=_env_int(env, "LLM_CONCURRENCY", cls.llm_concurrency),
             high_conf_threshold=_env_float(env, "HIGH_CONF_THRESHOLD", cls.high_conf_threshold),
             disagree_quarantine_below=_env_float(env, "DISAGREE_QUARANTINE_BELOW", cls.disagree_quarantine_below),
             candidate_k=_env_int(env, "CANDIDATE_K", cls.candidate_k),

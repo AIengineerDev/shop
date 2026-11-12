@@ -8,6 +8,7 @@ import time
 import traceback
 import uuid
 from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -57,13 +58,17 @@ class BatchSummary:
 
 
 class _Trail:
-    """Collects per-stage records and flushes them to pipeline_runs."""
+    """Buffers per-stage records in memory; `flush()` writes them to pipeline_runs.
+
+    Buffering lets the LLM-bound stages run on worker threads without touching SQLite; the main
+    thread flushes the trail in the same transaction as the item's outcome (C5)."""
 
     def __init__(self, store: Store, run_id: str, feed_item_id: str):
         self.store = store
         self.run_id = run_id
         self.feed_item_id = feed_item_id
         self.seq = 0
+        self.records: list[dict[str, Any]] = []
 
     def record(self, stage: str, input_obj: Any, output_obj: Any, started: float, llm_raw: Any = None) -> None:
         if isinstance(input_obj, list):
@@ -71,16 +76,45 @@ class _Trail:
         if isinstance(output_obj, list):
             output_obj = {"items": output_obj}
         self.seq += 1
-        self.store.insert_run(
-            run_id=self.run_id,
-            feed_item_id=self.feed_item_id,
-            stage=stage,
-            seq=self.seq,
-            input_obj=_dump(input_obj),
-            output_obj=_dump(output_obj),
-            llm_raw=_dump(llm_raw),
-            duration_ms=int((time.perf_counter() - started) * 1000),
-        )
+        self.records.append({
+            "run_id": self.run_id,
+            "feed_item_id": self.feed_item_id,
+            "stage": stage,
+            "seq": self.seq,
+            "input_obj": _dump(input_obj),
+            "output_obj": _dump(output_obj),
+            "llm_raw": _dump(llm_raw),
+            "duration_ms": int((time.perf_counter() - started) * 1000),
+        })
+
+    def flush(self) -> None:
+        for rec in self.records:
+            self.store.insert_run(**rec)
+        self.records.clear()
+
+    def reset(self) -> None:
+        self.records.clear()
+        self.seq = 0
+
+
+@dataclass
+class _Prepared:
+    """Output of the LLM-bound phase for one row (built on a worker thread, no DB access)."""
+
+    row: RawFeedRow
+    trail: _Trail
+    listing: NormalizedListing | None = None
+    cands: list[Candidate] = field(default_factory=list)
+    category_id: str | None = None
+    source: str | None = None
+    llm_cls: LLMClassification | None = None
+    cls_trace: list[LLMAttempt] = field(default_factory=list)
+    ext_trace: list[LLMAttempt] = field(default_factory=list)
+    llm_attrs: dict[str, Any] | None = None
+    codes: list[ReasonCode] = field(default_factory=list)
+    error: BaseException | None = None
+    error_stage: str = "clean"
+    error_tb: str = ""
 
 
 def _dump(obj: Any) -> Any:
@@ -131,6 +165,16 @@ def stored_llm_attrs(trace: list[LLMAttempt]) -> dict[str, Any] | None:
     return None
 
 
+def _tally(summary: BatchSummary, outcome: ItemOutcome) -> None:
+    if outcome.skipped:
+        summary.skipped += 1
+        return
+    summary.processed += 1
+    summary.errors += 1 if outcome.error else 0
+    summary.draft += 1 if outcome.status == "draft" else 0
+    summary.quarantined += 1 if outcome.status == "quarantined" else 0
+
+
 def _log_outcome(outcome: ItemOutcome) -> None:
     if outcome.skipped:
         log.debug("item skipped (already processed)", extra={"event": "item_skipped"})
@@ -162,6 +206,7 @@ class Engine:
         # Outcomes are stamped with rules + taxonomy content, so a changed category spec is a new
         # version: ingest supersedes, revalidate re-decides from stored candidates (AC-2.4, AC-3.4).
         self.version = pipeline_version(rules.version, taxonomy.content_hash())
+        self.concurrency = max(1, settings.llm_concurrency)
 
     # ------------------------------------------------------------------ batch
 
@@ -172,42 +217,138 @@ class Engine:
         limit: int | None = None,
         on_item: Callable[[ItemOutcome], None] | None = None,
     ) -> BatchSummary:
+        """Process feed rows. The LLM-bound stages run on `concurrency` worker threads; deciding and
+        persisting happen on this thread in input order, so outcomes (including duplicate
+        detection) are identical to a sequential run (§8)."""
         run_id = uuid.uuid4().hex[:12]
         summary = BatchSummary(run_id=run_id)
+        todo: list[RawFeedRow] = []
         for row in list(self.store.iter_feed_rows(supplier_id=supplier_id, limit=limit)):
-            with obs.item_context(run_id, row.feed_item_id):
-                outcome = self.process_item(row, run_id)
-                _log_outcome(outcome)
-            if outcome.skipped:
-                summary.skipped += 1
+            if self.store.processed_status(row.feed_item_id, self.version) is not None:
+                outcome = ItemOutcome(feed_item_id=row.feed_item_id, status=None, skipped=True)
+                with obs.item_context(run_id, row.feed_item_id):
+                    _log_outcome(outcome)
+                _tally(summary, outcome)
+                if on_item:
+                    on_item(outcome)
             else:
-                summary.processed += 1
-                if outcome.error:
-                    summary.errors += 1
-                if outcome.status == "draft":
-                    summary.draft += 1
-                elif outcome.status == "quarantined":
-                    summary.quarantined += 1
-            if on_item:
-                on_item(outcome)
+                todo.append(row)
+        with ThreadPoolExecutor(max_workers=self.concurrency, thread_name_prefix="llm") as pool:
+            for prep in pool.map(lambda r: self._prepare(r, run_id), todo):
+                with obs.item_context(run_id, prep.row.feed_item_id):
+                    outcome = self._finish(prep, run_id)
+                    _log_outcome(outcome)
+                _tally(summary, outcome)
+                if on_item:
+                    on_item(outcome)
         return summary
 
     # ------------------------------------------------------------------- item
 
     def process_item(self, row: RawFeedRow, run_id: str) -> ItemOutcome:
-        rv = self.version
-        if self.store.processed_status(row.feed_item_id, rv) is not None:
+        """Process one row on the calling thread (same two phases as run_batch)."""
+        if self.store.processed_status(row.feed_item_id, self.version) is not None:
             return ItemOutcome(feed_item_id=row.feed_item_id, status=None, skipped=True)
+        return self._finish(self._prepare(row, run_id), run_id)
 
-        trail = _Trail(self.store, run_id, row.feed_item_id)
+    def _prepare(self, row: RawFeedRow, run_id: str) -> _Prepared:
+        """Phase A (worker thread): clean -> candidates -> classify -> extract. No DB access."""
+        prep = _Prepared(row=row, trail=_Trail(self.store, run_id, row.feed_item_id))
+        trail, s = prep.trail, self.settings
         stage = "clean"
+        with obs.item_context(run_id, row.feed_item_id):
+            try:
+                t0 = time.perf_counter()
+                listing = _staged("clean", clean.normalize, row, self.rules)
+                trail.record("clean", row, listing, t0)
+                prep.listing = listing
+                prep.codes.extend(listing.reason_codes)
+
+                stage = "candidates"
+                t0 = time.perf_counter()
+                cands = _staged("candidates", self.index.shortlist, listing.search_text, s.candidate_k)
+                if not cands and cand_mod.tokenize(listing.search_text):
+                    # No lexical overlap with any leaf: let the model choose from the full leaf set.
+                    cands = self.index.all_leaves()
+                    prep.codes.append(
+                        ReasonCode(code="CLASSIFICATION_WEAK_CANDIDATES", severity="warning", stage="candidates")
+                    )
+                trail.record("candidates", {"text": listing.search_text}, {"candidates": cands}, t0)
+                prep.cands = cands
+
+                stage = "classify"
+                t0 = time.perf_counter()
+                category_id, source, llm_cls, cls_trace, cls_codes = _staged("classify", self._classify, listing, cands)
+                prep.codes.extend(cls_codes)
+                trail.record(
+                    "classify",
+                    {"candidates": [c.category_id for c in cands]},
+                    {"category_id": category_id, "source": source, "llm": llm_cls,
+                     "codes": [c.code for c in cls_codes]},
+                    t0,
+                    llm_raw=cls_trace,
+                )
+                prep.category_id, prep.source, prep.llm_cls, prep.cls_trace = category_id, source, llm_cls, cls_trace
+
+                if category_id is not None:
+                    specs = self.taxonomy.required_attributes(category_id)
+                    missing = reconcile.missing_specs(specs, listing.det_attrs)
+                    if missing:
+                        t0 = time.perf_counter()
+                        parsed, ext_trace = _staged(
+                            "classify", runner.extract, self.llm, listing, missing, max_retries=s.llm_max_retries
+                        )
+                        prep.ext_trace = ext_trace
+                        if parsed is None:
+                            # AC-2.2: exhausted retries quarantine the item; the stage goes in `detail`.
+                            prep.codes.append(
+                                ReasonCode(code=llm_failure_code(ext_trace), severity="blocking", stage="classify",
+                                           detail="extract")
+                            )
+                        else:
+                            prep.llm_attrs = parsed.model_dump()
+                        trail.record(
+                            "classify", {"missing": [m.key for m in missing]}, {"llm_attrs": prep.llm_attrs}, t0,
+                            llm_raw=ext_trace,
+                        )
+            except Exception as exc:  # noqa: BLE001 - recorded and quarantined by _finish
+                prep.error = exc
+                prep.error_stage = getattr(exc, "stage", stage)
+                prep.error_tb = traceback.format_exc()
+        return prep
+
+    def _finish(self, prep: _Prepared, run_id: str) -> ItemOutcome:
+        """Phase B (main thread, input order): reconcile -> validate -> comply -> route -> persist."""
+        row, trail, rv = prep.row, prep.trail, self.version
+        stage = prep.error_stage
         try:
-            candidate, result = self._run_stages(row, trail)
+            if prep.error is not None:
+                raise prep.error
+            listing = prep.listing
+            if listing is None:  # explicit: asserts vanish under python -O
+                raise RuntimeError("phase A produced no listing")
+            codes = list(prep.codes)
+            attrs, extra, decided = self._reconcile_validate(listing, prep.category_id, prep.llm_attrs, trail)
+            codes.extend(decided)
+            candidate = CandidateListing(
+                normalized=listing,
+                category_id=prep.category_id,
+                classification_source=prep.source,
+                det_top1=prep.cands[0] if prep.cands else None,
+                llm_classification=prep.llm_cls,
+                attributes=attrs,
+                extra_attributes=extra,
+                llm_trace=[*prep.cls_trace, *prep.ext_trace],
+                reason_codes=list(codes),
+            )
+            codes.extend(self._comply(listing, prep.category_id, attrs, trail))
+            result = ValidationResult(reason_codes=codes)
             status = route.route(result)
             stage = "route"
             t0 = time.perf_counter()
             self._persist(row.feed_item_id, row.supplier_id, candidate, result, status, run_id)
             trail.record("route", None, {"status": status, "codes": [c.code for c in result.reason_codes]}, t0)
+            trail.flush()
             self.store.mark_processed(row.feed_item_id, rv, status, run_id)
             self._commit()
             return ItemOutcome(row.feed_item_id, status, reason_codes=result.reason_codes)
@@ -215,16 +356,17 @@ class Engine:
             self.store.rollback()
             stage = getattr(exc, "stage", stage)
             err = f"{type(exc).__name__}: {exc}"
-            log.exception("item failed", extra={"event": "item_error", "stage": stage})
+            log.error("item failed", exc_info=exc, extra={"event": "item_error", "stage": stage})
             code = ReasonCode(code=f"PIPELINE_ERROR:{stage}", severity="blocking", stage="route", detail=err)
             try:
-                trail.seq = 0
+                trail.reset()
                 trail.record(
                     "error",
                     None,
-                    {"stage": stage, "error": err, "trace": traceback.format_exc()[-2000:]},
+                    {"stage": stage, "error": err, "trace": (prep.error_tb or traceback.format_exc())[-2000:]},
                     time.perf_counter(),
                 )
+                trail.flush()
                 self.store.supersede(row.feed_item_id)
                 self.store.insert_quarantine(
                     feed_item_id=row.feed_item_id,
@@ -294,6 +436,7 @@ class Engine:
             t0 = time.perf_counter()
             self._persist(fid, listing.supplier_id, updated, result, status, run_id)
             trail.record("route", None, {"status": status, "codes": [c.code for c in codes]}, t0)
+            trail.flush()
             self.store.mark_processed(fid, self.version, status, run_id)
             self._commit()
             return ItemOutcome(fid, status, reason_codes=codes)
@@ -310,73 +453,6 @@ class Engine:
             self.store.commit()
 
     # ----------------------------------------------------------------- stages
-
-    def _run_stages(self, row: RawFeedRow, trail: _Trail) -> tuple[CandidateListing, ValidationResult]:
-        s = self.settings
-        codes: list[ReasonCode] = []
-
-        t0 = time.perf_counter()
-        listing = _staged("clean", clean.normalize, row, self.rules)
-        trail.record("clean", row, listing, t0)
-        codes.extend(listing.reason_codes)
-
-        # candidates (deterministic)
-        t0 = time.perf_counter()
-        cands = _staged("candidates", self.index.shortlist, listing.search_text, s.candidate_k)
-        if not cands and cand_mod.tokenize(listing.search_text):
-            # No lexical overlap with any leaf: let the model choose from the full leaf set.
-            cands = self.index.all_leaves()
-            codes.append(ReasonCode(code="CLASSIFICATION_WEAK_CANDIDATES", severity="warning", stage="candidates"))
-        trail.record("candidates", {"text": listing.search_text}, {"candidates": cands}, t0)
-
-        # classify (LLM proposes, Python decides)
-        t0 = time.perf_counter()
-        category_id, source, llm_cls, cls_trace, cls_codes = _staged("classify", self._classify, listing, cands)
-        codes.extend(cls_codes)
-        trail.record(
-            "classify",
-            {"candidates": [c.category_id for c in cands]},
-            {"category_id": category_id, "source": source, "llm": llm_cls, "codes": [c.code for c in cls_codes]},
-            t0,
-            llm_raw=cls_trace,
-        )
-
-        ext_trace: list[LLMAttempt] = []
-        llm_attrs: dict[str, Any] | None = None
-        if category_id is not None:
-            missing = reconcile.missing_specs(self.taxonomy.required_attributes(category_id), listing.det_attrs)
-            if missing:
-                t0 = time.perf_counter()
-                parsed, ext_trace = _staged(
-                    "classify", runner.extract, self.llm, listing, missing, max_retries=s.llm_max_retries
-                )
-                if parsed is None:
-                    # AC-2.2: exhausted retries quarantine the item; the stage goes in `detail`.
-                    codes.append(
-                        ReasonCode(code=llm_failure_code(ext_trace), severity="blocking", stage="classify",
-                                   detail="extract")
-                    )
-                else:
-                    llm_attrs = parsed.model_dump()
-                trail.record(
-                    "classify", {"missing": [m.key for m in missing]}, {"llm_attrs": llm_attrs}, t0, llm_raw=ext_trace
-                )
-
-        attrs, extra, decided = self._reconcile_validate(listing, category_id, llm_attrs, trail)
-        codes.extend(decided)
-        candidate = CandidateListing(
-            normalized=listing,
-            category_id=category_id,
-            classification_source=source,
-            det_top1=cands[0] if cands else None,
-            llm_classification=llm_cls,
-            attributes=attrs,
-            extra_attributes=extra,
-            llm_trace=[*cls_trace, *ext_trace],
-            reason_codes=list(codes),
-        )
-        codes.extend(self._comply(listing, category_id, attrs, trail))
-        return candidate, ValidationResult(reason_codes=codes)
 
     # ------------------------------------------ deterministic decision (shared)
 

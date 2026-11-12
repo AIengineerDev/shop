@@ -38,6 +38,8 @@ def _open(args: argparse.Namespace, *, llm_override: LLMClient | None = None) ->
     settings = Settings.from_env()
     if getattr(args, "llm", None):
         settings = Settings(**{**settings.__dict__, "llm_provider": args.llm})
+    if getattr(args, "concurrency", None):
+        settings = Settings(**{**settings.__dict__, "llm_concurrency": args.concurrency})
     db = Path(args.db)
     if not db.exists():
         print(f"error: database not found: {db}", file=sys.stderr)
@@ -80,6 +82,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         ("run_id", summary.run_id),
         ("rules_version", engine.version),
         ("llm", settings.llm_provider),
+        ("concurrency", str(engine.concurrency)),
         ("dry_run", str(args.dry_run)),
         ("processed", str(summary.processed)),
         ("draft", str(summary.draft)),
@@ -121,6 +124,8 @@ def build_parser() -> argparse.ArgumentParser:
     ing.add_argument("--supplier", default=None)
     ing.add_argument("--dry-run", action="store_true")
     ing.add_argument("--llm", choices=["anthropic", "fake"], default=None)
+    ing.add_argument("--concurrency", type=int, default=None,
+                     help="LLM worker threads (default 8; env LLM_CONCURRENCY)")
     ing.add_argument("-v", "--verbose", action="store_true")
     ing.set_defaults(func=cmd_ingest)
     rev = sub.add_parser("revalidate", help="re-run validate / comply / route from stored candidates (no LLM)")
