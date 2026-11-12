@@ -65,12 +65,12 @@ def apply_rules(df: pd.DataFrame, flags: RuleFlags) -> pd.DataFrame:
             remaining.remove(pick)
         order = placed
 
-    if flags.new_item_exploration and len(order) > 10:
-        if not any(new[i] for i in order[5:10]):
-            below = [i for i in order[10:] if new[i]]
-            if below:
-                slot = 5 + int(df["qid"].iloc[0]) % 5  # 0-based index of positions 6-10
-                order = _move(order, below[0], slot)
+    no_new_in_6_10 = not any(new[i] for i in order[5:10])
+    if flags.new_item_exploration and len(order) > 10 and no_new_in_6_10:
+        below = [i for i in order[10:] if new[i]]
+        if below:
+            slot = 5 + int(df["qid"].iloc[0]) % 5  # 0-based index of positions 6-10
+            order = _move(order, below[0], slot)
 
     if flags.bestseller_boost and len(order) > 10:
         rank_cat = df["item_bestseller_rank_category"].to_numpy()
