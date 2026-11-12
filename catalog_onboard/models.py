@@ -4,9 +4,14 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from typing_extensions import TypeAliasType
+
+# An explicit recursive JSON type: unlike Any / pydantic.JsonValue it renders as a fully typed
+# OpenAPI schema (AC-4.1: no Any-typed fields) and rejects non-JSON values.
+JsonData = TypeAliasType("JsonData", "str | int | float | bool | None | list[JsonData] | dict[str, JsonData]")
 
 AttrType = Literal["enum", "int", "float", "string", "bool"]
 AttrValue = str | int | float | bool | list[str]
@@ -64,7 +69,7 @@ class RawFeedRow(BaseModel):
     raw_tags: str | None = None
     raw_price: str | None = None
     received_at: str | None = None
-    extra: dict[str, Any] = Field(default_factory=dict)
+    extra: dict[str, JsonData] = Field(default_factory=dict)
 
 
 class NormalizedListing(BaseModel):
@@ -79,7 +84,7 @@ class NormalizedListing(BaseModel):
     price_min: Decimal | None
     price_max: Decimal | None
     reason_codes: list[ReasonCode]
-    raw_json: dict[str, Any]
+    raw_json: dict[str, JsonData]
 
     @property
     def search_text(self) -> str:
@@ -174,8 +179,8 @@ class PipelineRunRecord(BaseModel):
     feed_item_id: str
     stage: Stage | Literal["error", "revalidate"]
     seq: int
-    input: dict[str, Any] | None
-    output: dict[str, Any] | None
-    llm_raw: list[dict[str, Any]] | None
+    input: dict[str, JsonData] | None
+    output: dict[str, JsonData] | None
+    llm_raw: list[dict[str, JsonData]] | None
     duration_ms: int
     created_at: datetime

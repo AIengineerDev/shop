@@ -13,6 +13,7 @@ dependencies = [
   "uvicorn>=0.22",
   "anthropic>=0.40",
   "pyyaml>=6.0",
+  "typing-extensions>=4.6",
 ]
 
 [project.optional-dependencies]

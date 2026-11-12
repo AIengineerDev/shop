@@ -29,7 +29,8 @@ def test_ac_4_1_openapi_has_no_any_typed_fields(client: TestClient):
 
     def walk(o, path):
         if isinstance(o, dict):
-            if o == {}:
+            # an untyped schema is either {} or an object with additionalProperties: true
+            if o == {} or o.get("additionalProperties") is True:
                 empty.append(path)
             for k, v in o.items():
                 walk(v, f"{path}/{k}")

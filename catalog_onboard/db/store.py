@@ -119,7 +119,12 @@ class Store:
             params.append(limit)
         for row in self.conn.execute(sql, params):
             d = dict(row)
-            extra = {k: v for k, v in d.items() if k not in FEED_KNOWN_COLUMNS}
+            # pass-through columns must be JSON values (AC-4.1): BLOBs become text
+            extra = {
+                k: (v.decode("utf-8", errors="replace") if isinstance(v, bytes) else v)
+                for k, v in d.items()
+                if k not in FEED_KNOWN_COLUMNS
+            }
             yield RawFeedRow(
                 feed_item_id=str(d["feed_item_id"]),
                 supplier_id=str(d["supplier_id"]),
