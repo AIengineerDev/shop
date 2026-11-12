@@ -138,3 +138,46 @@ def test_anthropic_client_max_tokens_cutoff_is_transport_error():
     client = AnthropicClient(model="m", max_tokens=64, client=SimpleNamespace(beta=SimpleNamespace(messages=_Msgs())))
     with pytest.raises(LLMTransportError, match="max_tokens=64"):
         client.complete(LLMRequest(purpose="classify", system="", user="", json_schema={}))
+
+
+def test_anthropic_sdk_errors_map_to_transport_errors():
+    """Rate limits, API status errors and connection errors all become LLMTransportError, which the
+    runner retries and the engine reports as LLM_TRANSPORT_ERROR (never as a schema problem)."""
+    from types import SimpleNamespace
+
+    import anthropic
+    import httpx2
+    import pytest
+
+    from catalog_onboard.pipeline.llm.anthropic_client import AnthropicClient
+
+    req = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+    errors = [
+        (anthropic.RateLimitError("slow down", response=httpx2.Response(429, request=req), body=None), "rate limited"),
+        (anthropic.InternalServerError("boom", response=httpx2.Response(500, request=req), body=None), "api error 500"),
+        (anthropic.APIConnectionError(request=req), "connection error"),
+    ]
+    for exc, match in errors:
+        class _Msgs:
+            def create(self, _exc=exc, **kw):
+                raise _exc
+
+        client = AnthropicClient(model="m", client=SimpleNamespace(beta=SimpleNamespace(messages=_Msgs())))
+        with pytest.raises(LLMTransportError, match=match):
+            client.complete(LLMRequest(purpose="classify", system="", user="", json_schema={}))
+
+
+def test_anthropic_response_without_text_block_is_transport_error():
+    from types import SimpleNamespace
+
+    import pytest
+
+    from catalog_onboard.pipeline.llm.anthropic_client import AnthropicClient
+
+    class _Msgs:
+        def create(self, **kw):
+            return SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="thinking", thinking="")])
+
+    client = AnthropicClient(model="m", client=SimpleNamespace(beta=SimpleNamespace(messages=_Msgs())))
+    with pytest.raises(LLMTransportError, match="no text block"):
+        client.complete(LLMRequest(purpose="classify", system="", user="", json_schema={}))

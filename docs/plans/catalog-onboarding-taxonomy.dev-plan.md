@@ -76,4 +76,25 @@ One commit per milestone on the work branch; one PR into `taxonomy`. Every miles
 
 ## 5. Results log
 
-Filled in as milestones land.
+| Milestone | Outcome |
+|---|---|
+| C0 | bandit 0 findings (SHA1 `usedforsecurity=False`, asserts → explicit checks); network guard; snapshot no longer self-heals; `validate.py` 88% → **100% branch** |
+| C1 | One non-UTF8 row no longer aborts the batch (was exit 1, no output). `$1,299.99` no longer parses as a 1.29–9.99 range; `USD 1,000` no longer parses as 0 (false `PRICE_INVALID`). `3x` packs parsed; `2x4` / `3 x 4` / `3XL` are not. `LANG_UNSUPPORTED` emitted |
+| C2 | Distinct `LLM_SCHEMA_INVALID` / `CLASSIFICATION_OUT_OF_SET` (was unreachable) / `LLM_TRANSPORT_ERROR`; extract failure blocks; `agree` respects the threshold; ≤ 2 LLM calls/item asserted |
+| C3 | `revalidate` CLI: 0 LLM calls, idempotent per version; version = rules + taxonomy content; drafts store their candidate |
+| C4 | `feed_item_id` / `run_id` on every JSON log line; API access log in every worker process; `.env`; defaults `claude-sonnet-5-5`, effort `low`, `max_tokens` 4096 |
+| C5 | Concurrency 8: outcomes, duplicate detection and trace order identical to sequential; **837 items/min** at 0.5 s/call (target ≥ 200) |
+| C6 | No `Any` in OpenAPI (a typed recursive `JsonData` schema; the old test missed `additionalProperties: true`) |
+| C7 | Test layers + CI. The load test found three serving defects, all fixed: wrong-thread SQLite connection (500s under overlap), GIL convoy in concurrent sqlite3 reads (500-row pages 1,064/s → 36/s on 8 threads), and worker processes emitting no logs. Also fixed: `close()` racing an in-flight statement (an interpreter crash in testing), and invalid env values exiting with a traceback instead of exit 2 |
+
+### Final measurements
+
+| Check | Result |
+|---|---|
+| Unit / unit+integration+e2e branch coverage | 94% / 94% (gates 92% / 93%); `validate.py` 100% |
+| AC-4.6 worst p95, 10k rows, any endpoint or filter | 10.7 ms (budget 100 ms) |
+| Live server, 8 clients, 1 worker | 323 req/s, p95 44 ms, 0 errors |
+| Live server, 8 clients, 4 workers | 977 req/s, p95 18 ms, 0 errors |
+| Ingest, concurrency 8, 0.5 s LLM latency | 837 items/min, 1.05 calls/item |
+| Ingest 10k rows, fake LLM (no latency) | 10.7 s |
+| Security | pip-audit 0 CVEs, bandit 0 findings, gitleaks 0 leaks |

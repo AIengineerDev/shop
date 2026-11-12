@@ -326,7 +326,13 @@ Acceptance criteria:
 - AC-4.5 `/items/{id}/trace` for a quarantined item includes the raw LLM
   responses that failed validation, so operators can debug prompts.
 - AC-4.6 p95 latency for list endpoints < 100 ms on 10k rows (local
-  SQLite, indexes on `supplier_id`, `category_id`, `created_at`).
+  SQLite, indexes on `supplier_id`, `category_id`, `created_at`). Verified
+  for **every** list endpoint and filter (incl. `q` and `reason_code`), and
+  for a live server under 8 concurrent clients with 1 worker and with 4
+  worker processes (`scripts/serve.py --workers N`), with zero errors. The
+  API shares one read-only connection per process and serialises SQLite
+  work behind a lock: CPython's sqlite3 otherwise suffers a GIL convoy
+  under concurrent reads (500-row pages fell from ~1,000/s to ~35/s).
 
 ## 6. Pydantic models (core)
 
@@ -431,6 +437,19 @@ class ValidationResult(BaseModel):
 
 Definition of done: `pytest -q` green, `ruff` clean, `mypy --strict` on
 `catalog_onboard/`, sample DB ingests with 0 `PIPELINE_ERROR` codes.
+
+CI (`.github/workflows/ci.yml`, every push and PR, no scheduled jobs):
+
+| job | gate |
+|---|---|
+| lint | `ruff check .` |
+| types | `mypy --strict catalog_onboard` |
+| unit | all pass; branch coverage ≥ 92% (currently 94%); `validate.py` 100% branch (AC-2.5) |
+| integration | starter DB → engine (concurrency 8) → SQLite → API in-process |
+| e2e | every CLI as a subprocess, then `scripts/serve.py` as a real HTTP server, incl. a concurrent burst |
+| coverage | unit + integration + e2e with CLI and server subprocesses counted: branch ≥ 93% (currently 94%) |
+| load | AC-4.6 per endpoint and filter on 10k rows; live server, 8 clients, 1 and 4 workers; ingest ≥ 200 items/min at concurrency 8 with 0.5 s LLM latency, ≤ 2 calls/item |
+| security | `pip-audit .`, `bandit` (all severities, justified `nosec` only), `gitleaks` over full history |
 
 ## 10. Out of scope (v1)
 

@@ -1,5 +1,4 @@
 import sqlite3
-import time
 from pathlib import Path
 
 import pytest
@@ -116,18 +115,4 @@ def test_ac_4_4_api_opens_db_readonly(client: TestClient, ingested_db: Path):
     assert before == after
 
 
-@pytest.mark.load
-def test_ac_4_6_list_latency_p95_under_100ms(tmp_path: Path, make_starter_db):
-    from catalog_onboard.cli import main
-
-    db = tmp_path / "big.sqlite"
-    make_starter_db.build(db, seed=1, n_rows=10_000)
-    assert main(["ingest", "--db", str(db), "--llm", "fake"]) == 0
-    c = TestClient(create_app(db))
-    times = []
-    for _ in range(40):
-        t = time.perf_counter()
-        assert c.get("/catalog/draft", params={"limit": 50, "supplier_id": "sup_acme"}).status_code == 200
-        times.append(time.perf_counter() - t)
-    times.sort()
-    assert times[int(len(times) * 0.95) - 1] < 0.1
+# AC-4.6 latency lives in tests/load/test_load.py (every list endpoint and filter, 10k rows).

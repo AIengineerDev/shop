@@ -24,9 +24,13 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 #   GET /stats  /catalog/draft?q=shorts  /quarantine?reason_code=PROHIBITED_GLOBAL
 #   GET /items/SAMPLE-0001/trace  /taxonomy/kitchen.cutlery.chef_knives  /docs
 
-# tests, lint, types
-.venv/bin/pytest -q          # add -m slow for the 10k-row latency check
+# tests, lint, types (CI runs each layer as its own job, see .github/workflows/ci.yml)
+.venv/bin/pytest                      # unit (default; network blocked, fake LLM)
+.venv/bin/pytest -m integration       # engine -> SQLite -> API, in-process
+.venv/bin/pytest -m e2e               # CLIs as subprocesses + live HTTP server
+.venv/bin/pytest -m load -s           # AC-4.6 latency on 10k rows, live server under load, §8 throughput
 .venv/bin/ruff check . && .venv/bin/mypy --strict catalog_onboard
+.venv/bin/pip install -e ".[security]" && pip-audit . && bandit -c pyproject.toml -r catalog_onboard scripts
 ```
 
 ## Pipeline
