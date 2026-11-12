@@ -100,7 +100,10 @@ def test_anthropic_client_request_shape(monkeypatch):
     assert client.complete(req) == '{"ok":1}'
     assert captured["model"] == "claude-opus-5-5" and captured["max_tokens"] == 99
     assert captured["system"] == "S" and captured["messages"] == [{"role": "user", "content": "U"}]
-    assert captured["output_config"] == {"format": {"type": "json_schema", "schema": {"type": "object"}}}
+    assert captured["output_config"] == {
+        "format": {"type": "json_schema", "schema": {"type": "object"}},
+        "effort": "low",
+    }
     assert captured["fallbacks"] == "default" and captured["betas"] == [FALLBACK_BETA]
     assert "hints" not in captured and "secret" not in json.dumps(captured)
 
@@ -118,4 +121,20 @@ def test_anthropic_client_refusal_is_transport_error():
 
     client = AnthropicClient(model="m", client=SimpleNamespace(beta=SimpleNamespace(messages=_Msgs())))
     with pytest.raises(LLMTransportError, match="refused"):
+        client.complete(LLMRequest(purpose="classify", system="", user="", json_schema={}))
+
+
+def test_anthropic_client_max_tokens_cutoff_is_transport_error():
+    from types import SimpleNamespace
+
+    import pytest
+
+    from catalog_onboard.pipeline.llm.anthropic_client import AnthropicClient
+
+    class _Msgs:
+        def create(self, **kw):
+            return SimpleNamespace(stop_reason="max_tokens", content=[SimpleNamespace(type="text", text='{"categ')])
+
+    client = AnthropicClient(model="m", max_tokens=64, client=SimpleNamespace(beta=SimpleNamespace(messages=_Msgs())))
+    with pytest.raises(LLMTransportError, match="max_tokens=64"):
         client.complete(LLMRequest(purpose="classify", system="", user="", json_schema={}))

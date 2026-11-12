@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import sys
 from pathlib import Path
 
+from catalog_onboard import obs
 from catalog_onboard.config import Settings
 from catalog_onboard.db.store import Store, open_readwrite
-from catalog_onboard.pipeline.engine import Engine, ItemOutcome
+from catalog_onboard.pipeline.engine import Engine
 from catalog_onboard.pipeline.llm import LLMClient
 from catalog_onboard.pipeline.llm.fake import FakeLLM, ForbiddenLLM
 from catalog_onboard.rules import load_rules
@@ -20,23 +20,9 @@ EXIT_OK = 0
 EXIT_CONFIG = 2
 
 
-class _JsonFormatter(logging.Formatter):
-    def format(self, record: logging.LogRecord) -> str:
-        payload = {
-            "level": record.levelname,
-            "logger": record.name,
-            "msg": record.getMessage(),
-        }
-        for k in ("feed_item_id", "run_id"):
-            if hasattr(record, k):
-                payload[k] = getattr(record, k)
-        return json.dumps(payload)
-
-
 def _configure_logging(verbose: bool) -> None:
-    handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(_JsonFormatter())
-    logging.basicConfig(level=logging.DEBUG if verbose else logging.WARNING, handlers=[handler])
+    # JSON on stderr with feed_item_id / run_id on every line; -v adds one INFO line per item.
+    obs.configure_logging(logging.INFO if verbose else logging.WARNING)
 
 
 def make_llm(settings: Settings) -> LLMClient:
@@ -44,7 +30,7 @@ def make_llm(settings: Settings) -> LLMClient:
         return FakeLLM()
     from catalog_onboard.pipeline.llm.anthropic_client import AnthropicClient
 
-    return AnthropicClient(model=settings.llm_model, max_tokens=settings.llm_max_tokens)
+    return AnthropicClient(model=settings.llm_model, max_tokens=settings.llm_max_tokens, effort=settings.llm_effort)
 
 
 def _open(args: argparse.Namespace, *, llm_override: LLMClient | None = None) -> tuple[Engine, Settings] | int:
@@ -89,12 +75,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         return opened
     engine, settings = opened
 
-    def report(o: ItemOutcome) -> None:
-        if args.verbose and not o.skipped:
-            codes = ",".join(c.code for c in o.reason_codes)
-            print(f"{o.feed_item_id}\t{o.status}\t{codes}", file=sys.stderr)
-
-    summary = engine.run_batch(supplier_id=args.supplier, limit=args.limit, on_item=report)
+    summary = engine.run_batch(supplier_id=args.supplier, limit=args.limit)
     rows = [
         ("run_id", summary.run_id),
         ("rules_version", engine.version),

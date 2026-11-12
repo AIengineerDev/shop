@@ -13,6 +13,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from catalog_onboard import obs
 from catalog_onboard.config import Settings
 from catalog_onboard.db.store import Store
 from catalog_onboard.models import (
@@ -130,6 +131,16 @@ def stored_llm_attrs(trace: list[LLMAttempt]) -> dict[str, Any] | None:
     return None
 
 
+def _log_outcome(outcome: ItemOutcome) -> None:
+    if outcome.skipped:
+        log.debug("item skipped (already processed)", extra={"event": "item_skipped"})
+        return
+    log.info(
+        "item %s", outcome.status,
+        extra={"event": "item_done", "status": outcome.status, "codes": [c.code for c in outcome.reason_codes]},
+    )
+
+
 class Engine:
     def __init__(
         self,
@@ -164,7 +175,9 @@ class Engine:
         run_id = uuid.uuid4().hex[:12]
         summary = BatchSummary(run_id=run_id)
         for row in list(self.store.iter_feed_rows(supplier_id=supplier_id, limit=limit)):
-            outcome = self.process_item(row, run_id)
+            with obs.item_context(run_id, row.feed_item_id):
+                outcome = self.process_item(row, run_id)
+                _log_outcome(outcome)
             if outcome.skipped:
                 summary.skipped += 1
             else:
@@ -202,7 +215,7 @@ class Engine:
             self.store.rollback()
             stage = getattr(exc, "stage", stage)
             err = f"{type(exc).__name__}: {exc}"
-            log.exception("item %s failed at stage %s", row.feed_item_id, stage)
+            log.exception("item failed", extra={"event": "item_error", "stage": stage})
             code = ReasonCode(code=f"PIPELINE_ERROR:{stage}", severity="blocking", stage="route", detail=err)
             try:
                 trail.seq = 0
@@ -226,7 +239,7 @@ class Engine:
                 self._commit()
             except Exception:  # noqa: BLE001
                 self.store.rollback()
-                log.exception("could not record failure for %s", row.feed_item_id)
+                log.exception("could not record failure", extra={"event": "item_error"})
             return ItemOutcome(row.feed_item_id, "quarantined", error=err, reason_codes=[code])
 
     # ------------------------------------------------------------- revalidate
@@ -242,7 +255,9 @@ class Engine:
             if self.store.processed_status(feed_item_id, self.version) is not None:
                 summary.skipped += 1
                 continue
-            outcome = self.revalidate_item(CandidateListing.model_validate_json(candidate_json), run_id)
+            with obs.item_context(run_id, feed_item_id):
+                outcome = self.revalidate_item(CandidateListing.model_validate_json(candidate_json), run_id)
+                _log_outcome(outcome)
             summary.processed += 1
             summary.errors += 1 if outcome.error else 0
             summary.draft += 1 if outcome.status == "draft" else 0
@@ -285,7 +300,7 @@ class Engine:
         except Exception as exc:  # noqa: BLE001 - one bad stored candidate must not abort the run
             self.store.rollback()
             err = f"{type(exc).__name__}: {exc}"
-            log.exception("revalidate failed for %s", fid)
+            log.exception("revalidate failed", extra={"event": "item_error", "stage": "revalidate"})
             return ItemOutcome(fid, None, error=err)
 
     def _commit(self) -> None:

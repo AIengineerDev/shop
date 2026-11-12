@@ -77,6 +77,16 @@ a test greps for it.
 The real client uses the Anthropic SDK with structured JSON-schema output and server-side
 refusal fallbacks enabled.
 
+## Configuration (§8)
+
+Environment variables, optionally from `.env` (path `$ENV_FILE`, default `./.env`; real environment
+variables win): `LLM_PROVIDER` (`anthropic|fake`), `LLM_MODEL` (default `claude-sonnet-5-5`),
+`LLM_EFFORT` (default `low`), `LLM_MAX_RETRIES` (2), `LLM_MAX_TOKENS` (4096), `HIGH_CONF_THRESHOLD`,
+`DISAGREE_QUARANTINE_BELOW`, `CANDIDATE_K`, `RULES_DIR`, `ANTHROPIC_API_KEY`.
+
+Logs are JSON on stderr with `feed_item_id` and `run_id` on every line (`-v` adds one line per
+item); the API server logs one JSON line per request.
+
 ## Re-validation (AC-2.4)
 
 ```bash

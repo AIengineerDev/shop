@@ -14,9 +14,17 @@ FALLBACK_BETA = "server-side-fallback-2026-07-01"
 class AnthropicClient:
     name = "anthropic"
 
-    def __init__(self, *, model: str, max_tokens: int = 1024, client: anthropic.Anthropic | None = None):
+    def __init__(
+        self,
+        *,
+        model: str,
+        max_tokens: int = 4096,
+        effort: str = "low",
+        client: anthropic.Anthropic | None = None,
+    ):
         self.model = model
         self.max_tokens = max_tokens
+        self.effort = effort
         self.client = client or anthropic.Anthropic()
 
     def build_params(self, request: LLMRequest) -> dict[str, Any]:
@@ -25,7 +33,11 @@ class AnthropicClient:
             "max_tokens": self.max_tokens,
             "system": request.system,
             "messages": [{"role": "user", "content": request.user}],
-            "output_config": {"format": {"type": "json_schema", "schema": request.json_schema}},
+            # Short structured output: low effort keeps thinking (which counts against max_tokens) small.
+            "output_config": {
+                "format": {"type": "json_schema", "schema": request.json_schema},
+                "effort": self.effort,
+            },
             "fallbacks": "default",
             "betas": [FALLBACK_BETA],
         }
@@ -39,6 +51,8 @@ class AnthropicClient:
             raise LLMTransportError(f"api error {exc.status_code}: {exc.message}") from exc
         except anthropic.APIConnectionError as exc:
             raise LLMTransportError(f"connection error: {exc}") from exc
+        if response.stop_reason == "max_tokens":
+            raise LLMTransportError(f"output truncated at max_tokens={self.max_tokens}")
         if response.stop_reason == "refusal":
             details = getattr(response, "stop_details", None)
             raise LLMTransportError(f"model refused: {details}")
