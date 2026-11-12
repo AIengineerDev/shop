@@ -15,6 +15,8 @@ from shopfeed.training.train_lambdamart import fit, write_artifacts
 SMOKE = {"min_data_in_leaf": 1, "min_data_in_bin": 1, "num_leaves": 4, "bagging_fraction": 1.0,
          "feature_fraction": 1.0, "num_threads": 1}
 NO_RULES = RuleFlags(False, False, False, False)
+# Parity tests must not depend on runner speed; timeout behaviour has its own test.
+PARITY_TIMEOUT_S = 10.0
 
 
 @pytest.fixture(scope="module")
@@ -33,7 +35,7 @@ def _req(rows, qid=1):
 
 def test_serving_scores_match_offline(fixture_rows, fixture_store, artefact):
     out, booster, X = artefact
-    ranker = Ranker.load(out, fixture_store, flags=NO_RULES)
+    ranker = Ranker.load(out, fixture_store, flags=NO_RULES, timeout_s=PARITY_TIMEOUT_S)
     req = _req(fixture_rows)
     res = ranker.rank(req)
     assert not res.fallback, res.reason
@@ -47,7 +49,7 @@ def test_serving_scores_match_offline(fixture_rows, fixture_store, artefact):
 def test_request_log_features_match_recomputed(fixture_rows, fixture_store, artefact):
     """Train-serve skew check: logged features equal an offline recomputation."""
     out, _, X = artefact
-    ranker = Ranker.load(out, fixture_store, flags=NO_RULES)
+    ranker = Ranker.load(out, fixture_store, flags=NO_RULES, timeout_s=PARITY_TIMEOUT_S)
     ranker.rank(_req(fixture_rows, 2))
     logged = np.array(ranker.request_log[-1]["features"])
     recomputed, _ = build_features(_req(fixture_rows, 2), fixture_store)
@@ -58,7 +60,7 @@ def test_request_log_features_match_recomputed(fixture_rows, fixture_store, arte
 @pytest.mark.parametrize("break_what", ["model", "store"])
 def test_failures_fall_back_to_bm25_order(fixture_rows, fixture_store, artefact, break_what):
     out, _, _ = artefact
-    ranker = Ranker.load(out, fixture_store)
+    ranker = Ranker.load(out, fixture_store, timeout_s=PARITY_TIMEOUT_S)
     if break_what == "model":
         ranker.score = lambda X: (_ for _ in ()).throw(RuntimeError("model down"))
     else:
