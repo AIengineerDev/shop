@@ -66,12 +66,12 @@ Twelve-month ambition (v1 → v3): +8–10% purchase conversion per search sessi
 
 | Metric | Definition | Baseline (`ranker_v1`) | v1 target | Gate |
 |---|---|---|---|---|
-| NDCG@10 (graded, purchase-dominant gain), test split | §8.1 | 0.440 at @20; @10 TBD | **≥ +2% relative** vs logged production order | Ship gate |
-| NDCG@10 on randomised slice | §8.3 | TBD | ≥ +2% relative, CI excludes 0 | Ship gate |
-| Purchase@10 recall | purchased items ranked in top 10 / purchased items | TBD | ≥ production | Ship gate |
-| Purchase MRR | mean 1 / rank of the purchased item | TBD | ≥ +3% relative | Ship gate |
+| NDCG@10 (graded, purchase-dominant gain), test split | §8.1 | 0.440 at @20; logged (random) order 0.356 on the sample* | **≥ +2% relative** vs logged production order | Ship gate. Sample: 0.535, +50.4% (CI lower bound +45.1%) |
+| NDCG@10 on randomised slice | §8.3 | 0.356* (the whole sample is randomised) | ≥ +2% relative, CI excludes 0 | Ship gate. Sample: same as above; IPW-NDCG@10 0.517 vs 0.315 |
+| Purchase@10 recall | purchased items ranked in top 10 / purchased items | 0.626* | ≥ production | Ship gate. Sample: 0.935 |
+| Purchase MRR | mean 1 / rank of the purchased item | 0.287* | ≥ +3% relative | Ship gate. Sample: 0.529, +84.6% |
 | Per-head AUC (click / ATC / purchase) | §8.1 | 0.64 / 0.71 / 0.73 | ≥ 0.70 / 0.75 / 0.78 | Target |
-| Scoring latency, 200 candidates | p50 / p99 on serving CPU | TBD | ≤ 2 ms / ≤ 8 ms | Ship gate |
+| Scoring latency, 200 candidates | p50 / p99 on serving CPU | 0.6 / 0.8 ms for the shipped model (4 threads) | ≤ 2 ms / ≤ 8 ms | Ship gate. Pass; ranking path total 20.7 / 25.3 ms (§12.4) |
 | End-to-end search latency p99 | request in → ranked list out | TBD | ≤ +10 ms vs production | Guardrail |
 | Feature freshness | age of `hist_ctr_7d` and item aggregates at request time | TBD | ≤ 24 h | Guardrail |
 | Train–serve skew | fraction of requests where logged features ≠ recomputed features | n/a | < 0.1% | Guardrail |
@@ -85,6 +85,8 @@ Twelve-month ambition (v1 → v3): +8–10% purchase conversion per search sessi
 | Pagination consistency | page-2+ responses with an item already shown on an earlier page | n/a | 0% | Ship gate (§12.2) |
 | Index freshness | age of price / stock / rating in the serving index | TBD | ≤ 15 min price & stock; ≤ 24 h aggregates | Guardrail (§12.1) |
 | Wishlist logging coverage | wishlist events with an attributed `query_id` | 91% of all events carry `impression_id` today | ≥ 95% | Data gate (§9) |
+
+\* Offline values from the 45-day randomised feed sample (test split; dev plan §6a). They are not production baselines: production NDCG / MRR must be re-read on production search logs, and business baselines from holdback week 1 (`docs/experiments/ranker-v2-ab.md` §4).
 
 #### Non-goals for the metrics
 
