@@ -81,9 +81,12 @@ refusal fallbacks enabled.
 
 `blocking` codes quarantine; `warning`/`info` are kept on the draft row for review.
 
-- clean: `TITLE_EMPTY`*, `PRICE_UNPARSEABLE`, `TAG_UNMAPPED`, `ATTR_CONFLICT:<key>`
+- clean: `TITLE_EMPTY`*, `PRICE_UNPARSEABLE`, `TAG_UNMAPPED`, `ATTR_CONFLICT:<key>`,
+  `TEXT_ENCODING_INVALID:<field>` (field unset), `LANG_UNSUPPORTED` (letters outside the Latin script)
 - classify: `CLASSIFICATION_NO_CANDIDATES`*, `CLASSIFICATION_WEAK_CANDIDATES`, `CLASSIFICATION_DISAGREE`(*),
-  `CLASSIFICATION_NOT_LEAF`*, `LLM_SCHEMA_INVALID:classify`*, `LLM_SCHEMA_INVALID:extract`
+  `CLASSIFICATION_NOT_LEAF`*, `CLASSIFICATION_OUT_OF_SET`*, `LLM_SCHEMA_INVALID`* and `LLM_TRANSPORT_ERROR`*
+  (`detail` = `classify` or `extract`; the API filter `?reason_code=LLM_SCHEMA_INVALID` also matches the
+  pre-v1.1 form `LLM_SCHEMA_INVALID:<stage>`)
 - reconcile: `ATTR_DEFAULTED:<key>`, `ATTR_EXTRA:<key>`, `ATTR_CONFLICT:<key>`
 - validate*: `ATTR_MISSING`, `ATTR_ENUM_INVALID`, `ATTR_RANGE`, `ATTR_TOO_LONG`, `ATTR_PATTERN`, `ATTR_MULTI_NOT_ALLOWED`
 - comply*: `PROHIBITED_KEYWORD:<kw>`, `PROHIBITED_GLOBAL:<kw>`, `PRICE_INVALID`, `TITLE_TOO_SHORT`, `DUPLICATE_LISTING`

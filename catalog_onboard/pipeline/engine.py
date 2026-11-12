@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 import traceback
@@ -91,6 +92,30 @@ def _dump(obj: Any) -> Any:
     if isinstance(obj, dict):
         return {k: _dump(v) for k, v in obj.items()}
     return obj
+
+
+def llm_failure_code(trace: list[LLMAttempt], *, candidate_ids: set[str] | None = None) -> str:
+    """Reason code for an LLM call that never produced a valid result (AC-2.2, FR-2a).
+
+    - every attempt failed in transport (timeout, 5xx, refusal) -> LLM_TRANSPORT_ERROR
+    - every parseable attempt named a category outside the shortlist -> CLASSIFICATION_OUT_OF_SET
+    - anything else (invalid JSON, schema violations, mixed) -> LLM_SCHEMA_INVALID
+    """
+    failed = [a for a in trace if not a.ok]
+    if failed and all((a.error or "").startswith("transport:") for a in failed):
+        return "LLM_TRANSPORT_ERROR"
+    if candidate_ids is not None and failed:
+
+        def out_of_set(a: LLMAttempt) -> bool:
+            try:
+                data = json.loads(a.raw_response or "")
+            except ValueError:
+                return False
+            return isinstance(data, dict) and data.get("category_id") not in candidate_ids
+
+        if all(out_of_set(a) for a in failed):
+            return "CLASSIFICATION_OUT_OF_SET"
+    return "LLM_SCHEMA_INVALID"
 
 
 class Engine:
@@ -240,7 +265,11 @@ class Engine:
                     "classify", runner.extract, self.llm, listing, missing, max_retries=s.llm_max_retries
                 )
                 if parsed is None:
-                    codes.append(ReasonCode(code="LLM_SCHEMA_INVALID:extract", severity="warning", stage="classify"))
+                    # AC-2.2: exhausted retries quarantine the item; the stage goes in `detail`.
+                    codes.append(
+                        ReasonCode(code=llm_failure_code(ext_trace), severity="blocking", stage="classify",
+                                   detail="extract")
+                    )
                 else:
                     llm_attrs = parsed.model_dump()
                 trail.record(
@@ -302,17 +331,20 @@ class Engine:
         det_conf = cand_mod.deterministic_confidence(cands)
         llm_cls, trace = runner.classify(self.llm, listing, cands, max_retries=self.settings.llm_max_retries)
 
+        cand_ids = {c.category_id for c in cands}
         if llm_cls is None:
-            codes.append(ReasonCode(code="LLM_SCHEMA_INVALID:classify", severity="blocking", stage="classify"))
+            code = llm_failure_code(trace, candidate_ids=cand_ids)
+            codes.append(ReasonCode(code=code, severity="blocking", stage="classify", detail="classify"))
             return det_top1.category_id, "deterministic", None, trace, codes
 
-        if llm_cls.category_id not in {c.category_id for c in cands}:
-            # unreachable with the Literal-constrained model, kept as a belt-and-braces check
+        if llm_cls.category_id not in cand_ids:  # defence in depth; the Literal model already rejects it
             codes.append(ReasonCode(code="CLASSIFICATION_OUT_OF_SET", severity="blocking", stage="classify"))
             return det_top1.category_id, "deterministic", llm_cls, trace, codes
 
         if llm_cls.category_id == det_top1.category_id:
-            chosen, source = llm_cls.category_id, "agree"
+            # FR-2a: "agree" only when the deterministic top-1 is itself confident.
+            confident = det_conf >= self.settings.high_conf_threshold
+            chosen, source = llm_cls.category_id, ("agree" if confident else "llm")
         else:
             severity = (
                 "blocking"

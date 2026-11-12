@@ -19,6 +19,13 @@ def q_codes(store: Store, feed_item_id: str) -> list[str]:
     return [c["code"] for c in json.loads(row[0])] if row else []
 
 
+def q_full(store: Store, feed_item_id: str) -> list[tuple[str, str, str | None]]:
+    row = store.conn.execute(
+        "SELECT reason_codes_json FROM quarantine WHERE feed_item_id=?", (feed_item_id,)
+    ).fetchone()
+    return [(c["code"], c["severity"], c.get("detail")) for c in json.loads(row[0])] if row else []
+
+
 def test_ac_2_1_sample_lands_in_draft(engine: Engine, store: Store):
     summary = engine.run_batch(limit=1)
     assert summary.processed == 1 and summary.draft == 1 and summary.errors == 0
@@ -84,7 +91,8 @@ def test_ac_2_2_llm_schema_failure_quarantines_with_raw(store: Store, taxonomy: 
     llm = ScriptedLLM(["garbage", '{"category_id": "nope", "confidence": 1, "rationale": ""}'])
     eng = Engine(store=store, taxonomy=taxonomy, rules=rules, llm=llm, settings=settings)
     eng.run_batch(limit=1)
-    assert "LLM_SCHEMA_INVALID:classify" in q_codes(store, SAMPLE_ID)
+    q = q_full(store, SAMPLE_ID)
+    assert ("LLM_SCHEMA_INVALID", "blocking", "classify") in q  # mixed failures -> schema invalid
     trace = store.trace(SAMPLE_ID)
     cls = next(r for r in trace if r.stage == "classify")
     assert cls.llm_raw and cls.llm_raw[0]["raw_response"] == "garbage"
@@ -162,3 +170,79 @@ def test_dry_run_writes_nothing(store: Store, taxonomy: Taxonomy, rules: Rules, 
     assert s.processed == 5
     for t in ("draft_catalog", "quarantine", "pipeline_runs", "processed_items"):
         assert store.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] == 0
+
+
+# ---- C2: failure codes, agree threshold, LLM call budget ----------------------------------
+
+OUT = json.dumps({"category_id": "not.a.candidate", "confidence": 0.9, "rationale": "r"})
+
+
+def test_out_of_set_after_retries_is_classification_out_of_set(store, taxonomy, rules):
+    settings = Settings(llm_provider="fake", llm_max_retries=1)
+    eng = Engine(store=store, taxonomy=taxonomy, rules=rules, llm=ScriptedLLM([OUT, OUT]), settings=settings)
+    eng.run_batch(limit=1)
+    assert ("CLASSIFICATION_OUT_OF_SET", "blocking", "classify") in q_full(store, SAMPLE_ID)
+
+
+def test_transport_failures_are_not_schema_errors(store, taxonomy, rules):
+    from catalog_onboard.pipeline.llm import LLMTransportError
+
+    class Down:
+        name = "down"
+
+        def complete(self, request: LLMRequest) -> str:
+            raise LLMTransportError("503 overloaded")
+
+    settings = Settings(llm_provider="fake", llm_max_retries=2)
+    Engine(store=store, taxonomy=taxonomy, rules=rules, llm=Down(), settings=settings).run_batch(limit=1)
+    assert ("LLM_TRANSPORT_ERROR", "blocking", "classify") in q_full(store, SAMPLE_ID)
+
+
+def test_extract_failure_is_blocking(store, taxonomy, rules):
+    """AC-2.2 applies to extraction too: exhausted retries quarantine the item."""
+
+    class BadExtract(FakeLLM):
+        def complete(self, request: LLMRequest) -> str:
+            return super().complete(request) if request.purpose == "classify" else "not json"
+
+    settings = Settings(llm_provider="fake", llm_max_retries=1)
+    eng = Engine(store=store, taxonomy=taxonomy, rules=rules, llm=BadExtract(), settings=settings)
+    summary = eng.run_batch(limit=40)
+    extract_failures = [
+        fid for (fid,) in store.conn.execute("SELECT feed_item_id FROM quarantine")
+        if ("LLM_SCHEMA_INVALID", "blocking", "extract") in q_full(store, fid)
+    ]
+    assert extract_failures, "some items need LLM extraction; their failure must block"
+    assert summary.errors == 0
+
+
+def test_agree_requires_confident_deterministic_top1(store, taxonomy, rules, engine):
+    engine.run_batch(limit=1)  # confident sample: det top-1 agrees with the LLM
+    draft = store.list_drafts(supplier_id=None, category_id=None, q=None, after=None, limit=1)[0]
+    trace = {r.stage: r for r in store.trace(draft.feed_item_id)}
+    assert trace["classify"].output["source"] == "agree"
+
+    strict = Settings(llm_provider="fake", high_conf_threshold=1.01)  # nothing can be confident
+    hi_rules = Rules(**{**rules.__dict__, "version": "strict"})
+    Engine(store=store, taxonomy=taxonomy, rules=hi_rules, llm=FakeLLM(), settings=strict).run_batch(limit=1)
+    trace = {r.stage: r for r in store.trace(draft.feed_item_id)}
+    assert trace["classify"].output["source"] == "llm"
+
+
+def test_at_most_two_llm_calls_per_item_on_happy_path(store, taxonomy, rules, settings):
+    """§8: classify + extract, no more, when every response is valid."""
+    n_calls = 0
+
+    class Counting(FakeLLM):
+        def complete(self, request: LLMRequest) -> str:
+            nonlocal n_calls
+            n_calls += 1
+            return super().complete(request)
+
+    summary = Engine(store=store, taxonomy=taxonomy, rules=rules, llm=Counting(), settings=settings).run_batch(
+        limit=60
+    )
+    assert n_calls <= 2 * summary.processed
+    for (fid,) in store.conn.execute("SELECT feed_item_id FROM processed_items"):
+        attempts = sum(len(r.llm_raw or []) for r in store.trace(fid))
+        assert 1 <= attempts <= 2, (fid, attempts)

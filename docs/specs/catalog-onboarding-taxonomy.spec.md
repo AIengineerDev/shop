@@ -2,8 +2,9 @@
 
 | | |
 |---|---|
-| Status | Draft v1 |
-| Date | 2026-11-10 |
+| Status | v1.1 (implementation decisions written back) |
+| Date | 2026-11-12 (v1: 2026-11-10) |
+| Dev plan | [`docs/plans/catalog-onboarding-taxonomy.dev-plan.md`](../plans/catalog-onboarding-taxonomy.dev-plan.md) |
 | Domain | E-Commerce Catalog & Merchandising / Marketplace Operations |
 | Branch | `taxonomy` |
 | Package | `catalog_onboard/` (Python 3.11, Pydantic v2, FastAPI, SQLite) |
@@ -153,7 +154,10 @@ Acceptance criteria:
   `NormalizedListing`. Covered by a snapshot test over ≥ 50 fixture rows.
 - AC-1.5 Malformed input (empty title, non-UTF8 bytes, price not parseable)
   never raises; it yields a `NormalizedListing` with the field unset and a
-  reason code (`TITLE_EMPTY`, `PRICE_UNPARSEABLE`).
+  reason code (`TITLE_EMPTY`, `PRICE_UNPARSEABLE`,
+  `TEXT_ENCODING_INVALID:<field>`). Undecodable bytes are read with
+  replacement at the DB connection, so reading a row can never abort the
+  batch; the affected field is then unset by the clean stage.
 - AC-1.6 No LLM call occurs in this stage (asserted in tests by a mock
   client that fails on invocation).
 
@@ -210,7 +214,11 @@ Acceptance criteria:
 - AC-2.2 An LLM response that fails Pydantic validation is retried at most
   `LLM_MAX_RETRIES` (default 2) times with the validation error appended to
   the prompt; after exhaustion the item is quarantined with
-  `LLM_SCHEMA_INVALID` and the raw responses are stored.
+  `LLM_SCHEMA_INVALID` and the raw responses are stored. The stage
+  (`classify` / `extract`) goes in the reason's `detail`. Exhaustion where
+  every parseable attempt named an id outside the shortlist is
+  `CLASSIFICATION_OUT_OF_SET`; exhaustion caused only by transport failures
+  (timeouts, 5xx, refusals) is `LLM_TRANSPORT_ERROR`. All three are blocking.
 - AC-2.3 A non-leaf `category_id` can never be assigned (enforced by the
   `Literal` candidate set and a second explicit leaf check).
 - AC-2.4 Changing `required_attributes_json` for a category and re-running
@@ -419,17 +427,21 @@ Definition of done: `pytest -q` green, `ruff` clean, `mypy --strict` on
 - Human review UI / quarantine resolution workflow (API is read-only).
 - Publishing from draft to live catalog.
 - Image processing, pricing strategy, inventory sync.
-- Multi-language titles (English only; non-ASCII titles get `LANG_UNSUPPORTED` warning, not quarantine).
+- Multi-language titles (English only; titles with letters outside the Latin script get a
+  `LANG_UNSUPPORTED` warning, not quarantine. Accented Latin such as "Café" is accepted:
+  a literal non-ASCII rule would flag ordinary brand names).
 - Learning/updating the taxonomy itself.
 
-## 11. Open questions
+## 11. Open questions (resolved in v1.1)
 
-1. Is `prohibited_keywords` comma- or pipe-delimited in the starter DB? Spec
-   assumes either; confirm from the data before freezing the parser.
-2. Should `CLASSIFICATION_DISAGREE` default to quarantine or warning? Spec
-   defaults to quarantine below 0.8 LLM confidence.
-3. Are multi-variant listings (several colors/sizes) one draft row with list
-   attributes, or exploded into per-variant rows? Spec assumes one row with
-   list attributes; exploding is a follow-up.
-4. Is there a global prohibited list in the starter, or only per-category?
-   Spec adds a `global_prohibited.yaml` that may start empty.
+1. `prohibited_keywords` delimiter: **both** comma and pipe are accepted by the
+   parser (`taxonomy.py`).
+2. `CLASSIFICATION_DISAGREE`: **blocking** only when the deterministic top-1
+   is confident (≥ `HIGH_CONF_THRESHOLD`) **and** LLM confidence <
+   `DISAGREE_QUARANTINE_BELOW` (0.8); otherwise a warning and the LLM pick
+   wins. `classification_source = "agree"` likewise requires a confident
+   deterministic top-1; an LLM pick that matches a weak top-1 is `"llm"`.
+3. Multi-variant listings: **one draft row with list attributes**; exploding
+   into variants remains a follow-up.
+4. Global prohibited list: `rules/global_prohibited.yaml` exists and is
+   hashed into `rules_version`.
