@@ -1,6 +1,6 @@
 """Train LambdaMART and write artifacts/ranker_v2/ (spec §7.4).
 
-Usage: python scripts/train.py [--out DIR] [--position-debias] [--n-boot N] [--params JSON]
+Usage: python scripts/train.py [--out DIR] [--no-position-debias] [--n-boot N] [--params JSON]
 Prints the ship-gate table. Gates are reported, not enforced: promotion is a review decision.
 """
 
@@ -20,14 +20,15 @@ from shopfeed.training.train_lambdamart import run
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=str(config.ARTIFACTS_DIR / "ranker_v2"))
-    ap.add_argument("--position-debias", action="store_true")
+    ap.add_argument("--no-position-debias", action="store_true",
+                    help="disable unbiased LambdaMART (on by default, spec §5.4)")
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--params", default=None, help="JSON dict overriding PARAMS")
     args = ap.parse_args()
 
     out = Path(args.out)
     r = run(load_dataset(), out, params=json.loads(args.params) if args.params else None,
-            position=args.position_debias, n_boot=args.n_boot)
+            position=not args.no_position_debias, n_boot=args.n_boot)
     write_html(r["result"], config.REPORTS_DIR / f"{out.name}_test.html",
                f"{out.name} test report")
     o = r["result"]["overall"].pivot(index="metric", columns="scorer", values="value")

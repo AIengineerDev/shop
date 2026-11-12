@@ -127,3 +127,23 @@ def add_longtail_flag(df: pd.DataFrame, top_share: float = 0.2) -> pd.DataFrame:
     per_item = df.groupby("item_id")["item_purchases_30d"].max()
     cut = per_item.quantile(1 - top_share)
     return df.assign(is_longtail=(df["item_purchases_30d"] <= cut).astype(int))
+
+
+def ipw_ndcg_at_k(grades, scores, propensities, k: int = 10,
+                  gain=config.GAIN_PURCHASE_DOMINANT) -> float:
+    """NDCG@k with each item's gain weighted by 1 / examination propensity of the position it
+    was LOGGED at (spec §8.3). Ideal DCG uses the same weighted gains."""
+    w = 1.0 / np.asarray(propensities, dtype=float)
+    g = np.asarray(gain, dtype=float)[np.asarray(grades, dtype=int)] * w
+    disc = 1.0 / np.log2(np.arange(2, len(g) + 2))
+    ideal = (np.sort(g)[::-1][:k] * disc[:k]).sum()
+    if ideal == 0:
+        return float("nan")
+    return float((g[_order(scores)][:k] * disc[:k]).sum() / ideal)
+
+
+def mean_ipw_ndcg(df: pd.DataFrame, score_col: str, prop_col: str = "propensity_exam",
+                  k: int = 10) -> float:
+    vals = [ipw_ndcg_at_k(g["relevance_grade"], g[score_col], g[prop_col], k)
+            for _, g in df.groupby("qid", sort=False)]
+    return float(np.nanmean(vals))

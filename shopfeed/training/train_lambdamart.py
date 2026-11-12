@@ -20,7 +20,8 @@ import numpy as np
 import pandas as pd
 
 from shopfeed import config
-from shopfeed.eval.metrics import per_query
+from shopfeed.eval.metrics import mean_ipw_ndcg, per_query
+from shopfeed.eval.propensity import estimate_from_randomised, lookup
 from shopfeed.eval.offline import evaluate, paired_delta
 from shopfeed.features.history import UNAVAILABLE
 from shopfeed.features.ranking import CATEGORICAL, EXCLUDED, WITHIN_GROUP
@@ -185,8 +186,15 @@ def run(ds, out: Path, params: dict | None = None, position: bool = False,
     te_rows, te_X = ds.part("test")
     booster = fit(tr_rows, tr_X, va_rows, va_X, params=params, position=position,
                   num_boost_round=num_boost_round, early_stopping=early_stopping)
-    res = evaluate_test(te_rows, predict(booster, te_X), n_boot=n_boot)
+    scores = predict(booster, te_X)
+    res = evaluate_test(te_rows, scores, n_boot=n_boot)
     imp = importance(booster)
+    if propensities is None:
+        propensities = estimate_from_randomised(ds.part("train")[0])
+    te = te_rows.assign(lambdamart=scores, propensity_exam=lookup(propensities,
+                                                                  te_rows["displayed_pos"]))
+    te = te.assign(**heuristic_scores(te_rows)[["logged", "semantic"]])
+    ipw = {s: mean_ipw_ndcg(te, s) for s in ("lambdamart", "logged", "semantic")}
     metrics = round_metrics({
         "best_iteration": booster.best_iteration,
         "val": {k: float(v) for k, v in booster.best_score["val"].items()},
@@ -198,6 +206,9 @@ def run(ds, out: Path, params: dict | None = None, position: bool = False,
             .to_dict(orient="records"),
         },
         "gates": res["gates"],
+        "ipw_ndcg@10": ipw,
+        "randomised_slice_note": "the whole log is randomised traffic, so raw test NDCG is "
+                                 "the §8.3 randomised-slice number",
         "leakage_check": {
             "max_gain_share": float(imp["gain_share"].max()),
             "top_feature": imp["feature"].iloc[0],

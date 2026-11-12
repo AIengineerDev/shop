@@ -146,6 +146,22 @@ Popularity alone ranks **worse than random** on this data. Best sellers up (§5.
 - Regularised probe (lr 0.01, 15 leaves, min_data_in_leaf 500): validation NDCG@10 0.531 vs semantic sort 0.520. This is input for the M7 sweep, not a selected config.
 - Reproducibility: two full runs give byte-identical `metrics.json`.
 
+### M6 position debiasing (test split)
+
+- Examination curve from the randomised log (train split), isotonic and clipped at 0.1: 1.00, 0.95, 0.91, 0.75 … 0.41 at position 20. The clip never binds.
+- The logged `propensity` column is flat across positions (~0.007) and records the item-selection probability, not examination, so it can't serve as a cross-check.
+- Unbiased LambdaMART via `Dataset(position=...)` is now the default:
+
+| Model | best iter | NDCG@10 | IPW-NDCG@10 | Purchase MRR | Purchase@10 |
+|---|---|---|---|---|---|
+| logged (random) | — | 0.356 | 0.315 | 0.287 | 0.626 |
+| semantic sort | — | 0.519 | 0.512 | 0.520 | 0.927 |
+| LambdaMART, no debias | 1 | 0.518 | 0.507 | 0.533 | 0.912 |
+| LambdaMART, debiased | 26 | 0.516 | 0.508 | 0.531 | 0.924 |
+
+- Debiasing makes training more stable (26 trees vs 1) and recovers Purchase@10. Differences against the semantic sort are not significant on any metric.
+- The whole log is randomised, so raw test NDCG is also the §8.3 randomised-slice number.
+
 ## 7. Definition of done for v1
 
 - M0–M9 merged to `main`.
