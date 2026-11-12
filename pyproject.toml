@@ -36,6 +36,8 @@ exclude_dirs = ["tests", ".venv"]
 
 [tool.coverage.run]
 source = ["shopfeed"]
+# Count code run by the e2e CLI subprocesses (pytest-cov >= 7 relies on coverage for this).
+patch = ["subprocess"]
 
 [tool.ruff]
 line-length = 100

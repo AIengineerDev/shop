@@ -1,9 +1,11 @@
-"""Online ranker: parity with offline scoring, fallback injection, latency (spec §13.4)."""
-
+"""Online ranker: parity with offline scoring, fallback injection, truncation (spec §13.4).
+Latency under load lives in tests/load/."""
 
 import numpy as np
+import pandas as pd
 import pytest
 
+from shopfeed import config
 from shopfeed.features.ranking import build_features
 from shopfeed.serving.ranker import Ranker, fallback_order
 from shopfeed.serving.rules import RuleFlags
@@ -79,3 +81,16 @@ def test_timeout_falls_back(fixture_rows, fixture_store, artefact):
 def test_fallback_with_missing_bm25_keeps_retrieval_order(fixture_rows):
     req = _req(fixture_rows).assign(bm25=np.nan)
     assert fallback_order(req) == req["item_id"].tolist()
+
+
+def test_more_than_max_candidates_is_truncated(fixture_rows, fixture_store, artefact):
+    out, _, _ = artefact
+    ranker = Ranker.load(out, fixture_store, flags=NO_RULES, timeout_s=PARITY_TIMEOUT_S)
+    base = _req(fixture_rows)
+    n = config.MAX_CANDIDATES + 50
+    big = pd.concat([base] * (n // len(base) + 1), ignore_index=True).head(n)
+    big["item_id"] = [f"p_{900000 + i}" for i in range(n)]  # unique, unknown to the store
+    res = ranker.rank(big)
+    assert not res.fallback, res.reason
+    assert len(res.item_ids) == config.MAX_CANDIDATES
+    assert set(res.item_ids) == set(big["item_id"].head(config.MAX_CANDIDATES))

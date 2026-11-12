@@ -138,3 +138,36 @@ def test_full_dataset_features_identical_in_batch_and_per_request(synth_dataset)
 
 def test_config_paths_default_to_repo():
     assert config.DATA_DIR.name == "data" or "SHOPFEED_DATA_DIR" in __import__("os").environ
+
+
+def test_readiness_check_catches_ctr_leakage(synth_root):
+    """hist_ctr_7d recomputed from raw events must match; a tampered column must fail."""
+    df = read_csv(synth_root["data"] / "ranking_items.csv")
+    df["hist_ctr_7d"] = df["hist_ctr_7d"].fillna(0.0) + 0.05
+    results = {r.name: r for r in run_all(df, Sources.load(synth_root["data"]), profile="ci")}
+    assert not results["hist_ctr_point_in_time"].passed
+    assert "mismatches=" in results["hist_ctr_point_in_time"].detail
+
+
+def test_sweep_selects_by_validation(synth_dataset):
+    from shopfeed.training.sweep import select, sweep
+
+    res = sweep(synth_dataset, n_trials=2, gains=(10, 40), num_boost_round=50,
+                early_stopping=10)
+    assert len(res) == 4 and set(res["purchase_gain"]) == {10, 40}
+    assert res[["val_purchase_mrr", "val_ndcg@10"]].notna().all().all()
+    best = select(res)
+    assert best["val_purchase_mrr"] == res["val_purchase_mrr"].max()
+
+
+def test_pointwise_baseline_trains_and_scores(synth_dataset):
+    from shopfeed.training.baselines import all_scores, train_pointwise
+
+    tr_rows, tr_X = synth_dataset.part("train")
+    va_rows, va_X = synth_dataset.part("val")
+    te_rows, te_X = synth_dataset.part("test")
+    booster = train_pointwise(tr_X, tr_rows["clicked"], va_X, va_rows["clicked"])
+    scores = all_scores(te_rows, te_X, booster)
+    assert set(scores.columns) == {"logged", "ctr", "bestseller", "semantic", "pointwise"}
+    assert scores.notna().all().all() and len(scores) == len(te_rows)
+    assert scores["pointwise"].between(0, 1).all()

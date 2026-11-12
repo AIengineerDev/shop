@@ -188,7 +188,7 @@ Popularity alone ranks **worse than random** on this data. Best sellers up (§5.
 
 ### CI quality gates (PR on top of M9)
 
-- Jobs: lint, unit (coverage ≥ 85%, currently 86%), integration (≥ 95%, currently 97%), e2e (8 CLIs, ~16 s), load (25 rps × 40 s, SLA gates), security (pip-audit, bandit, gitleaks). No scheduled jobs.
+- Jobs: lint, unit (coverage ≥ 87%, currently 88%), integration, e2e (8 CLIs, ~16 s), coverage (unit + integration + e2e including CLI subprocesses: ≥ 98%, currently 100%), load (25 rps × 40 s, SLA gates), security (pip-audit, bandit, gitleaks). No scheduled jobs.
 - The load test found two real defects, both fixed: ~50 ms gen-2 GC pauses causing timeout fallbacks (`gc.freeze()` on load), and an unbounded Python-float request log (now a bounded numpy-array sink).
 - Ranker now drops duplicate candidates (counted).
 - Security baseline: 0 CVEs in project deps, 0 bandit findings (one justified `nosec` for `git rev-parse`), 0 secrets across 61 commits.

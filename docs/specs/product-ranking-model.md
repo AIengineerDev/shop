@@ -669,8 +669,9 @@ Every row is a test in `tests/` (or a scripted check where stated) with a binary
 | CI job | Command | Gate |
 |---|---|---|
 | lint | `ruff check .` | 0 findings (lints git-excluded dirs too) |
-| unit | `pytest` | all pass, coverage ≥ 85% |
-| integration | `pytest -m "not e2e and not load"` | all pass, coverage ≥ 95% |
+| unit | `pytest` | all pass, coverage ≥ 87% (currently 88%) |
+| integration | `pytest -m integration` | all pass |
+| coverage | `pytest -m "not load"` (unit + integration + e2e, CLI subprocesses counted via coverage `patch = ["subprocess"]`) | coverage ≥ 98% (currently 100%) |
 | e2e | `pytest -m e2e` | every CLI exits as expected; gates pass on synthetic data |
 | load | `pytest -m load` | §13.4 load gates |
 | security | `pip-audit .`, `bandit -r shopfeed scripts`, `gitleaks git .` | 0 known CVEs in project deps, 0 bandit findings at any severity (justified `nosec` only), 0 secrets in history |
