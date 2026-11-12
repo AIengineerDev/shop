@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
+from typing import Any
 
 from catalog_onboard.models import AttributeSpec, AttrValue, ReasonCode
 
@@ -86,10 +87,11 @@ def validate_attributes(
         if spec.type == "enum":
             allowed = spec.allowed or []
             if spec.multi:
-                assert isinstance(value, list)
+                # value was wrapped into a list above when multi; no assert (stripped under -O)
+                values: list[Any] = value if isinstance(value, list) else [value]
                 matched: list[str] = []
                 bad: list[str] = []
-                for v in value:
+                for v in values:
                     m = _match_enum(v, allowed)
                     (matched if m else bad).append(m or str(v))
                 if bad:

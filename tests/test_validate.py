@@ -101,3 +101,58 @@ def test_validation_modules_do_not_import_llm():
         ["catalog_onboard.pipeline.validate", "catalog_onboard.pipeline.comply", "catalog_onboard.pipeline.reconcile"],
         forbidden_prefix="catalog_onboard.pipeline.llm",
     )
+
+
+# ---- AC-2.5: every coercion branch, table-driven, through the public validator ------------
+
+INT_SPEC = [AttributeSpec(key="n", type="int", min=0, max=100)]
+FLOAT_SPEC = [AttributeSpec(key="x", type="float", min=0, max=100)]
+BOOL_SPEC = [AttributeSpec(key="b", type="bool")]
+
+
+@pytest.mark.parametrize("value,expected,code", [
+    (7, 7, None),                       # int passes through
+    (7.0, 7, None),                     # integral float -> int
+    (7.5, None, "ATTR_RANGE:n"),        # non-integral float rejected
+    (" 42 ", 42, None),                 # numeric string with whitespace
+    ("-3", None, "ATTR_RANGE:n"),       # parses, then fails min
+    ("4 pcs", None, "ATTR_RANGE:n"),    # non-numeric string
+    (True, None, "ATTR_RANGE:n"),       # bool is not an int here
+    ({"v": 1}, None, "ATTR_RANGE:n"),   # other types ([x] is unwrapped when multi=false)
+])
+def test_int_coercion(value, expected, code):
+    out, codes_ = validate_attributes(INT_SPEC, {"n": value})
+    assert [c.code for c in codes_] == ([code] if code else [])
+    assert out.get("n") == expected
+
+
+@pytest.mark.parametrize("value,expected,code", [
+    (3, 3.0, None),
+    (2.5, 2.5, None),
+    (" 9.75 ", 9.75, None),
+    ("abc", None, "ATTR_RANGE:x"),      # unparseable string
+    (False, None, "ATTR_RANGE:x"),      # bool rejected
+    ({"v": 1}, None, "ATTR_RANGE:x"),   # other types
+    (101, None, "ATTR_RANGE:x"),        # above max
+])
+def test_float_coercion(value, expected, code):
+    out, codes_ = validate_attributes(FLOAT_SPEC, {"x": value})
+    assert [c.code for c in codes_] == ([code] if code else [])
+    assert out.get("x") == expected
+
+
+@pytest.mark.parametrize("value,expected,code", [
+    (True, True, None),
+    (False, False, None),
+    ("Yes", True, None),
+    ("1", True, None),
+    ("false", False, None),
+    ("NO", False, None),
+    ("0", False, None),
+    ("maybe", None, "ATTR_ENUM_INVALID:b"),
+    (1, None, "ATTR_ENUM_INVALID:b"),   # non-bool, non-string
+])
+def test_bool_coercion(value, expected, code):
+    out, codes_ = validate_attributes(BOOL_SPEC, {"b": value})
+    assert [c.code for c in codes_] == ([code] if code else [])
+    assert out.get("b") == expected

@@ -94,3 +94,37 @@ def mini_taxonomy_db(path: Path, categories: list[tuple[str, str, str | None, st
     conn.executemany("INSERT INTO canonical_categories VALUES (?,?,?,?,?)", categories)
     conn.commit()
     conn.close()
+
+
+# ---- no network in the test suite (spec §8) ------------------------------------------------
+
+_LOOPBACK = {"127.0.0.1", "::1", "localhost", "0.0.0.0"}  # e2e talks to a local server
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _block_network():
+    """Fail any outbound connection to a non-loopback address. Loopback stays allowed for the
+    e2e test that runs the API as a real HTTP server."""
+    import socket
+
+    real_connect = socket.socket.connect
+    real_create = socket.create_connection
+
+    def _host(address) -> str:
+        return str(address[0]) if isinstance(address, tuple) else str(address)
+
+    def guarded_connect(self, address):  # type: ignore[no-untyped-def]
+        if self.family in (socket.AF_INET, socket.AF_INET6) and _host(address) not in _LOOPBACK:
+            raise RuntimeError(f"network access blocked in tests: {address!r}")
+        return real_connect(self, address)
+
+    def guarded_create(address, *a, **k):  # type: ignore[no-untyped-def]
+        if _host(address) not in _LOOPBACK:
+            raise RuntimeError(f"network access blocked in tests: {address!r}")
+        return real_create(address, *a, **k)
+
+    socket.socket.connect = guarded_connect  # type: ignore[method-assign]
+    socket.create_connection = guarded_create  # type: ignore[assignment]
+    yield
+    socket.socket.connect = real_connect  # type: ignore[method-assign]
+    socket.create_connection = real_create  # type: ignore[assignment]

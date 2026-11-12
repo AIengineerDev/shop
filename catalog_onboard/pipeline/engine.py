@@ -347,7 +347,8 @@ class Engine:
         self.store.supersede(row.feed_item_id)
         listing = candidate.normalized
         if status == "draft":
-            assert candidate.category_id is not None
+            if candidate.category_id is None:  # explicit: asserts vanish under python -O
+                raise RuntimeError("routing invariant broken: draft listing without category_id")
             self.store.insert_draft(
                 feed_item_id=row.feed_item_id,
                 supplier_id=row.supplier_id,

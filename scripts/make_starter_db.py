@@ -352,7 +352,8 @@ def inject_bad_rows(rng: random.Random, rows: list[dict[str, Any]]) -> None:
 
 
 def build(out: Path, seed: int, n_rows: int) -> None:
-    rng = random.Random(seed)
+    # Synthetic test data: a seeded non-crypto RNG is intended here.
+    rng = random.Random(seed)  # nosec B311
     base_time = datetime(2026, 11, 1, 8, 0, tzinfo=UTC)
     leaves = list(PRODUCT_TEMPLATES)
 

@@ -32,7 +32,8 @@ def find_prohibited(text: str, keywords: Iterable[str]) -> list[str]:
 
 def fingerprint(supplier_id: str, clean_title: str, attrs: dict[str, AttrValue]) -> str:
     payload = json.dumps([supplier_id, clean_title.lower(), attrs], sort_keys=True, default=str)
-    return hashlib.sha1(payload.encode("utf-8")).hexdigest()
+    # Dedup fingerprint, not a security boundary; SHA1 kept so stored fingerprints stay stable.
+    return hashlib.sha1(payload.encode("utf-8"), usedforsecurity=False).hexdigest()
 
 
 def check_compliance(

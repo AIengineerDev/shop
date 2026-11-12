@@ -119,8 +119,10 @@ def test_ac_1_4_snapshot(rules, store):
     rows = list(store.iter_feed_rows(limit=60))
     assert len(rows) >= 50
     out = {r.feed_item_id: normalize(r, rules).model_dump(mode="json") for r in rows}
-    if os.environ.get("UPDATE_GOLDEN") or not GOLDEN.exists():
+    if os.environ.get("UPDATE_GOLDEN"):
         GOLDEN.write_text(json.dumps({"rules_version": rules.version, "rows": out}, indent=1, sort_keys=True))
+    if not GOLDEN.exists():  # never self-heal: a missing golden would make the snapshot vacuous
+        pytest.fail(f"{GOLDEN} missing; generate it with UPDATE_GOLDEN=1 and review it")
     golden = json.loads(GOLDEN.read_text())
     assert golden["rules_version"] == rules.version, "rules changed: run with UPDATE_GOLDEN=1 and review the diff"
     assert golden["rows"] == out

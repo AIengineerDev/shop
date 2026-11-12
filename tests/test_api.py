@@ -111,7 +111,7 @@ def test_ac_4_4_api_opens_db_readonly(client: TestClient, ingested_db: Path):
     assert before == after
 
 
-@pytest.mark.slow
+@pytest.mark.load
 def test_ac_4_6_list_latency_p95_under_100ms(tmp_path: Path, make_starter_db):
     from catalog_onboard.cli import main
 
