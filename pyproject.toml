@@ -28,6 +28,9 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+# Lint shopfeed/ even when a local .git/info/exclude hides it (CI has no such file).
+respect-gitignore = false
+extend-exclude = [".venv", "data", "artifacts", "reports"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "SIM"]
